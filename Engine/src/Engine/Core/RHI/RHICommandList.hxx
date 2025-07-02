@@ -13,7 +13,7 @@
     };                                            \
     FRHICommandListExecutor::GetCommandList().EnqueueLambda<MACRO_EXPENDER(Type##String, __LINE__)>
 
-DECLARE_LOGGER_CATEGORY(Core, LogRenderCommand, Warning)
+DECLARE_LOGGER_CATEGORY(Core, LogRenderCommand, Trace)
 
 class FFRHICommandList;
 

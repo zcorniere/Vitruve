@@ -33,6 +33,7 @@ public:
     virtual void Init() final override;
     virtual void PostInit() final override;
     virtual void Tick(double fDeltaTime) override;
+    virtual void PostFrame() final override;
     virtual void Shutdown() final override;
 
     virtual const char* GetName() const final override
@@ -92,10 +93,6 @@ public:
 private:
     VkInstance CreateInstance(const TArray<const char*>& ValidationLayers);
     FVulkanDevice* SelectDevice(VkInstance Instance);
-
-private:
-    void InitializeImGui();
-    void ShutdownImGui();
 
 private:
     friend class FVulkanCommandContext;

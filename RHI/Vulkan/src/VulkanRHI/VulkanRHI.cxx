@@ -74,6 +74,16 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
     ENQUEUE_RENDER_COMMAND(EndFrame)([](FFRHICommandList& CommandList) { CommandList.EndFrame(); });
 }
 
+void FVulkanDynamicRHI::PostFrame()
+{
+    // Reset the ImGui state
+    ImGuiStuff.Begin();
+
+    ImGuiStuff.End();
+
+    ImGuiStuff.Render();
+}
+
 VkDevice FVulkanDynamicRHI::RHIGetVkDevice() const
 {
     return Device->GetHandle();

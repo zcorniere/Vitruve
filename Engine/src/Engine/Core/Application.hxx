@@ -4,6 +4,8 @@
 #include "Engine/Core/RHI/Resources/RHIViewport.hxx"
 #include "Engine/Core/Window.hxx"
 
+extern class IApplication* GApplication;
+
 class IApplication : public RTTI::FEnable
 {
     RTTI_DECLARE_TYPEINFO(IApplication)
@@ -11,6 +13,8 @@ public:
     virtual ~IApplication()
     {
     }
+
+    virtual RWindow* GetMainWindow() = 0;
 
     /// Called when the Engine created
     virtual bool OnEngineInitialization() = 0;
@@ -26,8 +30,12 @@ class FBaseApplication : public IApplication
 {
     RTTI_DECLARE_TYPEINFO(FBaseApplication, IApplication)
 public:
-    virtual ~FBaseApplication()
+    FBaseApplication();
+    virtual ~FBaseApplication();
+
+    virtual RWindow* GetMainWindow() override
     {
+        return MainWindow.Raw();
     }
 
     virtual bool OnEngineInitialization() override;

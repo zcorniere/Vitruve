@@ -35,6 +35,8 @@ void RHI::Tick(float fDeltaTime)
 void RHI::EndFrame()
 {
     // Run the command list
+    RHI::Get()->PostFrame();
+
     FRHIContext* const Context = RHI::Get()->RHIGetCommandContext();
     FRHICommandListExecutor::Get().GetCommandList().Execute(Context);
     RHI::Get()->RHIReleaseCommandContext(Context);

@@ -9,6 +9,18 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogBaseApplication, Info)
 
+IApplication* GApplication = nullptr;
+
+FBaseApplication::FBaseApplication()
+{
+    GApplication = this;
+}
+
+FBaseApplication::~FBaseApplication()
+{
+    GApplication = nullptr;
+}
+
 bool FBaseApplication::OnEngineInitialization()
 {
     RPH_PROFILE_FUNC()

@@ -14,6 +14,10 @@ public:
     void Initialize(FVulkanDevice* Device, ImGui_ImplVulkan_InitInfo InitInfo);
     void Shutdown();
 
+    void Begin();
+    void End();
+    void Render();
+
 private:
     void CreateDescriptorPool(FVulkanDevice* Device);
 
