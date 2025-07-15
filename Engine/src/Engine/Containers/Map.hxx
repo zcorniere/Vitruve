@@ -470,6 +470,27 @@ public:
         return *Value;
     }
 
+    FORCEINLINE bool operator==(const TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>& Other) const
+    requires std::equality_comparable<TKey> && std::equality_comparable<TValue>
+    {
+        if (NumElements != Other.NumElements)
+        {
+            return false;
+        }
+        TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator It = begin();
+        TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator OtherIt = Other.begin();
+
+        while (It != end() && OtherIt != Other.end())
+        {
+            if (*It != *OtherIt)
+            {
+                return false;
+            }
+            ++It;
+            ++OtherIt;
+        }
+    }
+
 private:
     FORCEINLINE TSizeType Hash(const TKey& Key) const
     {
@@ -485,4 +506,24 @@ private:
     TSizeType NumElements = 0;
 
     friend class Iterator;
+};
+
+template <typename TKey, typename TValue>
+std::ostream& operator<<(std::ostream& os, const TMap<TKey, TValue>& m)
+{
+    os << std::format("{}", m);
+    return os;
+}
+
+template <typename TKey, typename TValue>
+struct std::formatter<TMap<TKey, TValue>> : std::formatter<TKey>
+{
+
+    template <class FormatContext>
+    auto format(const TMap<TKey, TValue>& Value, FormatContext& ctx) const
+    {
+        auto&& out = ctx.out();
+        format_to(out, "[{}]", Value.Size());
+        return out;
+    }
 };
