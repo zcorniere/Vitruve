@@ -336,7 +336,7 @@ struct std::formatter<RTTI::FParameter, char>
             ++it;
         }
         if (*it != '}')
-            throw std::format_error("Invalid format args for cpplogger::Level.");
+            assert("Invalid format args for cpplogger::Level.");
 
         return it;
     }
