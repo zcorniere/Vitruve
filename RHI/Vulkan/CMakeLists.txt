@@ -13,12 +13,9 @@ file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VulkanRHI/RenderPass/*.cxx
 )
 
-
 add_library(
-    ${PROJECT_NAME} STATIC EXCLUDE_FROM_ALL
-    ${VULKAN_RENDERER_FILES}
-    # Compile the imgui vulkan backend
-    ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
+    ${PROJECT_NAME} STATIC EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES} # Compile the imgui vulkan backend
+    # ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_precompile_headers(${PROJECT_NAME} PRIVATE VulkanRHI.pch.hxx)
