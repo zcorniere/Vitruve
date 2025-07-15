@@ -2,12 +2,13 @@
 
 #include "Engine/Core/RHI/RHIContext.hxx"
 
+#include "VulkanRHI/VulkanPendingState.hxx"
+
 namespace VulkanRHI
 {
 
 class FVulkanDevice;
 class FVulkanQueue;
-class FVulkanPendingState;
 class VulkanCommandBufferManager;
 
 class RVulkanTexture;
@@ -60,6 +61,13 @@ public:
 
     /// @brief VulkanRHI only, set the layout of the given texture
     void SetLayout(RVulkanTexture* const Texture, VkImageLayout Layout);
+
+    template <typename T>
+    requires std::is_standard_layout_v<T>
+    void SetPushConstants(const T& Data)
+    {
+        PendingState->SetPushConstant(Data);
+    }
 
     VulkanCommandBufferManager* GetCommandManager() const
     {

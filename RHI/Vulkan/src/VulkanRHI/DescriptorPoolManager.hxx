@@ -2,17 +2,20 @@
 
 #include "Engine/Core/RHI/RHIResource.hxx"
 #include "VulkanRHI/Resources/VulkanBuffer.hxx"
+#include "VulkanRHI/Resources/VulkanTexture.hxx"
 
 namespace VulkanRHI
 {
 class RVulkanShader;
+class RVulkanGraphicsPipeline;
 
 class FDescriptorSetManager : public IDeviceChild
 {
 public:
-    enum class ERenderPassInputType : uint16_t
+    enum class ERenderPassInputType
     {
         None = 0,
+        Texture,
         StorageBuffer,
     };
 
@@ -32,19 +35,28 @@ public:
         {
             Input.Add(StorageBuffer);
         }
+        FRenderPassInput(Ref<RVulkanTexture> Texture): Type(ERenderPassInputType::Texture)
+        {
+            Input.Add(Texture);
+        }
 
         void Set(Ref<RVulkanBuffer> StorageBuffer, uint32_t index = 0)
         {
             Type = ERenderPassInputType::StorageBuffer;
             Input[index] = StorageBuffer;
         }
+        void Set(Ref<RVulkanTexture> StorageBuffer, uint32_t index = 0)
+        {
+            Type = ERenderPassInputType::Texture;
+            Input[index] = StorageBuffer;
+        }
 
         ERenderPassInputType Type = ERenderPassInputType::None;
-        TArray<Ref<RRHIResource>> Input;
+        TArray<Ref<RRHIResource>> Input = {};
     };
 
 public:
-    FDescriptorSetManager(FVulkanDevice* InDevice, const TArray<WeakRef<RVulkanShader>>& Shaders);
+    FDescriptorSetManager(FVulkanDevice* InDevice, Ref<RVulkanGraphicsPipeline>& GraphicsPipeline);
     virtual ~FDescriptorSetManager();
 
     void Destroy();
@@ -68,19 +80,20 @@ public:
     const FRenderPassInputDeclaration* GetInputDeclaration(std::string_view name) const;
 
 private:
-    void CreateDescriptorPool(const TArray<VkDescriptorPoolSize>& PoolSize, unsigned InMaxSets);
-    void CreateDescriptorSets(const TArray<VkDescriptorSetLayout>& DescriptorSetLayouts);
+    void CreateDescriptorPool(unsigned InMaxSets);
+    void CreateDescriptorSets();
+    void CollectDescriptorSetInfo();
 
 private:
     VkDescriptorPool DescriptorPoolHandle = VK_NULL_HANDLE;
-    TArray<WeakRef<RVulkanShader>> Shaders = {};
+    Ref<RVulkanGraphicsPipeline> AssociatedPipeline = nullptr;
 
+    TArray<VkDescriptorPoolSize> DescriptorPoolSizes = {};
     TArray<VkDescriptorSet> DescriptorSets = {};
 
     TMap<std::string, FRenderPassInputDeclaration> InputDeclaration = {};
-    TMap<uint32, TMap<uint32, FRenderPassInput>> InputResource = {};
-
-    TMap<uint32_t, TMap<uint32_t, VkWriteDescriptorSet>> WriteDescriptorSet = {};
+    TMap<uint32, TMap<uint32, FRenderPassInput>> InputResources = {};
+    TMap<uint32, TMap<uint32, VkWriteDescriptorSet>> WriteDescriptorSet = {};
 };
 
 }    // namespace VulkanRHI

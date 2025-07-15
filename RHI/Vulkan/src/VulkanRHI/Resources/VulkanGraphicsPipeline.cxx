@@ -76,6 +76,15 @@ RVulkanGraphicsPipeline::~RVulkanGraphicsPipeline()
     {
         VulkanAPI::vkDestroyPipeline(Device->GetHandle(), VulkanPipeline, VULKAN_CPU_ALLOCATOR);
     }
+
+    for (VkDescriptorSetLayout Layout: DescriptorSetLayouts)
+    {
+        if (Layout != VK_NULL_HANDLE)
+        {
+            VulkanAPI::vkDestroyDescriptorSetLayout(Device->GetHandle(), Layout, VULKAN_CPU_ALLOCATOR);
+        }
+    }
+
     if (PipelineLayout)
     {
         VulkanAPI::vkDestroyPipelineLayout(Device->GetHandle(), PipelineLayout, VULKAN_CPU_ALLOCATOR);
@@ -92,6 +101,15 @@ void RVulkanGraphicsPipeline::SetName(std::string_view Name)
     if (PipelineLayout)
     {
         VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_PIPELINE_LAYOUT, PipelineLayout, "{:s}.PipelineLayout", Name);
+    }
+
+    for (unsigned i = 0; i < DescriptorSetLayouts.Size(); i++)
+    {
+        if (DescriptorSetLayouts[i] != VK_NULL_HANDLE)
+        {
+            VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, DescriptorSetLayouts[i],
+                                  "{:s}.DescriptorSetLayout[{:d}]", Name, i);
+        }
     }
 }
 
@@ -319,11 +337,7 @@ bool RVulkanGraphicsPipeline::CreatePipelineLayout()
     GetConstantRangeFromShader(PushRanges, Desc.VertexShader, VK_SHADER_STAGE_VERTEX_BIT);
     GetConstantRangeFromShader(PushRanges, Desc.FragmentShader, VK_SHADER_STAGE_FRAGMENT_BIT);
 
-    TArray<VkDescriptorSetLayout> DescriptorSetLayouts;
-    for (const WeakRef<RVulkanShader>& Shader: GetShaders())
-    {
-        DescriptorSetLayouts.Append(Shader->GetDescriptorSetLayout());
-    }
+    CreateDescriptorSetLayout();
 
     VkPipelineLayoutCreateInfo CreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -336,6 +350,58 @@ bool RVulkanGraphicsPipeline::CreatePipelineLayout()
     VK_CHECK_RESULT(
         VulkanAPI::vkCreatePipelineLayout(Device->GetHandle(), &CreateInfo, VULKAN_CPU_ALLOCATOR, &PipelineLayout));
     return true;
+}
+
+void RVulkanGraphicsPipeline::CreateDescriptorSetLayout()
+{
+    unsigned MaxSets = 0;
+    for (const WeakRef<RVulkanShader>& Shader: GetShaders())
+    {
+        MaxSets = std::max(MaxSets, Shader->GetReflectionData().DescriptorSetDeclaration.Size());
+    }
+
+    TArray<TArray<VkDescriptorSetLayoutBinding>> DescriptorSetBindings(MaxSets);
+    for (const WeakRef<RVulkanShader>& Shader: GetShaders())
+    {
+        for (auto& [Set, Layout]: Shader->GetReflectionData().DescriptorSetDeclaration)
+        {
+            for (auto& [Binding, Parameter]: Layout)
+            {
+                TArray<VkDescriptorSetLayoutBinding>& VulkanBindings = DescriptorSetBindings[Set];
+                VkDescriptorSetLayoutBinding* const FoundBinding = VulkanBindings.FindByLambda(
+                    [Binding](const VkDescriptorSetLayoutBinding& Iter) { return Iter.binding == Binding; });
+                if (FoundBinding)
+                {
+                    ensure(FoundBinding->descriptorType == DescriptorTypeToVkDescriptorType(Parameter.Type));
+                    FoundBinding->stageFlags |= ConvertToVulkanType(Shader->GetShaderType());
+                    continue;
+                }
+
+                // #TODO: figure .descriptorCount
+                VulkanBindings.Emplace(VkDescriptorSetLayoutBinding{
+                    .binding = Binding,
+                    .descriptorType = DescriptorTypeToVkDescriptorType(Parameter.Type),
+                    .descriptorCount = 1,
+                    .stageFlags = static_cast<VkShaderStageFlags>(ConvertToVulkanType(Shader->GetShaderType())),
+                    .pImmutableSamplers = nullptr,
+                });
+            };
+        }
+    }
+
+    DescriptorSetLayouts.Resize(DescriptorSetBindings.Size());
+    for (unsigned Set = 0; Set < DescriptorSetBindings.Size(); Set++)
+    {
+        const VkDescriptorSetLayoutCreateInfo CreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .bindingCount = DescriptorSetBindings[Set].Size(),
+            .pBindings = DescriptorSetBindings[Set].Raw(),
+        };
+        VK_CHECK_RESULT(VulkanAPI::vkCreateDescriptorSetLayout(Device->GetHandle(), &CreateInfo, VULKAN_CPU_ALLOCATOR,
+                                                               &DescriptorSetLayouts[Set]));
+    }
 }
 
 }    // namespace VulkanRHI

@@ -10,7 +10,7 @@ namespace VulkanRHI
 RVulkanMaterial::RVulkanMaterial(FVulkanDevice* InDevice, WeakRef<RVulkanGraphicsPipeline> InPipeline)
     : IDeviceChild(InDevice)
     , Pipeline(InPipeline)
-    , DescriptorManager(InDevice, Pipeline->GetShaders())
+    , DescriptorManager(InDevice, Pipeline)
 {
 }
 

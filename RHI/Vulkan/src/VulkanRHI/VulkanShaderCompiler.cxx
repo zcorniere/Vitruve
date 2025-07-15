@@ -190,7 +190,7 @@ void FVulkanShaderCompiler::SetOptimizationLevel(EOptimizationLevel InLevel)
     Level = InLevel;
 }
 
-Ref<RVulkanShader> FVulkanShaderCompiler::Get(std::filesystem::path Path, bool bForceCompile, bool bUnitTesting)
+Ref<RVulkanShader> FVulkanShaderCompiler::Get(std::filesystem::path Path, bool bForceCompile)
 {
     RPH_PROFILE_FUNC()
 
@@ -229,7 +229,7 @@ Ref<RVulkanShader> FVulkanShaderCompiler::Get(std::filesystem::path Path, bool b
     }
 
     ShaderUnit = Ref<RVulkanShader>::CreateNamed(Path.filename().string(), Result.ShaderType, Result.CompiledCode,
-                                                 Result.Reflection, !bUnitTesting);
+                                                 Result.Reflection);
     Result.Status = ECompilationStatus::Done;
     {
         std::unique_lock Lock(m_ShaderCacheMutex);
@@ -325,7 +325,7 @@ static bool GetStageReflection(const spirv_cross::SmallVector<spirv_cross::Resou
 
         const spirv_cross::SPIRType& ResourceType = Compiler.get_type(resource.base_type_id);
         std::optional<EVertexElementType> ElementType = Utils::SPRIVTypeToVertexElement(ResourceType);
-        if (!ElementType.has_value())
+        if (!ensureMsg(ElementType.has_value(), "Unsuported Element Type for resource {}!", resource.name))
         {
             return false;
         }
@@ -336,7 +336,7 @@ static bool GetStageReflection(const spirv_cross::SmallVector<spirv_cross::Resou
         OutResource.Location = Compiler.get_decoration(resource.id, spv::DecorationLocation);
         OutResource.Offset = AccumulatedOffset;
 
-        AccumulatedOffset += GetSizeOfElementType(OutResource.Type);
+        AccumulatedOffset += RHI::GetSizeOfElementType(OutResource.Type);
     }
     std::sort(StageIO.begin(), StageIO.end(), [](const ShaderResource::FStageIO& A, const ShaderResource::FStageIO& B)
               { return A.Location < B.Location; });
@@ -423,85 +423,42 @@ static bool GetPushConstantReflection(const spirv_cross::Compiler& Compiler,
     return true;
 }
 
-static VkWriteDescriptorSet GetWriteDescriptorSet(VkDescriptorType Type, uint32 Binding, uint32 Count)
+template <ShaderResource::FDescriptorSetInfo::EDescriptorType Type>
+static void GetDescriptorSetReflectionForType(
+    const spirv_cross::Compiler& Compiler, const spirv_cross::SmallVector<spirv_cross::Resource>& ShaderResrouceArray,
+    TMap<uint32, TMap<uint32, ShaderResource::FDescriptorSetInfo>>& DescriptorSetDeclaration)
 {
-    return {
-        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        .pNext = nullptr,
-        .dstSet = VK_NULL_HANDLE,
-        .dstBinding = Binding,
-        .dstArrayElement = 0,
-        .descriptorCount = Count,
-        .descriptorType = Type,
-        .pImageInfo = nullptr,
-        .pBufferInfo = nullptr,
-        .pTexelBufferView = nullptr,
-    };
-}
-
-static bool GetStorageBufferReflection(const spirv_cross::Compiler& Compiler,
-                                       const spirv_cross::SmallVector<spirv_cross::Resource>& ShaderStorageBuffers,
-                                       TArray<ShaderResource::FStorageBuffer>& OutStorageBuffers,
-                                       TMap<std::string, VkWriteDescriptorSet>& WriteDescriptorSet)
-{
-    for (const spirv_cross::Resource& resource: ShaderStorageBuffers)
+    for (const spirv_cross::Resource& resource: ShaderResrouceArray)
     {
-        const spirv_cross::SPIRType& Type = Compiler.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& SPIRType = Compiler.get_type(resource.base_type_id);
+        uint32 Set = Compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+        uint32 Binding = Compiler.get_decoration(resource.id, spv::DecorationBinding);
 
-        ShaderResource::FStorageBuffer& Buffer = OutStorageBuffers.Emplace();
-        Buffer.Set = Compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        Buffer.Binding = Compiler.get_decoration(resource.id, spv::DecorationBinding);
-        Buffer.Parameter.Name = resource.name;
-        Buffer.Parameter.Size = Compiler.get_declared_struct_size(Type);
-        Buffer.Parameter.Type = RTTI::EParameterType::Struct;
-        Buffer.Parameter.Offset = Compiler.get_decoration(resource.id, spv::DecorationOffset);
-        Buffer.Parameter.Rows = Type.vecsize;
-        Buffer.Parameter.Columns = Type.columns;
-
-        for (unsigned int i = 0; i < Type.member_types.size(); ++i)
+        ShaderResource::FDescriptorSetInfo Info{
+            .Type = Type,
+            .Parameter =
+                {
+                    .Name = resource.name,
+                    .Type = ::RTTI::EParameterType::Struct,
+                    .Offset = Compiler.get_decoration(resource.id, spv::DecorationOffset),
+                    .Columns = SPIRType.columns,
+                    .Rows = SPIRType.vecsize,
+                },
+        };
+        if constexpr (Type != ShaderResource::FDescriptorSetInfo::EDescriptorType::Sampler)
         {
-            spirv_cross::TypeID ID = Type.member_types[i];
-            Buffer.Parameter.Members.Add(RecursiveTypeDescription(Compiler, resource.base_type_id, ID, i));
+            Info.Parameter.Size = Compiler.get_declared_struct_size(SPIRType);
         }
-        LOG(LogVulkanShaderCompiler, Info, "  {}", Buffer);
 
-        WriteDescriptorSet.Insert(Buffer.Parameter.Name,
-                                  GetWriteDescriptorSet(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, Buffer.Binding, 1));
-    }
-    return true;
-}
-
-static bool GetUniformBufferReflection(const spirv_cross::Compiler& Compiler,
-                                       const spirv_cross::SmallVector<spirv_cross::Resource>& ShaderUniformBuffers,
-                                       TArray<ShaderResource::FUniformBuffer>& OutUniformBuffers,
-                                       TMap<std::string, VkWriteDescriptorSet>& WriteDescriptorSet)
-{
-    for (const spirv_cross::Resource& resource: ShaderUniformBuffers)
-    {
-        const spirv_cross::SPIRType& Type = Compiler.get_type(resource.base_type_id);
-
-        ShaderResource::FUniformBuffer& Buffer = OutUniformBuffers.Emplace();
-        Buffer.Set = Compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        Buffer.Binding = Compiler.get_decoration(resource.id, spv::DecorationBinding);
-        Buffer.Parameter.Name = resource.name;
-        Buffer.Parameter.Size = Compiler.get_declared_struct_size(Type);
-        Buffer.Parameter.Type = RTTI::EParameterType::Struct;
-        Buffer.Parameter.Offset = Compiler.get_decoration(resource.id, spv::DecorationOffset);
-        Buffer.Parameter.Rows = Type.vecsize;
-        Buffer.Parameter.Columns = Type.columns;
-
-        for (unsigned int i = 0; i < Type.member_types.size(); ++i)
+        LOG(LogVulkanShaderCompiler, Info, "  {}", Info);
+        for (unsigned int i = 0; i < SPIRType.member_types.size(); ++i)
         {
-            spirv_cross::TypeID ID = Type.member_types[i];
-            Buffer.Parameter.Members.Add(RecursiveTypeDescription(Compiler, resource.base_type_id, ID, i));
+            spirv_cross::TypeID ID = SPIRType.member_types[i];
+            Info.Parameter.Members.Add(RecursiveTypeDescription(Compiler, resource.base_type_id, ID, i));
         }
-        LOG(LogVulkanShaderCompiler, Info, "  {}", Buffer);
 
-        WriteDescriptorSet.Insert(Buffer.Parameter.Name,
-                                  GetWriteDescriptorSet(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Buffer.Binding, 1));
+        DescriptorSetDeclaration.FindOrAdd(Set).FindOrAdd(Binding) = Info;
     }
-
-    return true;
 }
 
 bool FVulkanShaderCompiler::GenerateReflection(ShaderCompileResult& Result)
@@ -536,17 +493,19 @@ bool FVulkanShaderCompiler::GenerateReflection(ShaderCompileResult& Result)
         return false;
     }
 
-    LOG(LogVulkanShaderCompiler, Info, "Storage Buffers:{}", resources.storage_buffers.empty() ? " None" : "");
-    if (!GetStorageBufferReflection(compiler, resources.storage_buffers, Result.Reflection.StorageBuffers,
-                                    Result.Reflection.WriteDescriptorSet))
     {
-        return false;
-    }
-    LOG(LogVulkanShaderCompiler, Info, "Uniform Buffers:{}", resources.uniform_buffers.empty() ? " None" : "");
-    if (!GetUniformBufferReflection(compiler, resources.uniform_buffers, Result.Reflection.UniformBuffers,
-                                    Result.Reflection.WriteDescriptorSet))
-    {
-        return false;
+        using EDescriptorType = ShaderResource::FDescriptorSetInfo::EDescriptorType;
+        LOG(LogVulkanShaderCompiler, Info, "Storage Buffers:{}", resources.storage_buffers.empty() ? " None" : "");
+        GetDescriptorSetReflectionForType<EDescriptorType::StorageBuffer>(compiler, resources.storage_buffers,
+                                                                          Result.Reflection.DescriptorSetDeclaration);
+
+        LOG(LogVulkanShaderCompiler, Info, "Uniform Buffers:{}", resources.uniform_buffers.empty() ? " None" : "");
+        GetDescriptorSetReflectionForType<EDescriptorType::UniformBuffer>(compiler, resources.uniform_buffers,
+                                                                          Result.Reflection.DescriptorSetDeclaration);
+
+        LOG(LogVulkanShaderCompiler, Info, "Samplers:{}", resources.sampled_images.empty() ? " None" : "");
+        GetDescriptorSetReflectionForType<EDescriptorType::Sampler>(compiler, resources.sampled_images,
+                                                                    Result.Reflection.DescriptorSetDeclaration);
     }
 
     return true;

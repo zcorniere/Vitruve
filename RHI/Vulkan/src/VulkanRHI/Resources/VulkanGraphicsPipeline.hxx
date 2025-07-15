@@ -3,6 +3,7 @@
 #include "Engine/Core/RHI/Resources/RHIGraphicsPipeline.hxx"
 
 #include "VulkanRHI/DescriptorPoolManager.hxx"
+#include "VulkanRHI/Resources/VulkanShader.hxx"
 
 namespace VulkanRHI
 {
@@ -86,15 +87,23 @@ public:
     {
         return PipelineLayout;
     }
+    TArray<VkDescriptorSetLayout>& GetDescriptorSetLayouts()
+    {
+        return DescriptorSetLayouts;
+    }
 
 private:
     bool CreatePipelineLayout();
+    void CreateDescriptorSetLayout();
 
 private:
     FGraphicsPipelineDescription Desc;
 
     VkPipelineLayout PipelineLayout = VK_NULL_HANDLE;
     VkPipeline VulkanPipeline = VK_NULL_HANDLE;
+
+    TArray<VkDescriptorSetLayout> DescriptorSetLayouts = {};
+    TMap<uint32, TMap<uint32, ShaderResource::FDescriptorSetInfo>> DescriptorSetDeclaration;
 };
 
 }    // namespace VulkanRHI

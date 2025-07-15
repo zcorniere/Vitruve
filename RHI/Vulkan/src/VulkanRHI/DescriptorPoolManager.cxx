@@ -8,38 +8,11 @@ DECLARE_LOGGER_CATEGORY(Core, LogDescriptorSetManager, Warning)
 namespace VulkanRHI
 {
 
-FDescriptorSetManager::FDescriptorSetManager(FVulkanDevice* InDevice, const TArray<WeakRef<RVulkanShader>>& InShaders)
+FDescriptorSetManager::FDescriptorSetManager(FVulkanDevice* InDevice, Ref<RVulkanGraphicsPipeline>& GraphicsPipeline)
     : IDeviceChild(InDevice)
-    , Shaders(InShaders)
+    , AssociatedPipeline(GraphicsPipeline)
 {
-    unsigned MaxSets = 0;
-    for (const WeakRef<RVulkanShader>& Shader: Shaders)
-    {
-        const TArray<VkDescriptorSetLayout>& DescriptorSetLayouts = Shader->GetDescriptorSetLayout();
-        MaxSets = std::max(MaxSets, DescriptorSetLayouts.Size());
-    }
-
-    for (unsigned Set = 0; Set < MaxSets; Set++)
-    {
-        for (const WeakRef<RVulkanShader>& Shader: Shaders)
-        {
-            for (const auto& [Name, WriteDescriptor]: Shader->GetReflectionData().WriteDescriptorSet)
-            {
-                InputDeclaration.Insert(Name, {
-                                                  .Type = ERenderPassInputType::StorageBuffer,
-                                                  .Set = Set,
-                                                  .Binding = WriteDescriptor.dstBinding,
-                                                  .Count = WriteDescriptor.descriptorCount,
-                                                  .Name = Name,
-                                              });
-                FRenderPassInput& Input = InputResource.FindOrAdd(Set).FindOrAdd(WriteDescriptor.dstBinding);
-                Input.Type = ERenderPassInputType::StorageBuffer;    // @todo
-                Input.Input.Resize(WriteDescriptor.descriptorCount);
-
-                WriteDescriptorSet.FindOrAdd(Set).FindOrAdd(WriteDescriptor.dstBinding) = WriteDescriptor;
-            }
-        }
-    }
+    CollectDescriptorSetInfo();
 }
 
 FDescriptorSetManager::~FDescriptorSetManager()
@@ -67,16 +40,8 @@ void FDescriptorSetManager::Destroy()
 
 void FDescriptorSetManager::Bake()
 {
-    TArray<VkDescriptorSetLayout> DescriptorSetLayouts;
-    TArray<VkDescriptorPoolSize> PoolSizes;
-    for (const WeakRef<RVulkanShader>& Shader: Shaders)
-    {
-        DescriptorSetLayouts.Append(Shader->GetDescriptorSetLayout());
-        PoolSizes.Append(Shader->GetDescriptorPoolSizes());
-    }
-
-    CreateDescriptorPool(PoolSizes, 1);
-    CreateDescriptorSets(DescriptorSetLayouts);
+    CreateDescriptorPool(1);
+    CreateDescriptorSets();
 
     TArray<VkWriteDescriptorSet> WriteDescriptorSetsArray;
     for (auto& [Set, Bindings]: WriteDescriptorSet)
@@ -86,7 +51,7 @@ void FDescriptorSetManager::Bake()
             WriteDescriptorSetsArray.Emplace(WriteDescriptor);
             WriteDescriptorSetsArray.Back().dstSet = DescriptorSets[Set];
 
-            Ref<RVulkanBuffer> Buffer = InputResource[Set][Binding].Input[0].As<RVulkanBuffer>();
+            Ref<RVulkanBuffer> Buffer = InputResources[Set][Binding].Input[0].As<RVulkanBuffer>();
             WriteDescriptorSetsArray.Back().pBufferInfo = &Buffer->GetDescriptorBufferInfo();
         }
     }
@@ -108,7 +73,7 @@ void FDescriptorSetManager::InvalidateAndUpdate()
 {
     TMap<uint32, TMap<uint32, FRenderPassInput>> InvalidatedInput;
 
-    for (auto& [Set, Inputs]: InputResource)
+    for (auto& [Set, Inputs]: InputResources)
     {
         for (auto& [Binding, Input]: Inputs)
         {
@@ -170,7 +135,7 @@ void FDescriptorSetManager::SetInput(std::string_view Name, const Ref<RVulkanBuf
     const FRenderPassInputDeclaration* const Declaration = GetInputDeclaration(Name);
     if (Declaration)
     {
-        InputResource[Declaration->Set][Declaration->Binding].Set(Buffer);
+        InputResources[Declaration->Set][Declaration->Binding].Set(Buffer);
     }
     else
     {
@@ -185,34 +150,90 @@ FDescriptorSetManager::GetInputDeclaration(std::string_view name) const
     return InputDeclaration.Find(nameStr);
 }
 
-void FDescriptorSetManager::CreateDescriptorPool(const TArray<VkDescriptorPoolSize>& PoolSize, unsigned InMaxSets)
+void FDescriptorSetManager::CreateDescriptorPool(unsigned InMaxSets)
 {
     VkDescriptorPoolCreateInfo CreateInfo{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .pNext = nullptr,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         .maxSets = InMaxSets,
-        .poolSizeCount = PoolSize.Size(),
-        .pPoolSizes = PoolSize.Raw(),
+        .poolSizeCount = DescriptorPoolSizes.Size(),
+        .pPoolSizes = DescriptorPoolSizes.Raw(),
     };
     ensure(DescriptorPoolHandle == VK_NULL_HANDLE);
     VK_CHECK_RESULT(VulkanAPI::vkCreateDescriptorPool(Device->GetHandle(), &CreateInfo, VULKAN_CPU_ALLOCATOR,
                                                       &DescriptorPoolHandle));
 }
 
-void FDescriptorSetManager::CreateDescriptorSets(const TArray<VkDescriptorSetLayout>& DescriptorSetLayouts)
+void FDescriptorSetManager::CreateDescriptorSets()
 {
     VkDescriptorSetAllocateInfo AllocateInfo{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .pNext = nullptr,
         .descriptorPool = DescriptorPoolHandle,
         .descriptorSetCount = 1,
-        .pSetLayouts = DescriptorSetLayouts.Raw(),
+        .pSetLayouts = AssociatedPipeline->GetDescriptorSetLayouts().Raw(),
     };
     ensure(DescriptorSets.IsEmpty());
 
     DescriptorSets.Resize(1);
     VK_CHECK_RESULT(VulkanAPI::vkAllocateDescriptorSets(Device->GetHandle(), &AllocateInfo, DescriptorSets.Raw()));
+}
+
+void FDescriptorSetManager::CollectDescriptorSetInfo()
+{
+
+    auto DescriptorTypeToRenderPassInputType = [](ShaderResource::FDescriptorSetInfo::EDescriptorType Type)
+    {
+        switch (Type)
+        {
+            case ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer:
+            case ShaderResource::FDescriptorSetInfo::EDescriptorType::UniformBuffer:
+                return ERenderPassInputType::StorageBuffer;
+            case ShaderResource::FDescriptorSetInfo::EDescriptorType::Sampler:
+                return ERenderPassInputType::Texture;
+        }
+        checkNoEntry();
+    };
+
+    for (const WeakRef<RVulkanShader>& Shader: AssociatedPipeline->GetShaders())
+    {
+        for (auto& [Set, Layout]: Shader->GetReflectionData().DescriptorSetDeclaration)
+        {
+            for (auto& [Binding, Parameter]: Layout)
+            {
+                DescriptorPoolSizes
+                    .FindByLambda<true>([Binding](const VkDescriptorPoolSize& Iter) { return Iter.type == Binding; })
+                    ->descriptorCount += 1;
+
+                InputDeclaration.Insert(Parameter.Parameter.Name,
+                                        FRenderPassInputDeclaration{
+                                            .Type = DescriptorTypeToRenderPassInputType(Parameter.Type),
+                                            .Set = Set,
+                                            .Binding = Binding,
+                                            .Count = 1,
+                                            .Name = Parameter.Parameter.Name,
+                                        });
+
+                FRenderPassInput& InputResource = InputResources.FindOrAdd(Set).FindOrAdd(Binding);
+                InputResource.Type = DescriptorTypeToRenderPassInputType(Parameter.Type);
+                InputResource.Input.Resize(1);
+
+                WriteDescriptorSet.FindOrAdd(Set).FindOrAdd(Binding) = {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .pNext = nullptr,
+                    .dstSet = VK_NULL_HANDLE,    // Will be set later
+                    .dstBinding = Binding,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = DescriptorTypeToVkDescriptorType(Parameter.Type),
+                    .pImageInfo = nullptr,
+                    .pBufferInfo = nullptr,
+                    .pTexelBufferView = nullptr,
+                };
+            };
+        }
+    }
 }
 
 }    // namespace VulkanRHI

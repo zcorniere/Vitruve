@@ -1,5 +1,7 @@
 #include "VulkanRHI/VulkanPendingState.hxx"
 
+#include "VulkanRHI/VulkanCommandContext.hxx"
+
 namespace VulkanRHI
 {
 
@@ -43,7 +45,7 @@ bool FVulkanPendingState::SetGraphicsPipeline(Ref<RVulkanGraphicsPipeline>& InPi
         CurrentPipeline = InPipeline;
         bNeedReset = true;
     }
-    /// TODO: reset descriptor sets
+    DescriptorSets.Clear();
 
     return bNeedReset;
 }
@@ -68,6 +70,7 @@ void FVulkanPendingState::PrepareForDraw(FVulkanCmdBuffer* CommandBuffer)
     }
     if (PushConstantData.Size() > 0)
     {
+        // #TODO: don't force vertex stage
         VulkanAPI::vkCmdPushConstants(CommandBuffer->GetHandle(), CurrentPipeline->GetPipelineLayout(),
                                       VK_SHADER_STAGE_VERTEX_BIT, 0, PushConstantData.Size(), PushConstantData.Raw());
     }

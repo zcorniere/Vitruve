@@ -4,6 +4,7 @@
 
 #include "Engine/Core/RHI/RHIDefinitions.hxx"
 #include "Engine/Core/RHI/Resources/RHIShader.hxx"
+#include "VulkanRHI/Resources/VulkanShader.hxx"
 
 #define VK_CHECK_RESULT(f)                                  \
     {                                                       \
@@ -162,6 +163,20 @@ FORCEINLINE VkAttachmentLoadOp RenderTargetLoadActionToVkAttachmentLoadOp(ERende
             return VK_ATTACHMENT_LOAD_OP_CLEAR;
         case ERenderTargetLoadAction::NoAction:
             return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    }
+    checkNoEntry();
+}
+
+FORCEINLINE VkDescriptorType DescriptorTypeToVkDescriptorType(ShaderResource::FDescriptorSetInfo::EDescriptorType Type)
+{
+    switch (Type)
+    {
+        case ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer:
+            return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        case ShaderResource::FDescriptorSetInfo::EDescriptorType::UniformBuffer:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        case ShaderResource::FDescriptorSetInfo::EDescriptorType::Sampler:
+            return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     }
     checkNoEntry();
 }

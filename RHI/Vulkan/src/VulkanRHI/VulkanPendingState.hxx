@@ -1,13 +1,13 @@
 #pragma once
 
 #include "VulkanRHI/Resources/VulkanBuffer.hxx"
-#include "VulkanRHI/VulkanCommandContext.hxx"
 
 #include "VulkanRHI/Resources/VulkanGraphicsPipeline.hxx"
 #include "VulkanRHI/VulkanCommandsObjects.hxx"
 
 namespace VulkanRHI
 {
+class FVulkanCommandContext;
 
 class FVulkanPendingState : public IDeviceChild
 {
