@@ -420,10 +420,21 @@ public:
     }
 
     /// Find the index of the given element using a lambda
-    template <typename Lambda>
-    requires std::invocable<Lambda, const T&>
+    /// @tparam TCreateIfNotFound If true, the function will append a default constructed element to the array if the
+    /// element is not found
+    /// @arg Func The lambda to use to find the element
+    template <bool TCreateIfNotFound = false, typename Lambda>
+    requires std::is_invocable_r_v<bool, Lambda, const T&>
     [[nodiscard]] FORCEINLINE T* FindByLambda(Lambda&& Func)
     {
+        if constexpr (TCreateIfNotFound)
+        {
+            static_assert(
+                std::is_default_constructible<T>::value,
+                "T must be default constructible if TCreateIfNotFound is true, otherwise it will not be possible to "
+                "return a valid pointer.");
+        }
+
         for (TSize i = 0; i < Size(); i++)
         {
             if (Func((*this)[i]))
@@ -431,7 +442,14 @@ public:
                 return &(*this)[i];
             }
         }
-        return nullptr;
+        if constexpr (TCreateIfNotFound)
+        {
+            return &Emplace();
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     /// Check if the given index is valid within the array
