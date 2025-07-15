@@ -5,6 +5,7 @@
 class RRHIGraphicsPipeline;
 class RRHIMaterial;
 class RRHIBuffer;
+class RRHITexture;
 class RRHIViewport;
 struct FRHIRenderPassDescription;
 
@@ -52,4 +53,8 @@ public:
     /// @brief Copy the content of a buffer to another buffer
     virtual void CopyBufferToBuffer(const Ref<RRHIBuffer>& Source, Ref<RRHIBuffer>& Destination, uint64 SourceOffset,
                                     uint64 DestinationOffset, uint64 Size) = 0;
+
+    /// @brief Copy the content of a buffer to a resource array
+    virtual void CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture>& Description, uint64 SourceOffset,
+                                   IVector3 DestinationOffset, UVector3 Size) = 0;
 };

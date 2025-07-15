@@ -87,6 +87,12 @@ void FFRHICommandList::CopyBufferToBuffer(const Ref<RRHIBuffer>& Source, Ref<RRH
     Enqueue(new RHICopyBufferToBuffer(Source, Destination, SourceOffset, DestinationOffset, Size));
 }
 
+void FFRHICommandList::CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture> Destination,
+                                         uint64 SourceOffset, const IVector3& DestinationOffset, const UVector3& Size)
+{
+    Enqueue(new RHICopyBufferToImage(Source, std::move(Destination), SourceOffset, DestinationOffset, Size));
+}
+
 void FFRHICommandList::CopyResourceArrayToBuffer(IResourceArrayInterface* Source, Ref<RRHIBuffer>& Destination,
                                                  uint64 SourceOffset, uint64 DestinationOffset, uint64 Size)
 {

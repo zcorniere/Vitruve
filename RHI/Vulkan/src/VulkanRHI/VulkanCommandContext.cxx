@@ -233,6 +233,49 @@ void FVulkanCommandContext::CopyBufferToBuffer(const Ref<RRHIBuffer>& Source, Re
     CommandManager->SubmitUploadCmdBuffer();
 }
 
+void FVulkanCommandContext::CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture>& Description,
+                                              uint64 SourceOffset, IVector3 DestinationOffset, UVector3 Size)
+{
+    const RVulkanBuffer* const SourceBuffer = Source.AsRaw<RVulkanBuffer>();
+    RVulkanTexture* const DestinationTexture = Description.AsRaw<RVulkanTexture>();
+    FVulkanCmdBuffer* CmdBuffer = CommandManager->GetUploadCmdBuffer();
+
+    VkImageLayout OriginalLayout = DestinationTexture->GetLayout();
+    DestinationTexture->SetLayout(CmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    VkBufferImageCopy Copy{
+        .bufferOffset = SourceOffset,
+        .bufferRowLength = 0,
+        .bufferImageHeight = 0,
+        .imageSubresource =
+            {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel = 0,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        .imageOffset =
+            {
+                .x = DestinationOffset.x,
+                .y = DestinationOffset.y,
+                .z = DestinationOffset.z,
+            },
+        .imageExtent =
+            {
+                .width = Size.x,
+                .height = Size.y,
+                .depth = Size.z,
+            },
+    };
+
+    VulkanAPI::vkCmdCopyBufferToImage(CmdBuffer->GetHandle(), SourceBuffer->GetHandle(), DestinationTexture->GetImage(),
+                                      DestinationTexture->GetLayout(), 1, &Copy);
+
+    if (OriginalLayout != VK_IMAGE_LAYOUT_UNDEFINED)
+    {
+        DestinationTexture->SetLayout(CmdBuffer, OriginalLayout);
+    }
+}
+
 void FVulkanCommandContext::SetLayout(RVulkanTexture* const Texture, VkImageLayout Layout)
 {
     Texture->SetLayout(CommandManager->GetActiveCmdBuffer(), Layout);

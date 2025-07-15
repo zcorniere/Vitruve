@@ -155,6 +155,15 @@ public:
     /// @param Size The number of bytes to copy
     void CopyBufferToBuffer(const Ref<RRHIBuffer>& Source, Ref<RRHIBuffer>& Destination, uint64 SourceOffset,
                             uint64 DestinationOffset, uint64 Size);
+    /// @brief Copy the content of a buffer to an image
+    ///
+    /// @param Source The buffer to copy from
+    /// @param Destination The image to copy to
+    /// @param SourceOffset The offset in the source buffer
+    /// @param DestinationOffset The offset in the destination image
+    /// @param Size The number of bytes to copy
+    void CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture> Destination, uint64 SourceOffset,
+                           const IVector3& DestinationOffset, const UVector3& Size);
 
     /// @brief Copy the content of a resource array to a buffer
     ///

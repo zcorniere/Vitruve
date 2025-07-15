@@ -55,6 +55,9 @@ public:
     virtual void CopyBufferToBuffer(const Ref<RRHIBuffer>& Source, Ref<RRHIBuffer>& Destination, uint64 SourceOffset,
                                     uint64 DestinationOffset, uint64 Size) override;
 
+    virtual void CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture>& Description, uint64 SourceOffset,
+                                   IVector3 DestinationOffset, UVector3 Size) override;
+
     /// @brief VulkanRHI only, set the layout of the given texture
     void SetLayout(RVulkanTexture* const Texture, VkImageLayout Layout);
 

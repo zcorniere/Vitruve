@@ -83,6 +83,8 @@ public:
                                                      VmaMemoryUsage MemUsage, bool Mappable);
     [[nodiscard]] std::pair<VkBuffer, Ref<RVulkanMemoryAllocation>>
     Alloc(const VkBufferCreateInfo& BufferCreateInfo, const VmaAllocationCreateInfo& AllocCreateInfo);
+    [[nodiscard]] std::pair<VkImage, Ref<RVulkanMemoryAllocation>>
+    Alloc(const VkImageCreateInfo& ImageCreateInfo, const VmaAllocationCreateInfo& AllocCreateInfo);
 
     void Free(Ref<RVulkanMemoryAllocation>& Allocation);
 

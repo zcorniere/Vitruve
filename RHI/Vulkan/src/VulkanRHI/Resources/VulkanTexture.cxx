@@ -178,12 +178,12 @@ void RVulkanTexture::CreateTexture()
             break;
     }
 
-    VK_CHECK_RESULT(VulkanAPI::vkCreateImage(Device->GetHandle(), &ImageCreateInfo, VULKAN_CPU_ALLOCATOR, &Image));
+    VmaAllocationCreateInfo AllocationInfo{
+        .flags = 0,
+        .usage = VMA_MEMORY_USAGE_AUTO,
+    };
 
-    VulkanAPI::vkGetImageMemoryRequirements(Device->GetHandle(), Image, &MemoryRequirements);
-
-    Allocation = Device->GetMemoryManager()->Alloc(MemoryRequirements, VMA_MEMORY_USAGE_GPU_ONLY, false);
-    Allocation->BindImage(Image);
+    std::tie(Image, Allocation) = Device->GetMemoryManager()->Alloc(ImageCreateInfo, AllocationInfo);
 }
 
 void RVulkanTexture::DestroyTexture()

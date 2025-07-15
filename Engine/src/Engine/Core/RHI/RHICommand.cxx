@@ -28,6 +28,14 @@ void FRHIEndDrawningViewport::Execute(FFRHICommandList& CommandList)
 
 FRHIBeginRendering::FRHIBeginRendering(const FRHIRenderPassDescription& InDescription): Description(InDescription)
 {
+    for (const FRHIRenderTarget& Target: Description.ColorTargets)
+    {
+        ensure(Target.Texture != nullptr);
+    }
+    if (Description.DepthTarget)
+    {
+        ensure(Description.DepthTarget->Texture != nullptr);
+    }
 }
 
 void FRHIBeginRendering::Execute(FFRHICommandList& CommandList)
@@ -154,4 +162,22 @@ void RHICopyBufferToBuffer::Execute(FFRHICommandList& CommandList)
 {
     CommandList.GetContext()->CopyBufferToBuffer(SourceBuffer, DestinationBuffer, SourceOffset, DestinationOffset,
                                                  Size);
+}
+
+RHICopyBufferToImage::RHICopyBufferToImage(const Ref<RRHIBuffer> Source, Ref<RRHITexture> Destination,
+                                           uint64 SourceOffset, const IVector3& DestinationOffset, const UVector3& Size)
+    : SourceBuffer(std::move(Source))
+    , DestinationTexture(std::move(Destination))
+    , SourceOffset(SourceOffset)
+    , DestinationOffset(DestinationOffset)
+    , Size(Size)
+{
+    check(EnumHasAnyFlags(SourceBuffer->GetUsage(), EBufferUsageFlags::SourceCopy));
+    check(EnumHasAnyFlags(DestinationTexture->GetDescription().Flags, ETextureUsageFlags::TransferTargetable));
+}
+
+void RHICopyBufferToImage::Execute(FFRHICommandList& CommandList)
+{
+    CommandList.GetContext()->CopyBufferToImage(SourceBuffer, DestinationTexture, SourceOffset, DestinationOffset,
+                                                Size);
 }

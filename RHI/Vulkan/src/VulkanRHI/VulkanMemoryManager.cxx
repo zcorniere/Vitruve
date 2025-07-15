@@ -229,6 +229,34 @@ FVulkanMemoryManager::Alloc(const VkBufferCreateInfo& BufferCreateInfo, const Vm
     return {Buffer, Alloc};
 }
 
+std::pair<VkImage, Ref<RVulkanMemoryAllocation>>
+FVulkanMemoryManager::Alloc(const VkImageCreateInfo& BufferCreateInfo, const VmaAllocationCreateInfo& AllocCreateInfo)
+{
+    Ref<RVulkanMemoryAllocation> Alloc = Ref<RVulkanMemoryAllocation>::Create(*this);
+
+#ifndef NDEBUG
+    {
+        std::unique_lock Lock(MemoryAllocationArrayMutex);
+        MemoryAllocationArray.Add(Alloc);
+    }
+#endif    // NDEBUG
+
+    VkImage Buffer = VK_NULL_HANDLE;
+    VK_CHECK_RESULT(vmaCreateImage(Allocator, &BufferCreateInfo, &AllocCreateInfo, &Buffer, &(Alloc->GetHandle()),
+                                   &Alloc->AllocationInfo));
+
+    VkMemoryPropertyFlags memPropFlags;
+    vmaGetAllocationMemoryProperties(Allocator, Alloc->GetHandle(), &memPropFlags);
+
+    Alloc->Size = BufferCreateInfo.extent.width * BufferCreateInfo.extent.height * BufferCreateInfo.extent.depth *
+                  RHI::GetSizeOfImageFormat(VulkanRHI::VkFormatToImageFormat(BufferCreateInfo.format));
+    Alloc->bCanBeMapped = memPropFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+    Alloc->bIsCoherent = memPropFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+    AllocationCount += 1;
+    return {Buffer, Alloc};
+}
+
 void FVulkanMemoryManager::Free(Ref<RVulkanMemoryAllocation>& Allocation)
 {
     // Allocator should be removed after this call

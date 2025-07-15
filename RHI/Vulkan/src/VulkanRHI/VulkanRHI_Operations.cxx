@@ -124,7 +124,7 @@ VulkanRHI::FVulkanDynamicRHI::CreateGraphicsPipeline(const FRHIGraphicsPipelineS
             Attribute.Location = NextLocation++;
             Attribute.Offset = Stride;
 
-            Stride += GetSizeOfElementType(Layout.Parameter[ElementIndex].Type);
+            Stride += RHI::GetSizeOfElementType(Layout.Parameter[ElementIndex].Type);
         }
 
         // Set the vertex binding with the new info

@@ -208,4 +208,21 @@ private:
     uint64 DestinationOffset = 0;
 };
 
+RHICOMMAND_MACRO(RHICopyBufferToImage)
+{
+public:
+    RHICopyBufferToImage(const Ref<RRHIBuffer> Source, Ref<RRHITexture> Destination, uint64 SourceOffset,
+                         const IVector3& DestinationOffset, const UVector3& Size);
+    virtual ~RHICopyBufferToImage() = default;
+
+    virtual void Execute(FFRHICommandList & CommandList) override final;
+
+private:
+    const Ref<RRHIBuffer> SourceBuffer = nullptr;
+    Ref<RRHITexture> DestinationTexture = nullptr;
+    uint64 SourceOffset = 0;
+    IVector3 DestinationOffset = {0, 0};
+    UVector3 Size = {1, 1};
+};
+
 #undef RHICOMMAND_MACRO

@@ -1,6 +1,6 @@
 #include "Engine/Core/RHI/RHIDefinitions.hxx"
 
-uint32 GetSizeOfElementType(EVertexElementType Type)
+uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
 {
     switch (Type)
     {
@@ -30,6 +30,23 @@ uint32 GetSizeOfElementType(EVertexElementType Type)
             return sizeof(int32) * 3;
         case EVertexElementType::Int4:
             return sizeof(int32) * 4;
+    }
+    checkNoEntry();
+    return 0;
+}
+
+uint32 RHI::GetSizeOfImageFormat(EImageFormat Format)
+{
+    switch (Format)
+    {
+        case EImageFormat::D32_SFLOAT:
+            return sizeof(float);
+        case EImageFormat::R8G8B8_SRGB:
+            return sizeof(uint8) * 3;
+        case EImageFormat::R8G8B8A8_SRGB:
+            return sizeof(uint8) * 4;
+        case EImageFormat::B8G8R8A8_SRGB:
+            return sizeof(uint8) * 4;
     }
     checkNoEntry();
     return 0;
