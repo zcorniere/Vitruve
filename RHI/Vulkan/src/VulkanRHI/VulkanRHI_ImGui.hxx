@@ -3,6 +3,7 @@
 #include "Engine/Containers/ResourceArray.hxx"
 
 #include "Engine/Core/RHI/RHICommandList.hxx"
+#include "Engine/Core/Window.hxx"
 
 #include "imgui.h"
 
@@ -38,6 +39,7 @@ private:
     void CreateDescriptorPool(FVulkanDevice* Device);
 
 private:
+    GLFWHolder GlfwHolder;
     FVulkanDevice* Device = nullptr;
     VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
     Ref<RVulkanTexture> ImGuiFontTexture = nullptr;

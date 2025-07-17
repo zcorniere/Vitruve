@@ -13,7 +13,7 @@
 DECLARE_LOGGER_CATEGORY(Core, LogWindow, Info);
 
 std::atomic_bool RWindow::bGLFWInitialized = false;
-std::atomic_short RWindow::GFLWInUseCount = 0;
+std::atomic_short RWindow::GLFWInUseCount = 0;
 
 bool RWindow::EnsureGLFWInit()
 {
@@ -40,7 +40,7 @@ RWindow::~RWindow()
 
 void RWindow::Initialize(const FWindowDefinition& InDefinition)
 {
-    GFLWInUseCount += 1;
+    GLFWInUseCount += 1;
 
     Definition = InDefinition;
     checkMsg(Definition.EventCallback, "You must provide an event callback !");
@@ -105,8 +105,8 @@ void RWindow::Destroy()
     glfwDestroyWindow(p_Handle);
     p_Handle = nullptr;
 
-    GFLWInUseCount -= 1;
-    if (GFLWInUseCount == 0)
+    GLFWInUseCount -= 1;
+    if (GLFWInUseCount == 0)
     {
         LOG(LogWindow, Info, "Terminating GLFW.");
         glfwTerminate();
@@ -399,4 +399,21 @@ void RWindow::SetupGLFWCallbacks()
             FWindowMinimizeEvent event((bool)iconified);
             Callback(event);
         });
+}
+
+GLFWHolder::GLFWHolder()
+{
+    RWindow::GLFWInUseCount += 1;
+    RWindow::EnsureGLFWInit();
+}
+
+GLFWHolder::~GLFWHolder()
+{
+    RWindow::GLFWInUseCount -= 1;
+    if (RWindow::GLFWInUseCount == 0)
+    {
+        LOG(LogWindow, Info, "Terminating GLFW.");
+        glfwTerminate();
+        RWindow::bGLFWInitialized = false;
+    }
 }

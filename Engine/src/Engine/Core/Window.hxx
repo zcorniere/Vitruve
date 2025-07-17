@@ -38,6 +38,13 @@ struct FWindowDefinition
     EventHandler EventCallback;
 };
 
+/// @brief A holder for GLFW to make sure it stays initialized
+struct GLFWHolder
+{
+    GLFWHolder();
+    ~GLFWHolder();
+};
+
 /// @class Window
 ///
 /// @brief A class allowing some abstraction over the GLFW library
@@ -102,15 +109,18 @@ public:
     void ProcessEvents();
 
 private:
-    static std::atomic_bool bGLFWInitialized;
-    static std::atomic_short GFLWInUseCount;
     static bool InitializeGLFW();
+    static std::atomic_bool bGLFWInitialized;
+    static std::atomic_short GLFWInUseCount;
 
     void SetupGLFWCallbacks();
 
 private:
+    GLFWHolder holder;
     FWindowDefinition Definition;
     GLFWwindow* p_Handle;
 
     bool bIsVisible;
+
+    friend struct GLFWHolder;
 };
