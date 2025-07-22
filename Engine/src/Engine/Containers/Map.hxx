@@ -230,6 +230,16 @@ public:
         Rehash();
     }
 
+    FORCEINLINE TMap(const std::initializer_list<TPair<TKey, TValue>>& InitList)
+    {
+        Rehash(InitList.size() > 0 ? InitList.size() : MinimalSize);
+
+        for (const TPair<TKey, TValue>& Pair: InitList)
+        {
+            Insert(Pair.template Get<0>(), Pair.template Get<1>());
+        }
+    }
+
     FORCEINLINE Iterator begin()
     {
         return Iterator(*this, 0);
@@ -267,7 +277,7 @@ public:
     /// @brief Insert a new element in the map
     /// @param Key The key of the element
     /// @return The reference to the of the element
-    TValue& Insert(const TKey& Key, TValue& Value)
+    TValue& Insert(const TKey& Key, const TValue& Value)
     {
         TValue* const FoundValue = Find(Key);
         if (FoundValue != nullptr)
@@ -424,7 +434,7 @@ public:
     /// @brief Check if an element is in the map
     /// @param Key The key of the element to find
     /// @return true if the element is in the map
-    FORCEINLINE bool Contains(const TKey& Key)
+    FORCEINLINE bool Contains(const TKey& Key) const
     {
         return Find(Key) != nullptr;
     }
