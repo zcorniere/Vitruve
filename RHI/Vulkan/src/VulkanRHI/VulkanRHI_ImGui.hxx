@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Engine/Containers/ResourceArray.hxx"
-
 #include "Engine/Core/RHI/RHICommandList.hxx"
 #include "Engine/Core/Window.hxx"
+#include "VulkanRHI/DescriptorPoolManager.hxx"
 
 #include "imgui.h"
 
@@ -36,12 +36,9 @@ private:
     template <typename T>
     bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<T>& Data);
 
-    void CreateDescriptorPool(FVulkanDevice* Device);
-
 private:
     GLFWHolder GlfwHolder;
     FVulkanDevice* Device = nullptr;
-    VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
     Ref<RVulkanTexture> ImGuiFontTexture = nullptr;
 
     Ref<RVulkanTexture> FontTexture = nullptr;
@@ -53,6 +50,7 @@ private:
     TResourceArray<ImDrawIdx> ImGuiIndexBufferData;
     Ref<RVulkanBuffer> ImGuiIndexBuffer = nullptr;
     Ref<RVulkanGraphicsPipeline> ImGuiPipeline = nullptr;
+    std::unique_ptr<FDescriptorSetManager> DescriptorSetManager;
 
     Ref<RVulkanTexture> ImGuiOutputTexture = nullptr;
 };

@@ -17,6 +17,7 @@ FDescriptorSetManager::FDescriptorSetManager(FVulkanDevice* InDevice, Ref<RVulka
 
 FDescriptorSetManager::~FDescriptorSetManager()
 {
+    Destroy();
 }
 
 void FDescriptorSetManager::Destroy()
@@ -51,10 +52,33 @@ void FDescriptorSetManager::Bake()
             WriteDescriptorSetsArray.Emplace(WriteDescriptor);
             WriteDescriptorSetsArray.Back().dstSet = DescriptorSets[Set];
 
-            Ref<RVulkanBuffer> Buffer = InputResources[Set][Binding].Input[0].As<RVulkanBuffer>();
-            WriteDescriptorSetsArray.Back().pBufferInfo = &Buffer->GetDescriptorBufferInfo();
+            FRenderPassInput& RenderPassInput = InputResources[Set][Binding];
+            switch (RenderPassInput.Type)
+            {
+                case ERenderPassInputType::Texture:
+                {
+                    Ref<RVulkanTexture> Image = RenderPassInput.Input[0].As<RVulkanTexture>();
+                    WriteDescriptorSetsArray.Back().pImageInfo = &Image->GetDescriptorImageInfo();
+                }
+                break;
+
+                case ERenderPassInputType::StorageBuffer:
+                {
+                    Ref<RVulkanBuffer> Buffer = RenderPassInput.Input[0].As<RVulkanBuffer>();
+                    WriteDescriptorSetsArray.Back().pBufferInfo = &Buffer->GetDescriptorBufferInfo();
+                }
+                break;
+
+                default:
+                {
+                    LOG(LogDescriptorSetManager, Error, "Unsupported render pass input type: {}",
+                        static_cast<int>(RenderPassInput.Type));
+                    continue;
+                }
+            }
         }
     }
+
     if (!WriteDescriptorSetsArray.IsEmpty())
     {
         VulkanAPI::vkUpdateDescriptorSets(Device->GetHandle(), WriteDescriptorSetsArray.Size(),
@@ -143,6 +167,19 @@ void FDescriptorSetManager::SetInput(std::string_view Name, const Ref<RVulkanBuf
     }
 }
 
+void FDescriptorSetManager::SetInput(std::string_view Name, const Ref<RVulkanTexture>& Texture)
+{
+    const FRenderPassInputDeclaration* const Declaration = GetInputDeclaration(Name);
+    if (Declaration)
+    {
+        InputResources[Declaration->Set][Declaration->Binding].Set(Texture);
+    }
+    else
+    {
+        LOG(LogDescriptorSetManager, Warning, "Input declaration not found for {}", Name);
+    }
+}
+
 const FDescriptorSetManager::FRenderPassInputDeclaration*
 FDescriptorSetManager::GetInputDeclaration(std::string_view name) const
 {
@@ -202,9 +239,17 @@ void FDescriptorSetManager::CollectDescriptorSetInfo()
         {
             for (auto& [Binding, Parameter]: Layout)
             {
-                DescriptorPoolSizes
-                    .FindByLambda<true>([Binding](const VkDescriptorPoolSize& Iter) { return Iter.type == Binding; })
-                    ->descriptorCount += 1;
+                VkDescriptorPoolSize* Found = DescriptorPoolSizes.FindByLambda(
+                    [Parameter](const VkDescriptorPoolSize& Iter)
+                    { return Iter.type == DescriptorTypeToVkDescriptorType(Parameter.Type); });
+                if (!Found)
+                {
+                    Found = &DescriptorPoolSizes.Emplace(VkDescriptorPoolSize{
+                        .type = DescriptorTypeToVkDescriptorType(Parameter.Type),
+                        .descriptorCount = 0,
+                    });
+                }
+                Found->descriptorCount += 1;
 
                 InputDeclaration.Insert(Parameter.Parameter.Name,
                                         FRenderPassInputDeclaration{

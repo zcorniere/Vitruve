@@ -29,7 +29,6 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
 
     ImGui_ImplGlfw_InitForVulkan(GApplication->GetMainWindow()->GetHandle(), true);
 
-    CreateDescriptorPool(Device);
     ImGuiPipeline = RHI::CreateGraphicsPipeline(FRHIGraphicsPipelineSpecification{
         .VertexShader = "ImGui/ImGui.vert",
         .FragmentShader = "ImGui/ImGui.frag",
@@ -61,6 +60,8 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
     ensure(ImGuiPipeline);
     ImGuiPipeline->SetName("ImGui Pipeline");
 
+    DescriptorSetManager = std::make_unique<FDescriptorSetManager>(Device, ImGuiPipeline);
+
     ENQUEUE_RENDER_COMMAND(ImGuiUpdateFontTexture)(
         [this](FFRHICommandList& CommandList)
         {
@@ -77,9 +78,6 @@ void VulkanRHI_ImGui::Shutdown()
 {
     ImGui_ImplGlfw_Shutdown();
 
-    VulkanAPI::vkDestroyDescriptorPool(Device->GetHandle(), DescriptorPool, VULKAN_CPU_ALLOCATOR);
-    DescriptorPool = VK_NULL_HANDLE;
-
     ImGuiFontTexture = nullptr;
 
     ImGuiVertexBufferData.Clear();
@@ -87,6 +85,8 @@ void VulkanRHI_ImGui::Shutdown()
     ImGuiIndexBufferData.Clear();
     ImGuiIndexBuffer = nullptr;
     ImGuiOutputTexture = nullptr;
+
+    DescriptorSetManager.reset();
 
     ImGuiPipeline = nullptr;
     ImGui::DestroyContext();
@@ -101,7 +101,7 @@ void VulkanRHI_ImGui::Begin()
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            // ImGui::ShowMetricsWindow();
+            ImGui::ShowMetricsWindow();
         });
 }
 
@@ -208,6 +208,7 @@ bool VulkanRHI_ImGui::UpdateFontTexture(FFRHICommandList& CommandList)
         .Name = "ImGui Font Texture",
     };
     ImGuiFontTexture = RHI::CreateTexture(TextureDesc);
+    ImGuiFontTexture->SetName("ImGui Font Texture");
 
     FRHIBufferDesc StagingBufferDesc{
         .Size = TexturePixels.GetByteSize(),
@@ -220,7 +221,15 @@ bool VulkanRHI_ImGui::UpdateFontTexture(FFRHICommandList& CommandList)
     CommandList.CopyBufferToImage(StagingBuffer, ImGuiFontTexture.As<RRHITexture>(), 0, {0, 0, 0},
                                   {static_cast<uint32>(TextureWidth), static_cast<uint32>(TextureHeight), 1});
 
+    FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
+    ImGuiFontTexture->SetLayout(CommandContext->GetCommandManager()->GetUploadCmdBuffer(),
+                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
     io.Fonts->TexID = (ImTextureID)ImGuiFontTexture.Raw();
+
+    DescriptorSetManager->SetInput("sTexture", ImGuiFontTexture);
+    DescriptorSetManager->Bake();
+
     return true;
 }
 
@@ -263,8 +272,8 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
     };
     CommandList.BeginRendering(RenderPassDesc);
 
-    CommandList.SetVertexBuffer(ImGuiVertexBuffer);
     CommandList.SetGraphicsPipeline(ImGuiPipeline);
+    CommandList.SetVertexBuffer(ImGuiVertexBuffer);
 
     struct PushConstants
     {
@@ -325,6 +334,9 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                 int vertexCount = pCmd->ElemCount;
                 int startIndexLocation = pCmd->IdxOffset + idxOffset;
                 int startVertexLocation = pCmd->VtxOffset + vtxOffset;
+
+                DescriptorSetManager->Bind(CommandContext->GetCommandManager()->GetActiveCmdBuffer()->GetHandle(),
+                                           ImGuiPipeline->GetPipelineLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS);
 
                 CommandContext->SetPushConstants(pushConstants);
                 CommandList.DrawIndexed(ImGuiIndexBuffer, 0, 0, vertexCount, startIndexLocation, startVertexLocation,
@@ -393,33 +405,6 @@ bool VulkanRHI_ImGui::UpdateTargetTexture(ImGuiViewport* Viewport, FFRHICommandL
     OutputTexture->SetLayout(Context->GetCommandManager()->GetUploadCmdBuffer(),
                              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     return true;
-}
-
-void VulkanRHI_ImGui::CreateDescriptorPool(FVulkanDevice* Device)
-{
-    const VkDescriptorPoolSize pool_sizes[]{
-        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
-        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
-        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000},
-    };
-
-    VkDescriptorPoolCreateInfo ImguiPoolCreateInfo{
-        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-        .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-        .maxSets = 1000,
-        .poolSizeCount = std::size(pool_sizes),
-        .pPoolSizes = pool_sizes,
-    };
-    VulkanAPI::vkCreateDescriptorPool(Device->GetHandle(), &ImguiPoolCreateInfo, VULKAN_CPU_ALLOCATOR, &DescriptorPool);
-    VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_DESCRIPTOR_POOL, DescriptorPool, "Imgui Descriptor Pool");
 }
 
 }    // namespace VulkanRHI

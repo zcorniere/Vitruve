@@ -3,6 +3,18 @@
 #include "Engine/Core/RHI/RHIDefinitions.hxx"
 #include "Engine/Core/RHI/RHIResource.hxx"
 
+enum class ETextureWrap
+{
+    Repeat,
+    Clamp,
+};
+
+enum class ETextureFilter
+{
+    Nearest,
+    Linear,
+};
+
 /// @brief Describe the texture to be created
 struct FRHITextureSpecification
 {
@@ -12,8 +24,17 @@ struct FRHITextureSpecification
 
     UVector2 Extent = {1, 1};
     uint32 Depth = 1;
-    uint8 NumMips = 1;
     uint8 NumSamples = 1;
+
+    bool CreateMipmap = false;
+    uint32 NumMips = 1;
+
+    bool CreateSampler = true;
+    ETextureWrap WrapU = ETextureWrap::Repeat;
+    ETextureWrap WrapV = ETextureWrap::Repeat;
+    ETextureWrap WrapW = ETextureWrap::Repeat;
+    ETextureFilter MinFilter = ETextureFilter::Linear;
+    ETextureFilter MagFilter = ETextureFilter::Linear;
 
     FVector4 ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 

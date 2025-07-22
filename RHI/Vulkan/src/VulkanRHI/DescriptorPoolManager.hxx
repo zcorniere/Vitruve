@@ -66,6 +66,7 @@ public:
     void InvalidateAndUpdate();
 
     void SetInput(std::string_view Name, const Ref<RVulkanBuffer>& Buffer);
+    void SetInput(std::string_view Name, const Ref<RVulkanTexture>& Texture);
 
     VkDescriptorPool GetHandle() const
     {

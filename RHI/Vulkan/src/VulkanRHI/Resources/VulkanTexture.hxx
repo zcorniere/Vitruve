@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIDefinitions.hxx"
 #include "Engine/Core/RHI/Resources/RHITexture.hxx"
 
 namespace VulkanRHI
@@ -26,10 +25,14 @@ public:
     VkImageView GetImageView() const;
     VkImageViewType GetViewType() const;
 
+    VkSampler GetSampler() const;
+
     VkImageLayout GetLayout() const;
     void SetLayout(FVulkanCmdBuffer* CommandBuffer, VkImageLayout NewLayout);
 
     VkImageLayout GetDefaultLayout() const;
+
+    const VkDescriptorImageInfo& GetDescriptorImageInfo() const;
 
 private:
     void CreateTexture();
@@ -40,7 +43,10 @@ private:
     VkMemoryRequirements MemoryRequirements;
     VkImage Image = VK_NULL_HANDLE;
     VkImageLayout Layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    VkSampler Sampler = VK_NULL_HANDLE;
+
     mutable VkImageView View = VK_NULL_HANDLE;
+    mutable VkDescriptorImageInfo DescriptorImageInfo;
 };
 
 struct VulkanTextureView

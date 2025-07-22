@@ -46,6 +46,7 @@ bool FVulkanPendingState::SetGraphicsPipeline(Ref<RVulkanGraphicsPipeline>& InPi
         bNeedReset = true;
     }
     DescriptorSets.Clear();
+    PushConstantData.Clear();
 
     return bNeedReset;
 }

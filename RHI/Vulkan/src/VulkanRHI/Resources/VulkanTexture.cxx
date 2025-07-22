@@ -18,6 +18,8 @@ RVulkanTexture::RVulkanTexture(FVulkanDevice* InDevice, const FRHITextureSpecifi
     , Layout(VK_IMAGE_LAYOUT_UNDEFINED)
     , View(VK_NULL_HANDLE)
 {
+    check(InDesc.CreateMipmap == false);
+
     CreateTexture();
 }
 
@@ -56,6 +58,11 @@ void RVulkanTexture::Invalidate()
             FVulkanCommandContext* Context = CommandList.GetContext()->Cast<FVulkanCommandContext>();
             Context->SetLayout(instance.Raw(), Layout);
         });
+}
+
+VkSampler RVulkanTexture::GetSampler() const
+{
+    return Sampler;
 }
 
 VkImage RVulkanTexture::GetImage() const
@@ -184,6 +191,29 @@ void RVulkanTexture::CreateTexture()
     };
 
     std::tie(Image, Allocation) = Device->GetMemoryManager()->Alloc(ImageCreateInfo, AllocationInfo);
+
+    if (Description.CreateSampler)
+    {
+        VkSamplerCreateInfo SamplerInfo{
+            .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter = TextureFilterToVkFilter(Description.MagFilter),
+            .minFilter = TextureFilterToVkFilter(Description.MinFilter),
+            .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+            .addressModeU = TextureWrapToVkSamplerAddressMode(Description.WrapU),
+            .addressModeV = TextureWrapToVkSamplerAddressMode(Description.WrapV),
+            .addressModeW = TextureWrapToVkSamplerAddressMode(Description.WrapW),
+            .anisotropyEnable = VK_FALSE,
+            .maxAnisotropy = 1.0f,
+            .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK,
+            .unnormalizedCoordinates = VK_FALSE,
+        };
+        VK_CHECK_RESULT(VulkanAPI::vkCreateSampler(Device->GetHandle(), &SamplerInfo, VULKAN_CPU_ALLOCATOR, &Sampler));
+        VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_SAMPLER, Sampler, "{:s}.Image.Sampler", GetName());
+    }
+    else
+    {
+        Sampler = VK_NULL_HANDLE;
+    }
 }
 
 void RVulkanTexture::DestroyTexture()
@@ -202,6 +232,13 @@ void RVulkanTexture::DestroyTexture()
     Allocation = nullptr;
     Image = VK_NULL_HANDLE;
     Layout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+    if (Sampler)
+    {
+        RHI::DeferedDeletion([Sampler = this->Sampler, Device = this->Device]()
+                             { VulkanAPI::vkDestroySampler(Device->GetHandle(), Sampler, VULKAN_CPU_ALLOCATOR); });
+        Sampler = VK_NULL_HANDLE;
+    }
 }
 
 VkImageLayout RVulkanTexture::GetDefaultLayout() const
@@ -219,6 +256,16 @@ VkImageLayout RVulkanTexture::GetDefaultLayout() const
         default:
             return VK_IMAGE_LAYOUT_UNDEFINED;
     }
+}
+
+const VkDescriptorImageInfo& RVulkanTexture::GetDescriptorImageInfo() const
+{
+    DescriptorImageInfo = {
+        .sampler = Sampler,
+        .imageView = GetImageView(),
+        .imageLayout = GetLayout(),
+    };
+    return DescriptorImageInfo;
 }
 
 //////////////////// VulkanTextureView ////////////////////

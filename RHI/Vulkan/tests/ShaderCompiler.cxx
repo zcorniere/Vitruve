@@ -84,20 +84,21 @@ static void CheckReflection(const VulkanRHI::RVulkanShader::FReflectionData& Exp
         INFO_N_CHECK("Stage Output", Offset, GotReflection.StageOutput[i], GotReflection.StageOutput[i])
     }
 
-    REQUIRE(GotReflection.StorageBuffers.Size() == ExpectedReflection.StorageBuffers.Size());
-    for (unsigned i = 0; i < GotReflection.StorageBuffers.Size(); i++)
+    REQUIRE(GotReflection.DescriptorSetDeclaration.Size() == ExpectedReflection.DescriptorSetDeclaration.Size());
+    for (unsigned Set = 0; Set < GotReflection.DescriptorSetDeclaration.Size(); Set++)
     {
-        INFO_N_CHECK("Storage Buffer", Set, GotReflection.StorageBuffers[i], GotReflection.StorageBuffers[i])
-        INFO_N_CHECK("Storage Buffer", Binding, GotReflection.StorageBuffers[i], GotReflection.StorageBuffers[i])
-        CheckParameter(ExpectedReflection.StorageBuffers[i].Parameter, GotReflection.StorageBuffers[i].Parameter);
-    }
+        for (unsigned Binding = 0; Binding < GotReflection.DescriptorSetDeclaration[Set].Size(); Binding++)
+        {
+            using namespace VulkanRHI;
+            const ShaderResource::FDescriptorSetInfo& GotInfo = GotReflection.DescriptorSetDeclaration[Set][Binding];
+            const ShaderResource::FDescriptorSetInfo& ExpectedInfo =
+                ExpectedReflection.DescriptorSetDeclaration[Set][Binding];
 
-    REQUIRE(GotReflection.UniformBuffers.Size() == ExpectedReflection.UniformBuffers.Size());
-    for (unsigned i = 0; i < GotReflection.UniformBuffers.Size(); i++)
-    {
-        INFO_N_CHECK("Uniform Buffer", Set, GotReflection.UniformBuffers[i], GotReflection.UniformBuffers[i])
-        INFO_N_CHECK("Uniform Buffer", Binding, GotReflection.UniformBuffers[i], GotReflection.UniformBuffers[i])
-        CheckParameter(ExpectedReflection.UniformBuffers[i].Parameter, GotReflection.UniformBuffers[i].Parameter);
+            INFO("Type: " << magic_enum::enum_name(GotInfo.Type) << " == " << magic_enum::enum_name(ExpectedInfo.Type));
+            CHECK(GotInfo.Type == ExpectedInfo.Type);
+
+            CheckParameter(ExpectedInfo.Parameter, GotInfo.Parameter);
+        }
     }
 
     CHECK(GotReflection == ExpectedReflection);
@@ -112,12 +113,12 @@ TEST_CASE("Vulkan Shader Compiler: Simple Compilation")
     FVulkanShaderCompiler Compiler;
     Compiler.SetOptimizationLevel(FVulkanShaderCompiler::EOptimizationLevel::None);
 
-    Ref<RVulkanShader> ShaderResult = Compiler.Get(SimpleShaderPath, false, true);
+    Ref<RVulkanShader> ShaderResult = Compiler.Get(SimpleShaderPath, false);
     REQUIRE(ShaderResult);
 
     SECTION("Test shader Cache")
     {
-        Ref<RVulkanShader> CachedResult = Compiler.Get(SimpleShaderPath, false, true);
+        Ref<RVulkanShader> CachedResult = Compiler.Get(SimpleShaderPath, false);
 
         CHECK(ShaderResult == CachedResult);
     }
@@ -211,7 +212,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
     FVulkanShaderCompiler Compiler;
     Compiler.SetOptimizationLevel(VulkanRHI::FVulkanShaderCompiler::EOptimizationLevel::None);
 
-    Ref<RVulkanShader> ShaderResult = Compiler.Get(SimpleShaderPath, false, true);
+    Ref<RVulkanShader> ShaderResult = Compiler.Get(SimpleShaderPath, false);
     REQUIRE(ShaderResult);
 
     CHECK(ShaderResult->GetShaderType() == ERHIShaderType::Fragment);
@@ -330,358 +331,383 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                 {
                     ExpectedPushConstant,
                 },
-            .StorageBuffers =
+            .DescriptorSetDeclaration =
                 {
-                    ShaderResource::FStorageBuffer{
-                        .Set = 2,
-                        .Binding = 1,
-                        .Parameter =
-                            {
-                                ::RTTI::FParameter{
-                                    .Name = "ObjectMaterials",
-                                    .Type = ::RTTI::EParameterType::Struct,
-                                    .Size = 0,
-                                    .Offset = 0,
-                                    .Columns = 1,
-                                    .Rows = 1,
-                                    .Members =
-                                        {
-                                            {
-                                                .Name = "materials",
-                                                .Type = ::RTTI::EParameterType::Struct,
-                                                .Size = 92,
-                                                .Offset = 0,
-                                                .Columns = 1,
-                                                .Rows = 1,
-                                                .Members =
-                                                    {
-                                                        {
-                                                            .Name = "alphaCutOff",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 0,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "metallic",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 4,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "roughness",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 8,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "baseColor",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 16,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "baseColorFactor",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 32,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "emissiveFactor",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 48,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "baseColorTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 64,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "metallicRoughnessTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 68,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "normalTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 72,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "occlusionTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 76,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "emissiveTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 80,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "specularGlossinessTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 84,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-
-                                                        },
-                                                        {
-                                                            .Name = "diffuseTexture",
-                                                            .Type = ::RTTI::EParameterType::Int32,
-                                                            .Size = 4,
-                                                            .Offset = 88,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
-                                                        },
-                                                    },
-                                            },
-                                        },
-                                },
-                            },
-                    },
-                    ShaderResource::FStorageBuffer{
-                        .Set = 1,
-                        .Binding = 0,
-                        .Parameter =
-                            ::RTTI::FParameter{
-                                .Name = "DirectLight",
-                                .Type = ::RTTI::EParameterType::Struct,
-                                .Size = 0,
-                                .Offset = 0,
-                                .Columns = 1,
-                                .Rows = 1,
-                                .Members =
+                    TPair<uint32, TPair<uint32, VulkanRHI::ShaderResource::FDescriptorSetInfo>>{
+                        2,
+                        TPair<uint32, VulkanRHI::ShaderResource::FDescriptorSetInfo>{
+                            1,
+                            VulkanRHI::ShaderResource::FDescriptorSetInfo{
+                                .Type = VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::UniformBuffer,
+                                .Parameter =
                                     {
-                                        {
-                                            .Name = "directionalLightArray",
+                                        ::RTTI::FParameter{
+                                            .Name = "ObjectMaterials",
                                             .Type = ::RTTI::EParameterType::Struct,
-                                            .Size = 36,
+                                            .Size = 0,
                                             .Offset = 0,
                                             .Columns = 1,
                                             .Rows = 1,
                                             .Members =
                                                 {
                                                     {
-                                                        .Name = "orientation",
-                                                        .Type = ::RTTI::EParameterType::Float,
-                                                        .Size = 4,
+                                                        .Name = "materials",
+                                                        .Type = ::RTTI::EParameterType::Struct,
+                                                        .Size = 92,
                                                         .Offset = 0,
                                                         .Columns = 1,
-                                                        .Rows = 4,
-
-                                                    },
-                                                    {
-                                                        .Name = "color",
-                                                        .Type = ::RTTI::EParameterType::Float,
-                                                        .Size = 4,
-                                                        .Offset = 16,
-                                                        .Columns = 1,
-                                                        .Rows = 4,
-
-                                                    },
-                                                    {
-                                                        .Name = "intensity",
-                                                        .Type = ::RTTI::EParameterType::Float,
-                                                        .Size = 4,
-                                                        .Offset = 32,
-                                                        .Columns = 1,
                                                         .Rows = 1,
+                                                        .Members =
+                                                            {
+                                                                {
+                                                                    .Name = "alphaCutOff",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 0,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "metallic",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 4,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "roughness",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 8,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "baseColor",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 16,
+                                                                    .Columns = 1,
+                                                                    .Rows = 4,
+
+                                                                },
+                                                                {
+                                                                    .Name = "baseColorFactor",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 32,
+                                                                    .Columns = 1,
+                                                                    .Rows = 4,
+
+                                                                },
+                                                                {
+                                                                    .Name = "emissiveFactor",
+                                                                    .Type = ::RTTI::EParameterType::Float,
+                                                                    .Size = 4,
+                                                                    .Offset = 48,
+                                                                    .Columns = 1,
+                                                                    .Rows = 4,
+
+                                                                },
+                                                                {
+                                                                    .Name = "baseColorTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 64,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "metallicRoughnessTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 68,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "normalTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 72,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "occlusionTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 76,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "emissiveTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 80,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "specularGlossinessTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 84,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+
+                                                                },
+                                                                {
+                                                                    .Name = "diffuseTexture",
+                                                                    .Type = ::RTTI::EParameterType::Int32,
+                                                                    .Size = 4,
+                                                                    .Offset = 88,
+                                                                    .Columns = 1,
+                                                                    .Rows = 1,
+                                                                },
+                                                            },
                                                     },
                                                 },
                                         },
                                     },
                             },
-                    },
-
-                    ShaderResource::FStorageBuffer{
-                        .Set = 1,
-                        .Binding = 1,
-                        .Parameter =
+                        },
+                        {
+                            1,
                             {
-                                ::RTTI::FParameter{
-                                    .Name = "SpoLight",
-                                    .Type = ::RTTI::EParameterType::Struct,
-                                    .Size = 0,
-                                    .Offset = 0,
-                                    .Columns = 1,
-                                    .Rows = 1,
-                                    .Members =
+                                0,
+                                {
+                                    .Type =
+                                        VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer,
+                                    .Parameter =
                                         {
-                                            {
-                                                .Name = "spotLightArray",
+                                            ::RTTI::FParameter{
+                                                .Name = "PointLight",
                                                 .Type = ::RTTI::EParameterType::Struct,
-                                                .Size = 60,
+                                                .Size = 0,
                                                 .Offset = 0,
                                                 .Columns = 1,
                                                 .Rows = 1,
                                                 .Members =
                                                     {
-
                                                         {
-                                                            .Name = "position",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
+                                                            .Name = "pointLightArray",
+                                                            .Type = ::RTTI::EParameterType::Struct,
+                                                            .Size = sizeof(PointLightStruct),
                                                             .Offset = 0,
                                                             .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "direction",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 16,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "color",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 32,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "cutOff",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 48,
-                                                            .Columns = 1,
                                                             .Rows = 1,
+                                                            .Members =
+                                                                {
+                                                                    {
+                                                                        .Name = "position",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 0,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
 
-                                                        },
-                                                        {
-                                                            .Name = "outerCutOff",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 52,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
+                                                                    },
+                                                                    {
+                                                                        .Name = "color",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 16,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
 
-                                                        },
-                                                        {
-                                                            .Name = "intensity",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 56,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
+                                                                    },
+                                                                    {
+                                                                        .Name = "intensity",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 32,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "falloff",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 36,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+
+                                                                    },
+                                                                },
                                                         },
                                                     },
                                             },
                                         },
                                 },
                             },
-                    },
-                    ShaderResource::FStorageBuffer{
-                        .Set = 1,
-                        .Binding = 2,
-                        .Parameter =
+                        },
+                        {
+                            1,
                             {
-                                ::RTTI::FParameter{
-                                    .Name = "LightBuffer",
-                                    .Type = ::RTTI::EParameterType::Struct,
-                                    .Size = 0,
-                                    .Offset = 0,
-                                    .Columns = 1,
-                                    .Rows = 1,
-                                    .Members =
+                                1,
+                                {
+                                    .Type =
+                                        VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer,
+                                    .Parameter =
                                         {
-                                            {
-                                                .Name = "pointLightArray",
+                                            ::RTTI::FParameter{
+                                                .Name = "SpoLight",
                                                 .Type = ::RTTI::EParameterType::Struct,
-                                                .Size = 40,
+                                                .Size = 0,
                                                 .Offset = 0,
                                                 .Columns = 1,
                                                 .Rows = 1,
                                                 .Members =
                                                     {
-
                                                         {
-                                                            .Name = "position",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
+                                                            .Name = "spotLightArray",
+                                                            .Type = ::RTTI::EParameterType::Struct,
+                                                            .Size = 60,
                                                             .Offset = 0,
                                                             .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "color",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 16,
-                                                            .Columns = 1,
-                                                            .Rows = 4,
-
-                                                        },
-                                                        {
-                                                            .Name = "intensity",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 32,
-                                                            .Columns = 1,
                                                             .Rows = 1,
+                                                            .Members =
+                                                                {
 
-                                                        },
-                                                        {
-                                                            .Name = "falloff",
-                                                            .Type = ::RTTI::EParameterType::Float,
-                                                            .Size = 4,
-                                                            .Offset = 36,
-                                                            .Columns = 1,
-                                                            .Rows = 1,
+                                                                    {
+                                                                        .Name = "position",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 0,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
 
+                                                                    },
+                                                                    {
+                                                                        .Name = "direction",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 16,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "color",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 32,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "cutOff",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 48,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "outerCutOff",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 52,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "intensity",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 56,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+                                                                    },
+                                                                },
                                                         },
                                                     },
                                             },
                                         },
                                 },
                             },
+                        },
+                        {
+                            1,
+                            {
+                                2,
+                                {
+                                    .Type =
+                                        VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer,
+                                    .Parameter =
+                                        {
+                                            ::RTTI::FParameter{
+                                                .Name = "DirectLight",
+                                                .Type = ::RTTI::EParameterType::Struct,
+                                                .Size = 0,
+                                                .Offset = 0,
+                                                .Columns = 1,
+                                                .Rows = 1,
+                                                .Members =
+                                                    {
+                                                        {
+                                                            .Name = "directLightArray",
+                                                            .Type = ::RTTI::EParameterType::Struct,
+                                                            .Size = sizeof(DirectionalLight),
+                                                            .Offset = 0,
+                                                            .Columns = 1,
+                                                            .Rows = 1,
+                                                            .Members =
+                                                                {
+                                                                    {
+                                                                        .Name = "orientation",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 0,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "color",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 16,
+                                                                        .Columns = 1,
+                                                                        .Rows = 4,
+
+                                                                    },
+                                                                    {
+                                                                        .Name = "intensity",
+                                                                        .Type = ::RTTI::EParameterType::Float,
+                                                                        .Size = 4,
+                                                                        .Offset = 32,
+                                                                        .Columns = 1,
+                                                                        .Rows = 1,
+
+                                                                    },
+                                                                },
+                                                        },
+                                                    },
+                                            },
+                                        },
+                                },
+                            },
+                        },
                     },
                 },
         };
+
     const RVulkanShader::FReflectionData& GotReflection = ShaderResult->GetReflectionData();
 
     CheckReflection(ExpectedReflection, GotReflection);

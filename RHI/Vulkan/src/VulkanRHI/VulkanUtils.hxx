@@ -142,7 +142,8 @@ FORCEINLINE VkImageAspectFlags TextureUsageFlagToVkImageAspectFlags(ETextureUsag
 {
     VkImageAspectFlags ReturnFlag = VK_IMAGE_ASPECT_NONE;
 
-    if (EnumHasAnyFlags(CreateFlags, ETextureUsageFlags::RenderTargetable | ETextureUsageFlags::ResolveTargetable))
+    if (EnumHasAnyFlags(CreateFlags, ETextureUsageFlags::RenderTargetable | ETextureUsageFlags::ResolveTargetable |
+                                         ETextureUsageFlags::SampleTargetable))
     {
         ReturnFlag |= VK_IMAGE_ASPECT_COLOR_BIT;
     }
@@ -189,6 +190,30 @@ FORCEINLINE VkAttachmentStoreOp RenderTargetStoreActionToVkAttachmentStoreOp(ERe
             return VK_ATTACHMENT_STORE_OP_STORE;
         case ERenderTargetStoreAction::NoAction:
             return VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    }
+    checkNoEntry();
+}
+
+FORCEINLINE VkFilter TextureFilterToVkFilter(ETextureFilter Filter)
+{
+    switch (Filter)
+    {
+        case ETextureFilter::Nearest:
+            return VK_FILTER_NEAREST;
+        case ETextureFilter::Linear:
+            return VK_FILTER_LINEAR;
+    }
+    checkNoEntry();
+}
+
+FORCEINLINE VkSamplerAddressMode TextureWrapToVkSamplerAddressMode(ETextureWrap Wrap)
+{
+    switch (Wrap)
+    {
+        case ETextureWrap::Clamp:
+            return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        case ETextureWrap::Repeat:
+            return VK_SAMPLER_ADDRESS_MODE_REPEAT;
     }
     checkNoEntry();
 }
