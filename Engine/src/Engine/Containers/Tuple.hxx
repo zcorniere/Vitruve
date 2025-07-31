@@ -24,6 +24,14 @@ struct TTupleElement
     TTupleElement& operator=(TTupleElement&&) = default;
     TTupleElement& operator=(const TTupleElement&) = default;
 
+    bool operator==(const TTupleElement& Other) const
+    requires std::equality_comparable<TType>
+    = default;
+
+    auto operator<=>(const TTupleElement& Other) const
+    requires std::three_way_comparable<TType>
+    = default;
+
     Type Value;
 };
 
@@ -51,6 +59,10 @@ struct TTupleImpl<std::index_sequence<Indices...>, Types...> : TTupleElement<Ind
     explicit TTupleImpl(Args&&... args): TTupleElement<Indices, Types>(std::forward<Args>(args))...
     {
     }
+
+    bool operator==(const TTupleImpl& Other) const
+    requires(std::equality_comparable<TTupleElement<Indices, Types>> && ...)
+    = default;
 };
 
 }    // namespace __details::tuple
