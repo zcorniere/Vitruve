@@ -69,6 +69,16 @@ void FFRHICommandList::SetScissor(IVector2 Offset, UVector2 Size)
     Enqueue(new FRHISetScissor(Offset, Size));
 }
 
+void FFRHICommandList::BeginGPURegion(const std::string& Name, const FColor& Color)
+{
+    Enqueue(new FRHIBeginGPURegion(Name, Color));
+}
+
+void FFRHICommandList::EndGPURegion()
+{
+    Enqueue(new FRHIEndGPURegion());
+}
+
 void FFRHICommandList::Draw(uint32 BaseVertexIndex, uint32 NumPrimitives, uint32 NumInstances)
 {
     Enqueue(new FRHIDraw(BaseVertexIndex, NumPrimitives, NumInstances));

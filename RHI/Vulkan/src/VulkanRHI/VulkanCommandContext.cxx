@@ -183,6 +183,29 @@ void FVulkanCommandContext::SetScissor(IVector2 Offset, UVector2 Size)
     PendingState->SetScissor(Offset, Size);
 }
 
+void FVulkanCommandContext::BeginGPURegion([[maybe_unused]] const std::string& Name,
+                                           [[maybe_unused]] const FColor& Color)
+{
+#if defined(VULKAN_DEBUGGING_ENABLED)
+    FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();
+    VkDebugUtilsLabelEXT Label{
+        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
+        .pNext = nullptr,
+        .pLabelName = Name.c_str(),
+        .color = {Color.r / 255, Color.g / 255, Color.b / 255, 1.0f},
+    };
+    VulkanAPI::vkCmdBeginDebugUtilsLabelEXT(CmdBuffer->GetHandle(), &Label);
+#endif
+}
+
+void FVulkanCommandContext::EndGPURegion()
+{
+#if defined(VULKAN_DEBUGGING_ENABLED)
+    FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();
+    VulkanAPI::vkCmdEndDebugUtilsLabelEXT(CmdBuffer->GetHandle());
+#endif
+}
+
 void FVulkanCommandContext::Draw(uint32 BaseVertexIndex, uint32 NumVertex, uint32 NumInstances)
 {
     FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();

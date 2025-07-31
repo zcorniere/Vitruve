@@ -97,6 +97,20 @@ void FRHISetScissor::Execute(FFRHICommandList& CommandList)
     CommandList.GetContext()->SetScissor(Offset, Size);
 }
 
+FRHIBeginGPURegion::FRHIBeginGPURegion(const std::string& Name, const FColor& Color): Name(Name), Color(Color)
+{
+}
+
+void FRHIBeginGPURegion::Execute(FFRHICommandList& CommandList)
+{
+    CommandList.GetContext()->BeginGPURegion(Name, Color);
+}
+
+void FRHIEndGPURegion::Execute(FFRHICommandList& CommandList)
+{
+    CommandList.GetContext()->EndGPURegion();
+}
+
 FRHIDraw::FRHIDraw(uint32 BaseVertexIndex, uint32 NumPrimitives, uint32 NumInstances)
     : BaseVertexIndex(BaseVertexIndex)
     , NumPrimitives(NumPrimitives)

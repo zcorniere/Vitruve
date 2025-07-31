@@ -126,6 +126,11 @@ public:
     /// @brief Set the scissor rectangle
     void SetScissor(IVector2 Offset, UVector2 Size);
 
+    /// @brief Begin a GPU region for profiling
+    void BeginGPURegion(const std::string& Name, const FColor& Color = {});
+    /// @brief End the current GPU region
+    void EndGPURegion();
+
     /// @brief Draw to the current render target
     ///
     /// @param BaseVertexIndex The index of the first vertex to draw

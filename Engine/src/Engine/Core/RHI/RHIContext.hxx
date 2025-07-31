@@ -42,6 +42,9 @@ public:
     virtual void SetViewport(FVector3 Min, FVector3 Max) = 0;
     virtual void SetScissor(IVector2 Offset, UVector2 Size) = 0;
 
+    virtual void BeginGPURegion(const std::string& Name, const FColor& Color = {}) = 0;
+    virtual void EndGPURegion() = 0;
+
     /// @brief Send a draw call to the RHI
     virtual void Draw(uint32 BaseVertexIndex, uint32 NumPrimitives, uint32 NumInstances) = 0;
     virtual void DrawIndexed(Ref<RRHIBuffer> InIndexBuffer, int32 BaseVertexIndex, uint32 FirstInstance,

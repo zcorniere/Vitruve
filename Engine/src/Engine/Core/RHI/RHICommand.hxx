@@ -111,8 +111,8 @@ public:
 
 private:
     Ref<RRHIBuffer> VertexBuffer = nullptr;
-    uint32 BufferIndex = 0;
-    uint32 Offset = 0;
+    const uint32 BufferIndex = 0;
+    const uint32 Offset = 0;
 };
 
 RHICOMMAND_MACRO(FRHISetViewport)
@@ -124,8 +124,8 @@ public:
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
 private:
-    FVector3 Min;
-    FVector3 Max;
+    const FVector3 Min;
+    const FVector3 Max;
 };
 
 RHICOMMAND_MACRO(FRHISetScissor)
@@ -137,8 +137,30 @@ public:
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
 private:
-    IVector2 Offset;
-    UVector2 Size;
+    const IVector2 Offset;
+    const UVector2 Size;
+};
+
+RHICOMMAND_MACRO(FRHIBeginGPURegion)
+{
+public:
+    FRHIBeginGPURegion(const std::string& Name, const FColor& Color);
+    virtual ~FRHIBeginGPURegion() = default;
+
+    virtual void Execute(FFRHICommandList & CommandList) override final;
+
+private:
+    const std::string Name;
+    const FColor Color = {0.0f, 0.0f, 0.0f};
+};
+
+RHICOMMAND_MACRO(FRHIEndGPURegion)
+{
+public:
+    FRHIEndGPURegion() = default;
+    virtual ~FRHIEndGPURegion() = default;
+
+    virtual void Execute(FFRHICommandList & CommandList) override final;
 };
 
 RHICOMMAND_MACRO(FRHIDraw)
@@ -150,9 +172,9 @@ public:
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
 public:
-    uint32 BaseVertexIndex = 0;
-    uint32 NumPrimitives = 0;
-    uint32 NumInstances = 0;
+    const uint32 BaseVertexIndex = 0;
+    const uint32 NumPrimitives = 0;
+    const uint32 NumInstances = 0;
 };
 
 RHICOMMAND_MACRO(RHIDrawIndexed)
@@ -166,12 +188,12 @@ public:
 
 private:
     Ref<RRHIBuffer> IndexBuffer = nullptr;
-    int32 BaseVertexIndex = 0;
-    uint32 FirstInstance = 0;
-    uint32 NumVertices = 0;
-    uint32 StartIndex = 0;
-    uint32 NumPrimitives = 0;
-    uint32 NumInstances = 0;
+    const int32 BaseVertexIndex = 0;
+    const uint32 FirstInstance = 0;
+    const uint32 NumVertices = 0;
+    const uint32 StartIndex = 0;
+    const uint32 NumPrimitives = 0;
+    const uint32 NumInstances = 0;
 };
 
 RHICOMMAND_MACRO(RHICopyResourceArrayToBuffer)
@@ -186,9 +208,9 @@ public:
 private:
     IResourceArrayInterface* const SourceArray = nullptr;
     Ref<RRHIBuffer> DestinationBuffer = nullptr;
-    uint64 Size = 0;
-    uint64 SourceOffset = 0;
-    uint64 DestinationOffset = 0;
+    const uint64 Size = 0;
+    const uint64 SourceOffset = 0;
+    const uint64 DestinationOffset = 0;
 };
 
 RHICOMMAND_MACRO(RHICopyBufferToBuffer)
@@ -203,9 +225,9 @@ public:
 private:
     const Ref<RRHIBuffer> SourceBuffer = nullptr;
     Ref<RRHIBuffer> DestinationBuffer = nullptr;
-    uint64 Size = 0;
-    uint64 SourceOffset = 0;
-    uint64 DestinationOffset = 0;
+    const uint64 Size = 0;
+    const uint64 SourceOffset = 0;
+    const uint64 DestinationOffset = 0;
 };
 
 RHICOMMAND_MACRO(RHICopyBufferToImage)
@@ -220,9 +242,9 @@ public:
 private:
     const Ref<RRHIBuffer> SourceBuffer = nullptr;
     Ref<RRHITexture> DestinationTexture = nullptr;
-    uint64 SourceOffset = 0;
-    IVector3 DestinationOffset = {0, 0};
-    UVector3 Size = {1, 1};
+    const uint64 SourceOffset = 0;
+    const IVector3 DestinationOffset = {0, 0};
+    const UVector3 Size = {1, 1};
 };
 
 #undef RHICOMMAND_MACRO
