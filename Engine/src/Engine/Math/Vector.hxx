@@ -165,6 +165,8 @@ using TVector4 = Math::TVector<4, T>;
 using FVector2 = Math::TVector<2, float>;
 using FVector3 = Math::TVector<3, float>;
 using FVector4 = Math::TVector<4, float>;
+using FColor = Math::TVector<3, float>;     // RGB color
+using FColorA = Math::TVector<4, float>;    // RGBA color
 
 using DVector2 = Math::TVector<2, double>;
 using DVector3 = Math::TVector<3, double>;
