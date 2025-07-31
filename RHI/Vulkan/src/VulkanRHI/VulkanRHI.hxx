@@ -46,7 +46,7 @@ public:
     }
 
     virtual void DeferedDeletion(std::function<void()>&& InDeletionFunction) final override;
-    virtual void FlushDeletionQueue() final override;
+    virtual void FlushDeletionQueue(bool bAsync = true) final override;
 
     virtual void RegisterScene(WeakRef<RRHIScene> Scene) final override;
     virtual void UnregisterScene(WeakRef<RRHIScene> Scene) final override;
@@ -117,6 +117,7 @@ private:
 
     TArray<WeakRef<RRHIScene>> ScenesContainers;
 
+    std::mutex DeletionQueueMutex;
     TArray<std::function<void()>> DeletionQueue;
 };
 

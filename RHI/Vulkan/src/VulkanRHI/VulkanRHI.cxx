@@ -124,23 +124,34 @@ void FVulkanDynamicRHI::PostInit()
     ImGuiStuff.Initialize(Device.get());
 }
 
-void FVulkanDynamicRHI::FlushDeletionQueue()
+void FVulkanDynamicRHI::FlushDeletionQueue(bool bAsync)
 {
-    int Counter = 0;
-    for (std::function<void()>& DeletionFunction: DeletionQueue)
+    auto Work = [this](int)
     {
-        DeletionFunction();
-        Counter++;
-    }
-    DeletionQueue.Clear();
-    if (Counter > 0)
-    {
-        LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
-    }
+        std::scoped_lock lock(DeletionQueueMutex);
+
+        int Counter = 0;
+        for (std::function<void()>& DeletionFunction: DeletionQueue)
+        {
+            DeletionFunction();
+            Counter++;
+        }
+        DeletionQueue.Clear();
+        if (Counter > 0)
+        {
+            LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
+        }
+    };
+
+    if (bAsync)
+        (void)GEngine->GetThreadPool().Push(Work);
+    else
+        Work(0);    // Run synchronously
 }
 
 void FVulkanDynamicRHI::DeferedDeletion(std::function<void()>&& InDeletionFunction)
 {
+    std::scoped_lock lock(DeletionQueueMutex);
     DeletionQueue.Emplace(std::move(InDeletionFunction));
 }
 
@@ -167,7 +178,7 @@ void FVulkanDynamicRHI::Shutdown()
     AvailableCommandContexts.Clear(true);
     check(CommandContexts.IsEmpty());
 
-    FlushDeletionQueue();    // Flush the deletion queue
+    FlushDeletionQueue(false);    // Flush the deletion queue, synchronously
 
     Device.reset();
 
