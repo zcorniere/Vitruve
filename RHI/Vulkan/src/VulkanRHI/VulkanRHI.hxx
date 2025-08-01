@@ -1,13 +1,12 @@
 #pragma once
 
-#include "VulkanRHI/VulkanPlatform.hxx"
-DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Trace);
-
 #include "Engine/Core/RHI/GenericRHI.hxx"
-
+#include "VulkanRHI/VulkanPlatform.hxx"
 #include "VulkanRHI/VulkanRHI_Debug.hxx"
 #include "VulkanRHI/VulkanRHI_ImGui.hxx"
 #include "VulkanRHI/VulkanShaderCompiler.hxx"
+
+DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Trace);
 
 // Raphael classes
 class RRHIResource;

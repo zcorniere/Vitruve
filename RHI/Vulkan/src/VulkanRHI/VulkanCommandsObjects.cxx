@@ -288,7 +288,6 @@ void VulkanCommandBufferManager::SubmitUploadCmdBuffer(const Ref<RSemaphore>& Si
             Queue->Submit(UploadCmdBufferRef);
         }
     }
-    UploadCmdBufferRef->SetName(std::format("{:s}.Unused.Buffer", GetName()));
     UploadCmdBufferRef = nullptr;
 }
 
@@ -315,7 +314,6 @@ void VulkanCommandBufferManager::SubmitActiveCmdBuffer(const Ref<RSemaphore>& Si
             Queue->Submit(ActiveCmdBufferRef);
         }
     }
-    ActiveCmdBufferRef->SetName(std::format("{:s}.Unused.Buffer", GetName()));
     ActiveCmdBufferRef = nullptr;
 }
 

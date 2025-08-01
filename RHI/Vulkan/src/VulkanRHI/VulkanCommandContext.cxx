@@ -192,7 +192,7 @@ void FVulkanCommandContext::BeginGPURegion([[maybe_unused]] const std::string& N
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
         .pNext = nullptr,
         .pLabelName = Name.c_str(),
-        .color = {Color.r / 255, Color.g / 255, Color.b / 255, 1.0f},
+        .color = {Color.r, Color.g, Color.b, 1.0f},
     };
     VulkanAPI::vkCmdBeginDebugUtilsLabelEXT(CmdBuffer->GetHandle(), &Label);
 #endif

@@ -69,7 +69,7 @@ bool RAsset::LoadOnGPU()
             CommandList.CopyBufferToBuffer(TmpBuffer, VertexBuffer, 0, 0, TmpBuffer->GetSize());
             CommandList.CopyBufferToBuffer(TmpIndexBuffer, IndexBuffer, 0, 0, TmpIndexBuffer->GetSize());
 
-            RHI::RHIWaitUntilIdle();
+            RHI::RHIWaitUntilIdle();    // #TODO: not that
         });
 
     return true;

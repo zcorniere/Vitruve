@@ -143,6 +143,8 @@ bool RVulkanViewport::Present(FVulkanCommandContext* Context, FVulkanCmdBuffer* 
         Ref<RSemaphore> SignalSemaphore =
             (AcquiredImageIndex >= 0) ? RenderingDoneSemaphores[AcquiredImageIndex] : nullptr;
         Context->GetCommandManager()->SubmitActiveCmdBufferFromPresent(SignalSemaphore);
+        // make sure there is a command buffer in flight
+        Context->GetCommandManager()->PrepareForNewActiveCommandBuffer();
     }
     else [[unlikely]]
     {

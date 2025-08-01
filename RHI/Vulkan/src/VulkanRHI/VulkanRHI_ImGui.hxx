@@ -23,8 +23,8 @@ public:
     void Initialize(FVulkanDevice* Device);
     void Shutdown();
 
-    void Begin();
-    void End();
+    void BeginFrame();
+    void EndFrame();
     void Render();
 
 private:
@@ -32,9 +32,6 @@ private:
     bool RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList);
     bool UpdateGeometry(ImDrawData* DrawData);
     bool UpdateTargetTexture(ImGuiViewport* Viewport, FFRHICommandList& CommandList);
-
-    template <typename T>
-    bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<T>& Data);
 
 private:
     GLFWHolder GlfwHolder;

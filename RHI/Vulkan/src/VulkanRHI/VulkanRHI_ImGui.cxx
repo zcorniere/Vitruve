@@ -84,6 +84,7 @@ void VulkanRHI_ImGui::Shutdown()
     ImGuiVertexBuffer = nullptr;
     ImGuiIndexBufferData.Clear();
     ImGuiIndexBuffer = nullptr;
+
     ImGuiOutputTexture = nullptr;
 
     DescriptorSetManager.reset();
@@ -92,7 +93,7 @@ void VulkanRHI_ImGui::Shutdown()
     ImGui::DestroyContext();
 }
 
-void VulkanRHI_ImGui::Begin()
+void VulkanRHI_ImGui::BeginFrame()
 {
     ENQUEUE_RENDER_COMMAND(ImGui_BeginFrame)
     (
@@ -105,7 +106,7 @@ void VulkanRHI_ImGui::Begin()
         });
 }
 
-void VulkanRHI_ImGui::End()
+void VulkanRHI_ImGui::EndFrame()
 {
     ENQUEUE_RENDER_COMMAND(ImGui_BeginFrame)
     ([](FFRHICommandList&) { ImGui::EndFrame(); });
@@ -119,64 +120,52 @@ void VulkanRHI_ImGui::Render()
         [this](FFRHICommandList& CommandList)
         {
             ImGui::Render();
+
+            const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
+            CommandList.BeginGPURegion("ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
             RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
+            CommandList.EndGPURegion();
         });
 }
 
-// #TODO magic number
-constexpr auto ImGuiVertexBufferSlack = 500;
-
-template <>
-bool VulkanRHI_ImGui::ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<ImDrawVert>& Data)
+template <typename T, EBufferUsageFlags Flags, int BufferSlack = 500>
+static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<T>& Data)
 {
     if (Buffer && Buffer->GetCurrentSize() >= Data.GetByteSize())
     {
-        return true;
+        return false;
     }
     // Reallocate the buffer
     FRHIBufferDesc Desc{
-        .Size = Data.GetByteSize() + ImGuiVertexBufferSlack,
+        .Size = Data.GetByteSize() + BufferSlack,
         .Usage = EBufferUsageFlags::SourceCopy | EBufferUsageFlags::KeepCPUAccessible,
         .ResourceArray = &Data,
-        .DebugName = "ImGui Vertex Buffer Staging",
+        .DebugName = "ImGuiBufferStaging",
     };
     Ref<RRHIBuffer> NewStagingBuffer = RHI::CreateBuffer(Desc);
 
-    Desc.Usage = EBufferUsageFlags::VertexBuffer | EBufferUsageFlags::DestinationCopy;
-    Desc.DebugName = "ImGui Vertex Buffer";
+    Desc.Usage = Flags | EBufferUsageFlags::DestinationCopy;
+    if constexpr (EnumHasAnyFlags(Flags, EBufferUsageFlags::VertexBuffer))
+    {
+        Desc.DebugName = "ImGuiBuffer.Vertex";
+    }
+    else if constexpr (EnumHasAnyFlags(Flags, EBufferUsageFlags::IndexBuffer))
+    {
+        Desc.DebugName = "ImGuiBuffer.Index";
+    }
+    else
+    {
+        Desc.DebugName = "ImGuiBuffer";
+    }
     Desc.ResourceArray = nullptr;
     Buffer = RHI::CreateBuffer(Desc);
 
     ENQUEUE_RENDER_COMMAND(UpdateImGuiVertexBuffer)(
         [NewStagingBuffer, TargetBuffer = Ref<RRHIBuffer>(Buffer), Desc](FFRHICommandList& CommandList) mutable
-        { CommandList.CopyBufferToBuffer(NewStagingBuffer, TargetBuffer, 0, 0, Desc.Size); });
-
-    return true;
-}
-template <>
-bool VulkanRHI_ImGui::ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<ImDrawIdx>& Data)
-{
-    if (Buffer && Buffer->GetCurrentSize() >= Data.GetByteSize())
-    {
-        return true;
-    }
-    // Reallocate the buffer
-    FRHIBufferDesc Desc{
-        .Size = Data.GetByteSize() + ImGuiVertexBufferSlack,
-        .Usage = EBufferUsageFlags::SourceCopy | EBufferUsageFlags::KeepCPUAccessible,
-        .ResourceArray = &Data,
-        .DebugName = "ImGui Index Buffer Staging",
-    };
-    Ref<RRHIBuffer> NewStagingBuffer = RHI::CreateBuffer(Desc);
-
-    Desc.Usage = EBufferUsageFlags::IndexBuffer | EBufferUsageFlags::DestinationCopy;
-    Desc.DebugName = "ImGui Index Buffer";
-    Desc.ResourceArray = nullptr;
-    Buffer = RHI::CreateBuffer(Desc);
-
-    ENQUEUE_RENDER_COMMAND(UpdateImGuiIndexBuffer)(
-        [NewStagingBuffer, TargetBuffer = Ref<RRHIBuffer>(Buffer), Desc](FFRHICommandList& CommandList) mutable
-        { CommandList.CopyBufferToBuffer(NewStagingBuffer, TargetBuffer, 0, 0, Desc.Size); });
+        {
+            CommandList.CopyBufferToBuffer(NewStagingBuffer, TargetBuffer, 0, 0, Desc.Size);
+            RHI::RHIWaitUntilIdle();    // #TODO: not that
+        });
 
     return true;
 }
@@ -247,15 +236,12 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
         return true;
     }
 
-    if (!UpdateGeometry(DrawData))
-        return false;
-
     FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
+
+    UpdateGeometry(DrawData);
 
     if (!UpdateFontTexture(CommandList))
         return false;
-
-    CommandList.BeginFrame();
 
     FRHIRenderPassDescription RenderPassDesc{
         .RenderAreaLocation = {0, 0},
@@ -349,7 +335,6 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
     }
 
     CommandList.EndRendering();
-    CommandList.EndFrame();
 
     return true;
 }
@@ -372,12 +357,13 @@ bool VulkanRHI_ImGui::UpdateGeometry(ImDrawData* DrawData)
         idxDst += cmdList->IdxBuffer.Size;
     }
 
-    if (!ReallocateBufferIfNeeded(ImGuiVertexBuffer, ImGuiVertexBufferData))
-        return false;
-    if (!ReallocateBufferIfNeeded(ImGuiIndexBuffer, ImGuiIndexBufferData))
-        return false;
+    bool bWasResized = false;
+    bWasResized |=
+        ReallocateBufferIfNeeded<ImDrawVert, EBufferUsageFlags::VertexBuffer>(ImGuiVertexBuffer, ImGuiVertexBufferData);
+    bWasResized |=
+        ReallocateBufferIfNeeded<ImDrawIdx, EBufferUsageFlags::IndexBuffer>(ImGuiIndexBuffer, ImGuiIndexBufferData);
 
-    return true;
+    return bWasResized;
 }
 
 bool VulkanRHI_ImGui::UpdateTargetTexture(ImGuiViewport* Viewport, FFRHICommandList& CommandList)

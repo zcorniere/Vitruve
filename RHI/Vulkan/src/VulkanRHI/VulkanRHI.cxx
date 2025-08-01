@@ -3,6 +3,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
+#include "Engine/Core/Engine.hxx"
 #include "Engine/Misc/Utils.hxx"
 
 #include "Engine/Platforms/PlatformMisc.hxx"
@@ -67,21 +68,25 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
         if (Scene.IsValid())
         {
             ENQUEUE_RENDER_COMMAND(RenderScene)
-            ([Scene](FFRHICommandList& CommandList) mutable { Scene->TickRenderer(CommandList); });
+            (
+                [Scene](FFRHICommandList& CommandList) mutable
+                {
+                    CommandList.BeginGPURegion(Scene->GetName());
+                    Scene->TickRenderer(CommandList);
+                    CommandList.EndGPURegion();
+                });
         }
     }
+
+    ImGuiStuff.BeginFrame();
+    ImGuiStuff.EndFrame();
+    ImGuiStuff.Render();
 
     ENQUEUE_RENDER_COMMAND(EndFrame)([](FFRHICommandList& CommandList) { CommandList.EndFrame(); });
 }
 
 void FVulkanDynamicRHI::PostFrame()
 {
-    // Reset the ImGui state
-    ImGuiStuff.Begin();
-
-    ImGuiStuff.End();
-
-    ImGuiStuff.Render();
 }
 
 VkDevice FVulkanDynamicRHI::RHIGetVkDevice() const
