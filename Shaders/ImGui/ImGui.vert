@@ -2,7 +2,8 @@
 
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aUV;
-layout(location = 2) in vec4 aColor;
+// layout(location = 2) in vec4 aColor;
+layout(location = 2) in uint aColor;
 
 layout(push_constant) uniform uPushConstant
 {
@@ -16,7 +17,9 @@ layout(location = 1) out vec2 outUV;
 
 void main()
 {
-    outColor = aColor;
+    // outColor = aColor;
+    outColor = vec4(float((aColor >> 16) & 0xFF) / 255.0, float((aColor >> 8) & 0xFF) / 255.0,
+                    float(aColor & 0xFF) / 255.0, float((aColor >> 24) & 0xFF) / 255.0);
     outUV = aUV;
     gl_Position = vec4(aPos * pc.uScale + pc.uTranslate, 0, 1);
 }

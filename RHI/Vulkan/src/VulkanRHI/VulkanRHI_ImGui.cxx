@@ -40,7 +40,8 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
                         {
                             {.Name = "Position", .Type = EVertexElementType::Float2},
                             {.Name = "Texcoord", .Type = EVertexElementType::Float2},
-                            {.Name = "Color", .Type = EVertexElementType::Float4},
+                            // {.Name = "Color", .Type = EVertexElementType::Float4},
+                            {.Name = "Color", .Type = EVertexElementType::Uint1},
                         },
                 },
             },
@@ -93,39 +94,28 @@ void VulkanRHI_ImGui::Shutdown()
     ImGui::DestroyContext();
 }
 
-void VulkanRHI_ImGui::BeginFrame()
+void VulkanRHI_ImGui::BeginFrame(FFRHICommandList&)
 {
-    ENQUEUE_RENDER_COMMAND(ImGui_BeginFrame)
-    (
-        [](FFRHICommandList&)
-        {
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 
-            ImGui::ShowMetricsWindow();
-        });
+    ImGui::ShowMetricsWindow();
 }
 
-void VulkanRHI_ImGui::EndFrame()
+void VulkanRHI_ImGui::EndFrame(FFRHICommandList&)
 {
-    ENQUEUE_RENDER_COMMAND(ImGui_BeginFrame)
-    ([](FFRHICommandList&) { ImGui::EndFrame(); });
+    ImGui::EndFrame();
 }
 
-void VulkanRHI_ImGui::Render()
+void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList)
 {
+    RPH_PROFILE_FUNC()
+    ImGui::Render();
 
-    ENQUEUE_RENDER_COMMAND(ImGuiRenderCommand)
-    (
-        [this](FFRHICommandList& CommandList)
-        {
-            ImGui::Render();
-
-            const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
-            CommandList.BeginGPURegion("ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
-            RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
-            CommandList.EndGPURegion();
-        });
+    const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
+    CommandList.BeginGPURegion("ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
+    RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
+    CommandList.EndGPURegion();
 }
 
 template <typename T, EBufferUsageFlags Flags, int BufferSlack = 500>
@@ -138,13 +128,12 @@ static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<
     // Reallocate the buffer
     FRHIBufferDesc Desc{
         .Size = Data.GetByteSize() + BufferSlack,
-        .Usage = EBufferUsageFlags::SourceCopy | EBufferUsageFlags::KeepCPUAccessible,
+        .Stride = sizeof(T),
+        .Usage = Flags | EBufferUsageFlags::KeepCPUAccessible,
         .ResourceArray = &Data,
         .DebugName = "ImGuiBufferStaging",
     };
-    Ref<RRHIBuffer> NewStagingBuffer = RHI::CreateBuffer(Desc);
 
-    Desc.Usage = Flags | EBufferUsageFlags::DestinationCopy;
     if constexpr (EnumHasAnyFlags(Flags, EBufferUsageFlags::VertexBuffer))
     {
         Desc.DebugName = "ImGuiBuffer.Vertex";
@@ -157,15 +146,7 @@ static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<
     {
         Desc.DebugName = "ImGuiBuffer";
     }
-    Desc.ResourceArray = nullptr;
     Buffer = RHI::CreateBuffer(Desc);
-
-    ENQUEUE_RENDER_COMMAND(UpdateImGuiVertexBuffer)(
-        [NewStagingBuffer, TargetBuffer = Ref<RRHIBuffer>(Buffer), Desc](FFRHICommandList& CommandList) mutable
-        {
-            CommandList.CopyBufferToBuffer(NewStagingBuffer, TargetBuffer, 0, 0, Desc.Size);
-            RHI::RHIWaitUntilIdle();    // #TODO: not that
-        });
 
     return true;
 }
@@ -185,7 +166,7 @@ bool VulkanRHI_ImGui::UpdateFontTexture(FFRHICommandList& CommandList)
     io.Fonts->GetTexDataAsRGBA32(&Pixels, &TextureWidth, &TextureHeight);
     if (!Pixels)
         return false;
-    // #TODO: magic number
+
     TexturePixels.Resize(static_cast<uint32>(TextureWidth * TextureHeight * 4));
     std::memcpy(TexturePixels.Raw(), Pixels, TextureWidth * TextureHeight * 4);
 
@@ -325,8 +306,8 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                                            ImGuiPipeline->GetPipelineLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS);
 
                 CommandContext->SetPushConstants(pushConstants);
-                CommandList.DrawIndexed(ImGuiIndexBuffer, 0, 0, vertexCount, startIndexLocation, startVertexLocation,
-                                        1);
+                CommandList.DrawIndexed(ImGuiIndexBuffer, startVertexLocation, 0, vertexCount, startIndexLocation,
+                                        vertexCount / 3, 1);
             }
         }
 

@@ -61,7 +61,12 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
 {
     (void)fDeltaTime;
 
-    ENQUEUE_RENDER_COMMAND(BeginFrame)([](FFRHICommandList& CommandList) { CommandList.BeginFrame(); });
+    ENQUEUE_RENDER_COMMAND(BeginFrame)(
+        [this](FFRHICommandList& CommandList)
+        {
+            CommandList.BeginFrame();
+            ImGuiStuff.BeginFrame(CommandList);
+        });
 
     for (WeakRef<RRHIScene>& Scene: ScenesContainers)
     {
@@ -78,9 +83,20 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
         }
     }
 
-    ImGuiStuff.BeginFrame();
-    ImGuiStuff.EndFrame();
-    ImGuiStuff.Render();
+    ENQUEUE_RENDER_COMMAND(ImGuiRender)
+    (
+        [this](FFRHICommandList& CommandList)
+        {
+            ImGuiStuff.EndFrame(CommandList);
+            ImGuiStuff.Render(CommandList);
+
+            // Maybe not optimal, but we copy the ImGui output texture to the backbuffer of the first scene's viewport
+            // We should always have at least one scene, right ?
+            Ref<RRHITexture> OutputTexture = ImGuiStuff.GetOutputTexture();
+            Ref<RRHITexture> Backbuffer = ScenesContainers[0]->GetViewport()->GetBackbuffer();
+            CommandList.CopyImageToImage(OutputTexture, Backbuffer, IVector2(0, 0), IVector2(0, 0),
+                                         Backbuffer->GetDescription().Extent);
+        });
 
     ENQUEUE_RENDER_COMMAND(EndFrame)([](FFRHICommandList& CommandList) { CommandList.EndFrame(); });
 }

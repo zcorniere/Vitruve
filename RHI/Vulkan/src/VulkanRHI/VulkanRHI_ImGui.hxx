@@ -23,9 +23,14 @@ public:
     void Initialize(FVulkanDevice* Device);
     void Shutdown();
 
-    void BeginFrame();
-    void EndFrame();
-    void Render();
+    void BeginFrame(FFRHICommandList& CommandList);
+    void EndFrame(FFRHICommandList& CommandList);
+    void Render(FFRHICommandList& CommandList);
+
+    Ref<RVulkanTexture> GetOutputTexture() const
+    {
+        return ImGuiOutputTexture;
+    }
 
 private:
     bool UpdateFontTexture(FFRHICommandList& CommandList);
@@ -36,10 +41,8 @@ private:
 private:
     GLFWHolder GlfwHolder;
     FVulkanDevice* Device = nullptr;
-    Ref<RVulkanTexture> ImGuiFontTexture = nullptr;
 
-    Ref<RVulkanTexture> FontTexture = nullptr;
-    VkSampler FontSampler = VK_NULL_HANDLE;
+    Ref<RVulkanTexture> ImGuiFontTexture = nullptr;
 
     TResourceArray<ImDrawVert> ImGuiVertexBufferData;
     Ref<RVulkanBuffer> ImGuiVertexBuffer = nullptr;
