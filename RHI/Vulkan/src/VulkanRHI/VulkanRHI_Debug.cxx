@@ -159,3 +159,13 @@ void VulkanRHI_Debug::RemoveDebugLayer(VkInstance Instance)
 }    // namespace VulkanRHI
 
 #endif    // VULKAN_DEBUGGING_ENABLED
+
+VulkanRHI::FVulkanRegion::FVulkanRegion(FFRHICommandList& CommandList, const std::string& Name, const FColor& Color)
+    : CommandList(CommandList)
+{
+    CommandList.BeginGPURegion(Name, Color);
+}
+VulkanRHI::FVulkanRegion::~FVulkanRegion()
+{
+    CommandList.EndGPURegion();
+}

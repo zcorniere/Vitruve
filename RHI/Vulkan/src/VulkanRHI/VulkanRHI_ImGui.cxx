@@ -112,10 +112,11 @@ void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList)
     RPH_PROFILE_FUNC()
     ImGui::Render();
 
-    const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
-    CommandList.BeginGPURegion("ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
-    RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
-    CommandList.EndGPURegion();
+    {
+        const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
+        FVulkanRegion Region(CommandList, "ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
+        RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
+    }
 }
 
 template <typename T, EBufferUsageFlags Flags, int BufferSlack = 500>

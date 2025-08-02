@@ -76,9 +76,8 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
             (
                 [Scene](FFRHICommandList& CommandList) mutable
                 {
-                    CommandList.BeginGPURegion(Scene->GetName());
+                    FVulkanRegion Region(CommandList, Scene->GetName());
                     Scene->TickRenderer(CommandList);
-                    CommandList.EndGPURegion();
                 });
         }
     }

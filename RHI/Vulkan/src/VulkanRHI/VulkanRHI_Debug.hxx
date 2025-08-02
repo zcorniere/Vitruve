@@ -1,7 +1,19 @@
 #pragma once
 
+class FFRHICommandList;
+
 namespace VulkanRHI
 {
+
+class FVulkanRegion
+{
+public:
+    FVulkanRegion(FFRHICommandList& CommandList, const std::string& Name, const FColor& Color = {});
+    ~FVulkanRegion();
+
+private:
+    FFRHICommandList& CommandList;
+};
 
 #if VULKAN_DEBUGGING_ENABLED
 
