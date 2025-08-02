@@ -299,6 +299,51 @@ void FVulkanCommandContext::CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref
     }
 }
 
+void FVulkanCommandContext::CopyImageToImage(Ref<RRHITexture> Source, Ref<RRHITexture> Destination,
+                                             IVector2 SourceOffset, IVector2 DestinationOffset, UVector2 Size)
+{
+    RVulkanTexture* const SrcTexture = Source.AsRaw<RVulkanTexture>();
+    RVulkanTexture* const DstTexture = Destination.AsRaw<RVulkanTexture>();
+
+    FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();
+
+    VkImageLayout OriginalSrcLayout = SrcTexture->GetLayout();
+    VkImageLayout OriginalDstLayout = DstTexture->GetLayout();
+
+    SrcTexture->SetLayout(CmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+    DstTexture->SetLayout(CmdBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+    VkImageCopy Copy{
+        .srcSubresource =
+            {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel = 0,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        .srcOffset = {.x = SourceOffset.x, .y = SourceOffset.y, .z = 0},
+        .dstSubresource =
+            {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel = 0,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        .dstOffset = {.x = DestinationOffset.x, .y = DestinationOffset.y, .z = 0},
+        .extent = {.width = Size.x, .height = Size.y, .depth = 1},
+    };
+    VulkanAPI::vkCmdCopyImage(CmdBuffer->GetHandle(), SrcTexture->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                              DstTexture->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Copy);
+    if (OriginalSrcLayout != VK_IMAGE_LAYOUT_UNDEFINED)
+    {
+        SrcTexture->SetLayout(CmdBuffer, OriginalSrcLayout);
+    }
+    if (OriginalDstLayout != VK_IMAGE_LAYOUT_UNDEFINED)
+    {
+        DstTexture->SetLayout(CmdBuffer, OriginalDstLayout);
+    }
+}
+
 void FVulkanCommandContext::SetLayout(RVulkanTexture* const Texture, VkImageLayout Layout)
 {
     Texture->SetLayout(CommandManager->GetActiveCmdBuffer(), Layout);

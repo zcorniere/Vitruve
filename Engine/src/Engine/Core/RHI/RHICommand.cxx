@@ -195,3 +195,21 @@ void RHICopyBufferToImage::Execute(FFRHICommandList& CommandList)
     CommandList.GetContext()->CopyBufferToImage(SourceBuffer, DestinationTexture, SourceOffset, DestinationOffset,
                                                 Size);
 }
+
+RHICopyImageToImage::RHICopyImageToImage(const Ref<RRHITexture> Source, Ref<RRHITexture> Destination,
+                                         IVector2 SourceOffset, IVector2 DestinationOffset, UVector2 Size)
+    : SourceTexture(Source)
+    , DestinationTexture(std::move(Destination))
+    , SourceOffset(SourceOffset)
+    , DestinationOffset(DestinationOffset)
+    , Size(Size)
+{
+    check(EnumHasAnyFlags(SourceTexture->GetDescription().Flags, ETextureUsageFlags::TransferTargetable));
+    check(EnumHasAnyFlags(DestinationTexture->GetDescription().Flags, ETextureUsageFlags::TransferTargetable));
+}
+
+void RHICopyImageToImage::Execute(FFRHICommandList& CommandList)
+{
+    CommandList.GetContext()->CopyImageToImage(SourceTexture, DestinationTexture, SourceOffset, DestinationOffset,
+                                               Size);
+}

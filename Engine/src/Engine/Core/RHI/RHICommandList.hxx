@@ -170,6 +170,16 @@ public:
     void CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture> Destination, uint64 SourceOffset,
                            const IVector3& DestinationOffset, const UVector3& Size);
 
+    /// @brief Copy the content of an image to another image
+    ///
+    /// @param Source The image to copy from
+    /// @param Destination The image to copy to
+    /// @param SourceOffset The offset in the source image
+    /// @param DestinationOffset The offset in the destination image
+    /// @param Size The size of the region to copy
+    void CopyImageToImage(Ref<RRHITexture>& Source, Ref<RRHITexture>& Destination, IVector2 SourceOffset,
+                          IVector2 DestinationOffset, UVector2 Size);
+
     /// @brief Copy the content of a resource array to a buffer
     ///
     /// @param Source The resource array to copy from (the caller is responsible for the lifetime of the object)

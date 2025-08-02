@@ -247,4 +247,21 @@ private:
     const UVector3 Size = {1, 1};
 };
 
+RHICOMMAND_MACRO(RHICopyImageToImage)
+{
+public:
+    RHICopyImageToImage(Ref<RRHITexture> Source, Ref<RRHITexture> Destination, IVector2 SourceOffset,
+                        IVector2 DestinationOffset, UVector2 Size);
+    virtual ~RHICopyImageToImage() = default;
+
+    virtual void Execute(FFRHICommandList & CommandList) override final;
+
+private:
+    Ref<RRHITexture> SourceTexture = nullptr;
+    Ref<RRHITexture> DestinationTexture = nullptr;
+    const IVector2 SourceOffset = {0, 0};
+    const IVector2 DestinationOffset = {0, 0};
+    const UVector2 Size = {1, 1};
+};
+
 #undef RHICOMMAND_MACRO

@@ -60,4 +60,8 @@ public:
     /// @brief Copy the content of a buffer to a resource array
     virtual void CopyBufferToImage(const Ref<RRHIBuffer>& Source, Ref<RRHITexture>& Description, uint64 SourceOffset,
                                    IVector3 DestinationOffset, UVector3 Size) = 0;
+
+    /// @brief Copy the content of an image to another image
+    virtual void CopyImageToImage(const Ref<RRHITexture> Source, Ref<RRHITexture> Destination, IVector2 SourceOffset,
+                                  IVector2 DestinationOffset, UVector2 Size) = 0;
 };
