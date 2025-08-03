@@ -53,7 +53,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
             },
         .AttachmentFormats =
             {
-                .ColorFormats = {EImageFormat::R8G8B8A8_SRGB},
+                .ColorFormats = {EImageFormat::B8G8R8A8_SRGB},
                 .DepthFormat = std::nullopt,
                 .StencilFormat = std::nullopt,
             },
@@ -86,8 +86,6 @@ void VulkanRHI_ImGui::Shutdown()
     ImGuiIndexBufferData.Clear();
     ImGuiIndexBuffer = nullptr;
 
-    ImGuiOutputTexture = nullptr;
-
     DescriptorSetManager.reset();
 
     ImGuiPipeline = nullptr;
@@ -107,7 +105,7 @@ void VulkanRHI_ImGui::EndFrame(FFRHICommandList&)
     ImGui::EndFrame();
 }
 
-void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList)
+void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList, RRHIViewport* BackBuffer)
 {
     RPH_PROFILE_FUNC()
     ImGui::Render();
@@ -115,7 +113,7 @@ void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList)
     {
         const ImVec4& Color = ImGui::GetStyleColorVec4(ImGuiCol_TitleBg);
         FVulkanRegion Region(CommandList, "ImGui Render", *(reinterpret_cast<const FColor*>(&Color)));
-        RenderImGuiViewport(ImGui::GetMainViewport(), CommandList);
+        RenderImGuiViewport(ImGui::GetMainViewport(), CommandList, BackBuffer);
     }
 }
 
@@ -204,13 +202,10 @@ bool VulkanRHI_ImGui::UpdateFontTexture(FFRHICommandList& CommandList)
     return true;
 }
 
-bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList)
+bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList,
+                                          RRHIViewport* RenderingViewport)
 {
-    if (!UpdateTargetTexture(Viewport, CommandList))
-    {
-        return false;
-    }
-
+    RPH_PROFILE_FUNC()
     ImDrawData* const DrawData = ImGui::GetDrawData();
     // Nothing to draw, yay
     if (DrawData->TotalVtxCount == 0)
@@ -231,13 +226,14 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
         .ColorTargets =
             {
                 {
-                    .Texture = ImGuiOutputTexture,
+                    .Texture = RenderingViewport->GetBackbuffer(),
                     .ClearColor = {0.0f, 0.0f, 0.0f, 1.0f},
-                    .LoadAction = ERenderTargetLoadAction::Clear,
+                    .LoadAction = ERenderTargetLoadAction::Load,
                     .StoreAction = ERenderTargetStoreAction::Store,
                 },
             },
     };
+    CommandList.BeginRenderingViewport(RenderingViewport);
     CommandList.BeginRendering(RenderPassDesc);
 
     CommandList.SetGraphicsPipeline(ImGuiPipeline);
@@ -346,33 +342,6 @@ bool VulkanRHI_ImGui::UpdateGeometry(ImDrawData* DrawData)
         ReallocateBufferIfNeeded<ImDrawIdx, EBufferUsageFlags::IndexBuffer>(ImGuiIndexBuffer, ImGuiIndexBufferData);
 
     return bWasResized;
-}
-
-bool VulkanRHI_ImGui::UpdateTargetTexture(ImGuiViewport* Viewport, FFRHICommandList& CommandList)
-{
-    if (ImGuiOutputTexture)
-    {
-        if (ImGuiOutputTexture->GetDescription().Extent.x == Viewport->Size.x ||
-            ImGuiOutputTexture->GetDescription().Extent.y == Viewport->Size.y)
-        {
-            return true;
-        }
-    }
-
-    FRHITextureSpecification TextureDesc{
-        .Flags = ETextureUsageFlags::RenderTargetable | ETextureUsageFlags::TransferTargetable,
-        .Dimension = EImageDimension::Texture2D,
-        .Format = EImageFormat::R8G8B8A8_SRGB,
-        .Extent = {static_cast<uint32>(Viewport->Size.x), static_cast<uint32>(Viewport->Size.y)},
-        .Name = "ImGui Output Texture",
-    };
-    ImGuiOutputTexture = RHI::CreateTexture(TextureDesc);
-
-    FVulkanCommandContext* Context = CommandList.GetContext()->Cast<FVulkanCommandContext>();
-    Ref<RVulkanTexture> OutputTexture = ImGuiOutputTexture.As<RVulkanTexture>();
-    OutputTexture->SetLayout(Context->GetCommandManager()->GetUploadCmdBuffer(),
-                             VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    return true;
 }
 
 }    // namespace VulkanRHI

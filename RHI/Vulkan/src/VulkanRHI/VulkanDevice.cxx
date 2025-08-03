@@ -116,6 +116,7 @@ void FVulkanDevice::InitPhysicalDevice()
     MemoryAllocator = std::make_unique<FVulkanMemoryManager>(this);
 
     ImmediateContext = static_cast<FVulkanCommandContext*>(RHI::Get()->RHIGetCommandContext());
+    ImmediateContext->SetName("ImmediateContext");
 }
 
 bool FVulkanDevice::CreateDeviceAndQueue(const TArray<const char*>& DeviceLayers,

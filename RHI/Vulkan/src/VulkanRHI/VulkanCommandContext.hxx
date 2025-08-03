@@ -31,10 +31,9 @@ public:
 
     void SetName(std::string_view InName) override final;
 
-    /// @brief Indicate the RHI that we are starting drawing in the given viewport
     virtual void RHIBeginDrawingViewport(RRHIViewport* const Viewport) override final;
-    /// @brief Indicate the RHI that we are done drawing in the given viewport
     virtual void RHIEndDrawningViewport(RRHIViewport* const Viewport) override final;
+    virtual void RHIPresentViewport(RRHIViewport* const Viewport) override final;
 
     virtual void RHIBeginRendering(const FRHIRenderPassDescription& Description) override final;
     virtual void RHIEndRendering() override final;

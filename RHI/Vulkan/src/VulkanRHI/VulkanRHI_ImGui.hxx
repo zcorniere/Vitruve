@@ -25,18 +25,12 @@ public:
 
     void BeginFrame(FFRHICommandList& CommandList);
     void EndFrame(FFRHICommandList& CommandList);
-    void Render(FFRHICommandList& CommandList);
-
-    Ref<RVulkanTexture> GetOutputTexture() const
-    {
-        return ImGuiOutputTexture;
-    }
+    void Render(FFRHICommandList& CommandList, RRHIViewport* Viewport);
 
 private:
     bool UpdateFontTexture(FFRHICommandList& CommandList);
-    bool RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList);
+    bool RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList, RRHIViewport* RenderingViewport);
     bool UpdateGeometry(ImDrawData* DrawData);
-    bool UpdateTargetTexture(ImGuiViewport* Viewport, FFRHICommandList& CommandList);
 
 private:
     GLFWHolder GlfwHolder;
@@ -51,8 +45,6 @@ private:
     Ref<RVulkanBuffer> ImGuiIndexBuffer = nullptr;
     Ref<RVulkanGraphicsPipeline> ImGuiPipeline = nullptr;
     std::unique_ptr<FDescriptorSetManager> DescriptorSetManager;
-
-    Ref<RVulkanTexture> ImGuiOutputTexture = nullptr;
 };
 
 }    // namespace VulkanRHI
