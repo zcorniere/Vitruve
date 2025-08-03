@@ -217,6 +217,8 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
     UpdateGeometry(DrawData);
 
+    DrawData->ScaleClipRects(DrawData->FramebufferScale);
+
     if (!UpdateFontTexture(CommandList))
         return false;
 
@@ -252,6 +254,9 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
     const float fbWidth = DrawData->DisplaySize.x * DrawData->FramebufferScale.x;
     const float fbHeight = DrawData->DisplaySize.y * DrawData->FramebufferScale.y;
+
+    CommandList.SetViewport({0, 0, 0}, {fbWidth, fbHeight, 1.0f});
+
     // Will project scissor/clipping rectangles into framebuffer space
     ImVec2 clip_off = DrawData->DisplayPos;            // (0,0) unless using multi-viewports
     ImVec2 clip_scale = DrawData->FramebufferScale;    // (1,1) unless using retina display which are often (2,2)
@@ -272,9 +277,6 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
             }
             else
             {
-                // drawState.bindings = {GetBindingSet((nvrhi::ITexture*)pCmd->TextureId)};
-                // HZ_CORE_ASSERT(drawState.bindings[0]);
-
                 // Project scissor/clipping rectangles into framebuffer space
                 ImVec2 clipMin((pCmd->ClipRect.x - clip_off.x) * clip_scale.x,
                                (pCmd->ClipRect.y - clip_off.y) * clip_scale.y);
@@ -287,13 +289,14 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                 if (clipMin.y < 0.0f)
                     clipMin.y = 0.0f;
                 if (clipMax.x > fbWidth)
-                    clipMax.x = (float)fbWidth;
+                    clipMax.x = fbWidth;
                 if (clipMax.y > fbHeight)
-                    clipMax.y = (float)fbHeight;
+                    clipMax.y = fbHeight;
                 if (clipMax.x <= clipMin.x || clipMax.y <= clipMin.y)
                     continue;
 
-                CommandList.SetViewport({clipMin.x, clipMin.y, 0}, {clipMax.x, clipMax.y, 1});
+                CommandList.SetScissor({static_cast<int32>(clipMin.x), static_cast<int32>(clipMin.y)},
+                                       {static_cast<uint32>(clipMax.x), static_cast<uint32>(clipMax.y)});
 
                 int vertexCount = pCmd->ElemCount;
                 int startIndexLocation = pCmd->IdxOffset + idxOffset;
