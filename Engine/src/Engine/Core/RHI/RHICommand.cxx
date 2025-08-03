@@ -26,6 +26,14 @@ void FRHIEndDrawningViewport::Execute(FFRHICommandList& CommandList)
     CommandList.GetContext()->RHIEndDrawningViewport(Viewport.Raw());
 }
 
+FRHIPresetViewport::FRHIPresetViewport(Ref<RRHIViewport> InViewport): Viewport(std::move(InViewport))
+{
+}
+void FRHIPresetViewport::Execute(FFRHICommandList& CommandList)
+{
+    CommandList.GetContext()->RHIPresentViewport(Viewport.Raw());
+}
+
 FRHIBeginRendering::FRHIBeginRendering(const FRHIRenderPassDescription& InDescription): Description(InDescription)
 {
     for (const FRHIRenderTarget& Target: Description.ColorTargets)

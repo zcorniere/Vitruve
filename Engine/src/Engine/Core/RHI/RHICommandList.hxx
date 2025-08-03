@@ -105,6 +105,8 @@ public:
     void BeginRenderingViewport(RRHIViewport* Viewport);
     /// @brief Stop rendering to the given viewport and present it
     void EndRenderingViewport(RRHIViewport* Viewport);
+    /// @brief Present the given viewport to its associated window
+    void PresentViewport(RRHIViewport* Viewport);
 
     /// @brief Begin a new rendering pass
     void BeginRendering(const FRHIRenderPassDescription& Description);

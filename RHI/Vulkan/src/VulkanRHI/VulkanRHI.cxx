@@ -97,6 +97,22 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
                                          Backbuffer->GetDescription().Extent);
         });
 
+    for (WeakRef<RRHIScene>& Scene: ScenesContainers)
+    {
+        if (Scene.IsValid())
+        {
+            ENQUEUE_RENDER_COMMAND(PresentScnee)
+            (
+                [Scene](FFRHICommandList& CommandList) mutable
+                {
+                    if (Scene->GetViewport())
+                    {
+                        CommandList.PresentViewport(Scene->GetViewport().Raw());
+                    }
+                });
+        }
+    }
+
     ENQUEUE_RENDER_COMMAND(EndFrame)([](FFRHICommandList& CommandList) { CommandList.EndFrame(); });
 }
 

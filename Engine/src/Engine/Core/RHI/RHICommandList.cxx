@@ -34,6 +34,10 @@ void FFRHICommandList::EndRenderingViewport(RRHIViewport* Viewport)
 {
     Enqueue(new FRHIEndDrawningViewport(Viewport));
 }
+void FFRHICommandList::PresentViewport(RRHIViewport* Viewport)
+{
+    Enqueue(new FRHIPresetViewport(Viewport));
+}
 
 void FFRHICommandList::BeginRendering(const FRHIRenderPassDescription& Description)
 {

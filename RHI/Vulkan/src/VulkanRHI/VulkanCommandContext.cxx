@@ -63,11 +63,14 @@ void FVulkanCommandContext::RHIBeginDrawingViewport(RRHIViewport* const Viewport
 
 void FVulkanCommandContext::RHIEndDrawningViewport(RRHIViewport* const Viewport)
 {
-    RVulkanViewport* const VKViewport = Viewport->Cast<RVulkanViewport>();
-    VKViewport->Present(this, CommandManager->GetActiveCmdBuffer(), GfxQueue, PresentQueue);
-
     check(GetVulkanDynamicRHI()->DrawingViewport == Viewport);
     GetVulkanDynamicRHI()->DrawingViewport = nullptr;
+}
+
+void FVulkanCommandContext::RHIPresentViewport(RRHIViewport* const Viewport)
+{
+    RVulkanViewport* const VKViewport = Viewport->Cast<RVulkanViewport>();
+    VKViewport->Present(this, CommandManager->GetActiveCmdBuffer(), GfxQueue, PresentQueue);
 }
 
 void FVulkanCommandContext::RHIBeginRendering(const FRHIRenderPassDescription& Description)

@@ -27,6 +27,8 @@ public:
     virtual void RHIBeginDrawingViewport(RRHIViewport* const Viewport) = 0;
     /// @brief Indicate the RHI that we are done drawing in the given viewport
     virtual void RHIEndDrawningViewport(RRHIViewport* const Viewport) = 0;
+    /// @brief Present the given viewport to it associated window
+    virtual void RHIPresentViewport(RRHIViewport* const Viewport) = 0;
 
     /// @brief Begin rendering a new render pass
     virtual void RHIBeginRendering(const FRHIRenderPassDescription& Description) = 0;

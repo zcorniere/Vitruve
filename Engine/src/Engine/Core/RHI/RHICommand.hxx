@@ -39,7 +39,7 @@ public:
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
-public:
+private:
     Ref<RRHIViewport> Viewport = nullptr;
 };
 
@@ -52,7 +52,19 @@ public:
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
+private:
+    Ref<RRHIViewport> Viewport = nullptr;
+};
+
+RHICOMMAND_MACRO(FRHIPresetViewport)
+{
 public:
+    FRHIPresetViewport(Ref<RRHIViewport> InViewport);
+    virtual ~FRHIPresetViewport() = default;
+
+    virtual void Execute(FFRHICommandList & CommandList) override final;
+
+private:
     Ref<RRHIViewport> Viewport = nullptr;
 };
 
@@ -64,7 +76,7 @@ public:
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
 
-public:
+private:
     const FRHIRenderPassDescription Description = {};
 };
 
