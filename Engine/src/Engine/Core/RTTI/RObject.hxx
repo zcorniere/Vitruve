@@ -41,6 +41,12 @@ public:
     virtual ~FNamedClass() = default;
 
     /// Give the object a debug name
+    template <typename... ArgsTypes>
+    inline void SetNamef(std::format_string<ArgsTypes...> InFormat, ArgsTypes&&... InArgs)
+    {
+        std::string NewName = std::format(std::move(InFormat), std::forward<ArgsTypes>(InArgs)...);
+        SetName(NewName);
+    }
     virtual void SetName(std::string_view InName)
     {
         m_Name = InName;

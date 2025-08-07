@@ -20,7 +20,7 @@ RWorld::~RWorld()
 void RWorld::SetName(std::string_view InName)
 {
     Super::SetName(InName);
-    Scene->SetName(std::format("{:s} Scene", InName));
+    Scene->SetNamef("{:s}.Scene", InName);
 }
 
 void RWorld::AddToWorld(Ref<AActor> Actor)

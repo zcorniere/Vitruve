@@ -41,7 +41,7 @@ void RVulkanTexture::SetName(std::string_view InName)
     }
     if (Allocation)
     {
-        Allocation->SetName(std::format("{:s}.Image.Memory", InName));
+        Allocation->SetNamef("{:s}.Image.Memory", InName);
     }
 }
 

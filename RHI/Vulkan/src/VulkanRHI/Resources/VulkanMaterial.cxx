@@ -22,7 +22,7 @@ RVulkanMaterial::~RVulkanMaterial()
 void RVulkanMaterial::SetName(std::string_view InName)
 {
     Super::SetName(InName);
-    Pipeline->SetName(std::format("{:s} Pipeline", InName));
+    Pipeline->SetNamef("{:s}.Pipeline", InName);
 }
 
 void RVulkanMaterial::Prepare()

@@ -89,7 +89,7 @@ void RVulkanBuffer::SetName(std::string_view InName)
 {
     Super::SetName(InName);
     VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_BUFFER, BufferHandle, "{:s}", InName);
-    Memory->SetName(std::format("{:s}.Memory", InName));
+    Memory->SetNamef("{:s}.Memory", InName);
 }
 
 }    // namespace VulkanRHI

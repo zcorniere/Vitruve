@@ -47,14 +47,14 @@ void RVulkanViewport::SetName(std::string_view InName)
         return;
 
     SwapChain->SetName(InName);
-    RenderingBackbuffer->SetName(std::format("{:s}.BackBuffer", InName));
+    RenderingBackbuffer->SetNamef("{:s}.BackBuffer", InName);
 
     check(BackBufferImages.Size() == RenderingDoneSemaphores.Size());
     check(BackBufferImages.Size() == TexturesViews.Size());
 
     for (unsigned i = 0; i < BackBufferImages.Size(); i++)
     {
-        RenderingDoneSemaphores[i]->SetName(std::format("{:s}.RenderingDone{:d}", InName, i));
+        RenderingDoneSemaphores[i]->SetNamef("{:s}.RenderingDone{:d}", InName, i);
 
         VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_IMAGE, TexturesViews[i].Image, "{:s}.Image{:d}", InName, i);
         VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_IMAGE_VIEW, TexturesViews[i].View, "{:s}.Image{:d}.View", InName,

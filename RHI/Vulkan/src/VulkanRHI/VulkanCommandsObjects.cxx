@@ -234,7 +234,7 @@ VulkanCommandBufferManager::~VulkanCommandBufferManager()
 void VulkanCommandBufferManager::SetName(std::string_view InName)
 {
     FNamedClass::SetName(InName);
-    Pool->SetName(std::format("{:s}.CommandPool", InName));
+    Pool->SetNamef("{:s}.CommandPool", InName);
 }
 
 void VulkanCommandBufferManager::WaitForCmdBuffer(FVulkanCmdBuffer* CmdBuffer, float TimeInSecondsToWait)
@@ -258,7 +258,7 @@ FVulkanCmdBuffer* VulkanCommandBufferManager::GetUploadCmdBuffer()
     if (!UploadCmdBufferRef)
     {
         UploadCmdBufferRef = FindAvailableCmdBuffer();
-        UploadCmdBufferRef->SetName(std::format("{:s}.Upload.CommandBuffer", GetName()));
+        UploadCmdBufferRef->SetNamef("{:s}.Upload.CommandBuffer", GetName());
     }
     return UploadCmdBufferRef;
 }
@@ -266,7 +266,7 @@ FVulkanCmdBuffer* VulkanCommandBufferManager::GetUploadCmdBuffer()
 void VulkanCommandBufferManager::PrepareForNewActiveCommandBuffer()
 {
     ActiveCmdBufferRef = FindAvailableCmdBuffer();
-    ActiveCmdBufferRef->SetName(std::format("{:s}.Active{:d}.CommandBuffer", GetName(), GFrameCounter));
+    ActiveCmdBufferRef->SetNamef("{:s}.Active{:d}.CommandBuffer", GetName(), GFrameCounter);
 }
 
 void VulkanCommandBufferManager::SubmitUploadCmdBuffer(const Ref<RSemaphore>& SignalSemaphore)
