@@ -12,7 +12,7 @@ class FVulkanCommandContext;
 class FVulkanPendingState : public IDeviceChild
 {
 public:
-    FVulkanPendingState(FVulkanDevice* InDevice, FVulkanCommandContext& InCmdContext);
+    FVulkanPendingState(FVulkanDevice* InDevice);
     ~FVulkanPendingState();
 
     void Reset();
@@ -75,7 +75,6 @@ private:
 
     TArray<VkDescriptorSet> DescriptorSets;
     Ref<RVulkanGraphicsPipeline> CurrentPipeline = nullptr;
-    FVulkanCommandContext& CmdContext;
 };
 
 }    // namespace VulkanRHI

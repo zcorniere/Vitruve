@@ -5,9 +5,7 @@
 namespace VulkanRHI
 {
 
-FVulkanPendingState::FVulkanPendingState(FVulkanDevice* InDevice, FVulkanCommandContext& InCmdContext)
-    : IDeviceChild(InDevice)
-    , CmdContext(InCmdContext)
+FVulkanPendingState::FVulkanPendingState(FVulkanDevice* InDevice): IDeviceChild(InDevice)
 {
     Reset();
 }

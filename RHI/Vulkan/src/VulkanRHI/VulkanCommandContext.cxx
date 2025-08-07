@@ -19,7 +19,7 @@ FVulkanCommandContext::FVulkanCommandContext(FVulkanDevice* InDevice, FVulkanQue
     , GfxQueue(InGraphicsQueue)
     , PresentQueue(InPresentQueue)
 {
-    PendingState = std::make_unique<FVulkanPendingState>(Device, *this);
+    PendingState = std::make_unique<FVulkanPendingState>(Device);
 
     // TODO: Differentiate between immediate context and frame context to use the transfer Queue
     CommandManager = std::make_unique<VulkanCommandBufferManager>(Device, GfxQueue);
