@@ -23,7 +23,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    // Enable Keyboard Controls
-    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;        // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // Enable Docking
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows
 
     io.BackendRendererName = "Raphael ImGui Render";
