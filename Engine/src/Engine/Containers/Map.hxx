@@ -487,6 +487,12 @@ public:
         {
             return false;
         }
+
+        if (NumElements == 0)
+        {
+            return true;    // Both maps are empty
+        }
+
         TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator It = begin();
         TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator OtherIt = Other.begin();
 
