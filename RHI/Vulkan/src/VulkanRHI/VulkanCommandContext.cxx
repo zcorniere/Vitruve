@@ -349,7 +349,7 @@ void FVulkanCommandContext::CopyImageToImage(Ref<RRHITexture> Source, Ref<RRHITe
 
 void FVulkanCommandContext::SetLayout(RVulkanTexture* const Texture, VkImageLayout Layout)
 {
-    Texture->SetLayout(CommandManager->GetActiveCmdBuffer(), Layout);
+    Texture->SetLayout(CommandManager->GetUploadCmdBuffer(), Layout);
 }
 
 }    // namespace VulkanRHI
