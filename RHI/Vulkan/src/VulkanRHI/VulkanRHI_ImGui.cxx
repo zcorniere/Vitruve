@@ -1,11 +1,13 @@
 #include "VulkanRHI/VulkanRHI_ImGui.hxx"
 
 #include "Engine/Core/Application.hxx"
+
 #include "VulkanRHI/Resources/VulkanBuffer.hxx"
 #include "VulkanRHI/Resources/VulkanGraphicsPipeline.hxx"
 #include "VulkanRHI/Resources/VulkanTexture.hxx"
 #include "VulkanRHI/VulkanCommandsObjects.hxx"
 #include "VulkanRHI/VulkanDevice.hxx"
+#include "VulkanRHI/VulkanMemoryManager.hxx"
 
 #include "imgui_impl_glfw.h"
 
@@ -23,9 +25,12 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;        // Enable Docking
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows
+
     io.BackendRendererName = "Raphael ImGui Render";
-    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;    // We can honor the ImDrawCmd::VtxOffset field,
-                                                                  // allowing for large meshes.
+    // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
+    // We can honor ImGuiPlatformIO::Textures[] requests during render.
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
     ImGui_ImplGlfw_InitForVulkan(GApplication->GetMainWindow()->GetHandle(), true);
 
@@ -62,24 +67,12 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
     ImGuiPipeline->SetName("ImGui Pipeline");
 
     DescriptorSetManager = std::make_unique<FDescriptorSetManager>(Device, ImGuiPipeline);
-
-    ENQUEUE_RENDER_COMMAND(ImGuiUpdateFontTexture)(
-        [this](FFRHICommandList& CommandList)
-        {
-            ImGuiIO& io = ImGui::GetIO();
-
-            // Build the font texture
-            io.Fonts->AddFontDefault();
-            io.Fonts->Build();
-            UpdateFontTexture(CommandList);
-        });
+    DescriptorSetManager->Bake();
 }
 
 void VulkanRHI_ImGui::Shutdown()
 {
     ImGui_ImplGlfw_Shutdown();
-
-    ImGuiFontTexture = nullptr;
 
     ImGuiVertexBufferData.Clear();
     ImGuiVertexBuffer = nullptr;
@@ -87,6 +80,12 @@ void VulkanRHI_ImGui::Shutdown()
     ImGuiIndexBuffer = nullptr;
 
     DescriptorSetManager.reset();
+
+    for (ImTextureData* tex: ImGui::GetPlatformIO().Textures)
+    {
+        tex->SetTexID(0);
+    }
+    ImGuiTexturesArray.Clear();
 
     ImGuiPipeline = nullptr;
     ImGui::DestroyContext();
@@ -150,54 +149,72 @@ static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<
     return true;
 }
 
-bool VulkanRHI_ImGui::UpdateFontTexture(FFRHICommandList& CommandList)
+bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& CommandList)
 {
-    ImGuiIO& io = ImGui::GetIO();
+    check(Texture);
+    check(Texture->GetTexID() == 0 || Texture->GetTexID() <= ImGuiTexturesArray.Size());
 
-    if (ImGuiFontTexture && io.Fonts->IsBuilt())
-        return true;
+    Ref<RVulkanTexture> VulkanTexture;
+    if (Texture->Status == ImTextureStatus_WantCreate)
+    {
+        const FRHITextureSpecification TextureDesc{
+            .Flags = ETextureUsageFlags::SampleTargetable | ETextureUsageFlags::TransferTargetable,
+            .Dimension = EImageDimension::Texture2D,
+            .Format = EImageFormat::R8G8B8A8_SRGB,
+            .Extent = {static_cast<uint32>(Texture->Width), static_cast<uint32>(Texture->Height)},
+            .NumSamples = 1,
+            .Name = std::format("ImGuiTexture.{}", ImGuiTexturesArray.Size()),
+        };
+        ImGuiTexturesArray.Emplace(RHI::CreateTexture(TextureDesc));
+        // The actual index is "TexID - 1", because we need to reserve value 0 for "nothing"
+        Texture->SetTexID(ImGuiTexturesArray.Size());
+        VulkanTexture = ImGuiTexturesArray.Back();
+    }
+    else
+    {
+        VulkanTexture = ImGuiTexturesArray[Texture->GetTexID() - 1];
+    }
 
-    TResourceArray<uint8_t> TexturePixels;
-    uint8_t* Pixels = nullptr;
-    int TextureWidth = 0;
-    int TextureHeight = 0;
+    if (Texture->Status == ImTextureStatus_WantCreate || Texture->Status == ImTextureStatus_WantUpdates)
+    {
+        const int32 UploadX = (Texture->Status == ImTextureStatus_WantCreate) ? 0 : Texture->UpdateRect.x;
+        const int32 UploadY = (Texture->Status == ImTextureStatus_WantCreate) ? 0 : Texture->UpdateRect.y;
+        const uint32 UploadW = (Texture->Status == ImTextureStatus_WantCreate) ? Texture->Width : Texture->UpdateRect.w;
+        const uint32 UploadH =
+            (Texture->Status == ImTextureStatus_WantCreate) ? Texture->Height : Texture->UpdateRect.h;
+        const uint32 UploadPitch = UploadW * Texture->BytesPerPixel;
+        const uint32 UploadSize = UploadH * UploadPitch;
 
-    io.Fonts->GetTexDataAsRGBA32(&Pixels, &TextureWidth, &TextureHeight);
-    if (!Pixels)
-        return false;
+        const FRHIBufferDesc Description{
+            .Size = UploadSize,
+            .Stride = static_cast<uint32>(Texture->BytesPerPixel),
+            .Usage = EBufferUsageFlags::SourceCopy | EBufferUsageFlags::KeepCPUAccessible,
+            .DebugName = std::format("{}.StagingBuffer", VulkanTexture->GetName()),
+        };
+        Ref<RVulkanBuffer> StagingBuffer = RHI::CreateBuffer(Description);
+        uint8* BufferMemory = (uint8*)StagingBuffer->GetMemory()->Map(UploadSize);
+        for (uint32 y = 0; y < UploadH; y++)
+        {
+            std::memcpy(BufferMemory + UploadPitch * y, Texture->GetPixelsAt(UploadX, UploadY + y), UploadPitch);
+        }
+        StagingBuffer->GetMemory()->FlushMappedMemory(0, UploadSize);
+        StagingBuffer->GetMemory()->Unmap();
 
-    TexturePixels.Resize(static_cast<uint32>(TextureWidth * TextureHeight * 4));
-    std::memcpy(TexturePixels.Raw(), Pixels, TextureWidth * TextureHeight * 4);
+        Device->GetImmediateContext()->SetLayout(VulkanTexture.Raw(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        Ref<RRHITexture> RHITexture = VulkanTexture.As<RRHITexture>();
+        Device->GetImmediateContext()->CopyBufferToImage(StagingBuffer, RHITexture, 0, {UploadX, UploadY, 0},
+                                                         {UploadW, UploadH, 1});
+        Device->GetImmediateContext()->SetLayout(VulkanTexture.Raw(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        Device->GetImmediateContext()->GetCommandManager()->SubmitUploadCmdBuffer();
+        Device->WaitUntilIdle();    // TODO: Not that
+        Texture->Status = ImTextureStatus_OK;
+    }
 
-    FRHITextureSpecification TextureDesc{
-        .Flags = ETextureUsageFlags::SampleTargetable | ETextureUsageFlags::TransferTargetable,
-        .Dimension = EImageDimension::Texture2D,
-        .Format = EImageFormat::R8G8B8A8_SRGB,
-        .Extent = {static_cast<uint32>(TextureWidth), static_cast<uint32>(TextureHeight)},
-        .Name = "ImGui Font Texture",
-    };
-    ImGuiFontTexture = RHI::CreateTexture(TextureDesc);
-    ImGuiFontTexture->SetName("ImGui Font Texture");
-
-    FRHIBufferDesc StagingBufferDesc{
-        .Size = TexturePixels.GetByteSize(),
-        .Usage = EBufferUsageFlags::SourceCopy | EBufferUsageFlags::KeepCPUAccessible,
-        .ResourceArray = &TexturePixels,
-        .DebugName = "ImGui Font Texture Staging",
-    };
-    Ref<RRHIBuffer> StagingBuffer = RHI::CreateBuffer(StagingBufferDesc);
-
-    CommandList.CopyBufferToImage(StagingBuffer, ImGuiFontTexture.As<RRHITexture>(), 0, {0, 0, 0},
-                                  {static_cast<uint32>(TextureWidth), static_cast<uint32>(TextureHeight), 1});
-
-    FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
-    ImGuiFontTexture->SetLayout(CommandContext->GetCommandManager()->GetUploadCmdBuffer(),
-                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-    io.Fonts->TexID = (ImTextureID)ImGuiFontTexture.Raw();
-
-    DescriptorSetManager->SetInput("sTexture", ImGuiFontTexture);
-    DescriptorSetManager->Bake();
+    if (Texture->Status == ImTextureStatus_WantDestroy)
+    {
+        // TODO: worry about that
+        ensure(false);
+    }
 
     return true;
 }
@@ -219,9 +236,16 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
     DrawData->ScaleClipRects(DrawData->FramebufferScale);
 
-    if (!UpdateFontTexture(CommandList))
-        return false;
-
+    if (DrawData->Textures)
+    {
+        for (ImTextureData* tex: *DrawData->Textures)
+        {
+            if (tex->Status != ImTextureStatus_OK)
+            {
+                UpdateTexture(tex, CommandList);
+            }
+        }
+    }
     FRHIRenderPassDescription RenderPassDesc{
         .RenderAreaLocation = {0, 0},
         .RenderAreaSize = {static_cast<uint32>(Viewport->Size.x), static_cast<uint32>(Viewport->Size.y)},
@@ -302,6 +326,9 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                 int startIndexLocation = pCmd->IdxOffset + idxOffset;
                 int startVertexLocation = pCmd->VtxOffset + vtxOffset;
 
+                check(pCmd->GetTexID() == 0 || pCmd->GetTexID() <= ImGuiTexturesArray.Size());
+                DescriptorSetManager->SetInput("sTexture", ImGuiTexturesArray[pCmd->GetTexID() - 1]);
+                DescriptorSetManager->InvalidateAndUpdate();
                 DescriptorSetManager->Bind(CommandContext->GetCommandManager()->GetActiveCmdBuffer()->GetHandle(),
                                            ImGuiPipeline->GetPipelineLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS);
 

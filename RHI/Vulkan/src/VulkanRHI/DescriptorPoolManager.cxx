@@ -49,10 +49,16 @@ void FDescriptorSetManager::Bake()
     {
         for (auto& [Binding, WriteDescriptor]: Bindings)
         {
+            FRenderPassInput& RenderPassInput = InputResources[Set][Binding];
+            if (RenderPassInput.Input[0] == nullptr)
+            {
+                LOG(LogDescriptorSetManager, Warning, "No input set for binding {} in set {}", Binding, Set);
+                continue;
+            }
+
             WriteDescriptorSetsArray.Emplace(WriteDescriptor);
             WriteDescriptorSetsArray.Back().dstSet = DescriptorSets[Set];
 
-            FRenderPassInput& RenderPassInput = InputResources[Set][Binding];
             switch (RenderPassInput.Type)
             {
                 case ERenderPassInputType::Texture:
@@ -89,6 +95,11 @@ void FDescriptorSetManager::Bake()
 void FDescriptorSetManager::Bind(VkCommandBuffer CmdBuffer, VkPipelineLayout PipelineLayout,
                                  VkPipelineBindPoint BindPoint)
 {
+    if (DescriptorSets.IsEmpty())
+    {
+        LOG(LogDescriptorSetManager, Error, "Descriptor sets are empty. Cannot bind.");
+        return;
+    }
     VulkanAPI::vkCmdBindDescriptorSets(CmdBuffer, BindPoint, PipelineLayout, 0, DescriptorSets.Size(),
                                        DescriptorSets.Raw(), 0, nullptr);
 }
@@ -113,12 +124,27 @@ void FDescriptorSetManager::InvalidateAndUpdate()
 
                     const VkDescriptorBufferInfo& Info = Buffer->GetDescriptorBufferInfo();
                     const VkWriteDescriptorSet& SetWrite = WriteDescriptorSet[Set][Binding];
-                    if (SetWrite.pBufferInfo && Info.buffer != SetWrite.pBufferInfo->buffer)
+                    if (!SetWrite.pBufferInfo || Info.buffer != SetWrite.pBufferInfo->buffer)
                     {
-                        InvalidatedInput[Set][Binding] = Input;
+                        InvalidatedInput.FindOrAdd(Set).FindOrAdd(Binding) = Input;
                     }
                 }
                 break;
+                case ERenderPassInputType::Texture:
+                {
+                    const RVulkanTexture* const Texture = Input.Input[0].AsRaw<RVulkanTexture>();
+                    if (!Texture)
+                    {
+                        continue;
+                    }
+
+                    const VkDescriptorImageInfo& Info = Texture->GetDescriptorImageInfo();
+                    const VkWriteDescriptorSet& SetWrite = WriteDescriptorSet[Set][Binding];
+                    if (!SetWrite.pImageInfo || Info.imageView != SetWrite.pImageInfo->imageView)
+                    {
+                        InvalidatedInput.FindOrAdd(Set).FindOrAdd(Binding) = Input;
+                    }
+                }
                 default:
                     break;
             }
@@ -135,12 +161,19 @@ void FDescriptorSetManager::InvalidateAndUpdate()
         for (auto& [Binding, Input]: Inputs)
         {
             VkWriteDescriptorSet& WriteDescriptor = WriteDescriptorSet[Set][Binding];
+            WriteDescriptor.dstSet = DescriptorSets[Set];
             switch (Input.Type)
             {
                 case ERenderPassInputType::StorageBuffer:
                 {
                     const VkDescriptorBufferInfo& Info = Input.Input[0].As<RVulkanBuffer>()->GetDescriptorBufferInfo();
                     WriteDescriptor.pBufferInfo = &Info;
+                }
+                break;
+                case ERenderPassInputType::Texture:
+                {
+                    const VkDescriptorImageInfo& Info = Input.Input[0].As<RVulkanTexture>()->GetDescriptorImageInfo();
+                    WriteDescriptor.pImageInfo = &Info;
                 }
                 break;
                 default:

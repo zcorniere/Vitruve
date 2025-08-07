@@ -28,15 +28,13 @@ public:
     void Render(FFRHICommandList& CommandList, RRHIViewport* Viewport);
 
 private:
-    bool UpdateFontTexture(FFRHICommandList& CommandList);
+    bool UpdateTexture(ImTextureData* Texture, FFRHICommandList& CommandList);
     bool RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList, RRHIViewport* RenderingViewport);
     bool UpdateGeometry(ImDrawData* DrawData);
 
 private:
     GLFWHolder GlfwHolder;
     FVulkanDevice* Device = nullptr;
-
-    Ref<RVulkanTexture> ImGuiFontTexture = nullptr;
 
     TResourceArray<ImDrawVert> ImGuiVertexBufferData;
     Ref<RVulkanBuffer> ImGuiVertexBuffer = nullptr;
@@ -45,6 +43,8 @@ private:
     Ref<RVulkanBuffer> ImGuiIndexBuffer = nullptr;
     Ref<RVulkanGraphicsPipeline> ImGuiPipeline = nullptr;
     std::unique_ptr<FDescriptorSetManager> DescriptorSetManager;
+
+    TArray<Ref<RVulkanTexture>> ImGuiTexturesArray;
 };
 
 }    // namespace VulkanRHI
