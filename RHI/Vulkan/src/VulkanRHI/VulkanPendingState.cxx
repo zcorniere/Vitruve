@@ -22,6 +22,8 @@ void FVulkanPendingState::Reset()
     Scissors.Resize(1);
 
     CurrentPipeline = nullptr;
+    DescriptorSets.Clear();
+    PushConstantData.Clear();
 }
 
 void FVulkanPendingState::SetVertexBuffer(Ref<RVulkanBuffer>& Buffer, uint32 BufferIndex, uint32 Offset)
