@@ -54,7 +54,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
             {
                 .PolygonMode = EPolygonMode::Fill,
                 .CullMode = ECullMode::None,
-                .FrontFaceCulling = EFrontFace::CounterClockwise,
+                .FrontFaceCulling = EFrontFace::Clockwise,
             },
         .AttachmentFormats =
             {
@@ -290,10 +290,10 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
     int idxOffset = 0;
     for (int n = 0; n < DrawData->CmdListsCount; n++)
     {
-        const ImDrawList* cmdList = DrawData->CmdLists[n];
+        const ImDrawList* const cmdList = DrawData->CmdLists[n];
         for (int i = 0; i < cmdList->CmdBuffer.Size; i++)
         {
-            const ImDrawCmd* pCmd = &cmdList->CmdBuffer[i];
+            const ImDrawCmd* const pCmd = &cmdList->CmdBuffer[i];
 
             if (pCmd->UserCallback)
             {
@@ -323,9 +323,9 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                     {static_cast<int32>(clipMin.x), static_cast<int32>(clipMin.y)},
                     {static_cast<uint32>(clipMax.x - clipMin.x), static_cast<uint32>(clipMax.y - clipMin.y)});
 
-                int vertexCount = pCmd->ElemCount;
-                int startIndexLocation = pCmd->IdxOffset + idxOffset;
-                int startVertexLocation = pCmd->VtxOffset + vtxOffset;
+                const int vertexCount = pCmd->ElemCount;
+                const int startIndexLocation = pCmd->IdxOffset + idxOffset;
+                const int startVertexLocation = pCmd->VtxOffset + vtxOffset;
 
                 check(pCmd->GetTexID() == 0 || pCmd->GetTexID() <= ImGuiTexturesArray.Size());
                 DescriptorSetManager->SetInput("sTexture", ImGuiTexturesArray[pCmd->GetTexID() - 1]);
@@ -335,7 +335,7 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
                 CommandContext->SetPushConstants(pushConstants);
                 CommandList.DrawIndexed(ImGuiIndexBuffer, startVertexLocation, 0, vertexCount, startIndexLocation,
-                                        vertexCount / 3, 1);
+                                        pCmd->ElemCount, 1);
             }
         }
 
