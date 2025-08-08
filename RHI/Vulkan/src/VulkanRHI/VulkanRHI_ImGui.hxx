@@ -30,7 +30,7 @@ public:
 private:
     bool UpdateTexture(ImTextureData* Texture, FFRHICommandList& CommandList);
     bool RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList, RRHIViewport* RenderingViewport);
-    bool UpdateGeometry(ImDrawData* DrawData);
+    bool UpdateGeometry(ImDrawData* DrawData, FFRHICommandList& CommandList);
 
 private:
     GLFWHolder GlfwHolder;

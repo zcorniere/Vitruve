@@ -171,7 +171,19 @@ VkImageSubresourceRange FBarrier::MakeSubresourceRange(VkImageAspectFlags Aspect
 }
 
 FBarrier::FBarrier()
+
 {
+}
+
+void FBarrier::AddMemoryBarrier(VkAccessFlags SrcAccessFlags, VkAccessFlags DstAccessFlags,
+                                VkPipelineStageFlags SrcStageMask, VkPipelineStageFlags DstStageMask)
+{
+    VkMemoryBarrier& Barrier = MemoryBarrier.Emplace();
+
+    std::memset(&Barrier, 0, sizeof(Barrier));
+    Barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    Barrier.srcAccessMask = SrcAccessFlags;
+    Barrier.dstAccessMask = DstAccessFlags;
 }
 
 void FBarrier::TransitionLayout(VkImage Image, VkImageLayout OldLayout, VkImageLayout NewLayout,
@@ -204,7 +216,8 @@ void FBarrier::Execute(VkCommandBuffer CmdBuffer)
 
     if (!ImageBarrier.IsEmpty())
     {
-        VulkanAPI::vkCmdPipelineBarrier(CmdBuffer, SrcStageMask, DstStageMask, 0, 0, nullptr, 0, nullptr,
+        VulkanAPI::vkCmdPipelineBarrier(CmdBuffer, SrcStageMask, DstStageMask, 0, MemoryBarrier.Size(),
+                                        MemoryBarrier.Raw(), BufferBarrier.Size(), BufferBarrier.Raw(),
                                         ImageBarrier.Size(), ImageBarrier.Raw());
     }
 }

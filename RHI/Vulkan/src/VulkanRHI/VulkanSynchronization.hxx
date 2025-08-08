@@ -20,12 +20,16 @@ public:
 public:
     FBarrier();
 
+    void AddMemoryBarrier(VkAccessFlags SrcAccessFlags, VkAccessFlags DstAccessFlags, VkPipelineStageFlags SrcStageMask,
+                          VkPipelineStageFlags DstStageMask);
     void TransitionLayout(VkImage Image, VkImageLayout OldLayout, VkImageLayout NewLayout,
                           const VkImageSubresourceRange& SubresourceRange);
     void Execute(VkCommandBuffer CmdBuffer);
 
 private:
     TArray<VkImageMemoryBarrier> ImageBarrier;
+    TArray<VkBufferMemoryBarrier> BufferBarrier;
+    TArray<VkMemoryBarrier> MemoryBarrier;
 };
 
 class RSemaphore : public RObject, public IDeviceChild

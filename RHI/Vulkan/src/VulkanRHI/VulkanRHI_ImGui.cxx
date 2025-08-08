@@ -117,18 +117,18 @@ void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList, RRHIViewport* BackBu
 }
 
 template <typename T, EBufferUsageFlags Flags, int BufferSlack = 500>
-static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, TResourceArray<T>& Data)
+static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, uint32 MinimalSize)
 {
-    if (Buffer && Buffer->GetCurrentSize() >= Data.GetByteSize())
+    if (Buffer && Buffer->GetCurrentSize() >= MinimalSize)
     {
         return false;
     }
     // Reallocate the buffer
     FRHIBufferDesc Desc{
-        .Size = Data.GetByteSize() + BufferSlack,
+        .Size = MinimalSize + BufferSlack,
         .Stride = sizeof(T),
         .Usage = Flags | EBufferUsageFlags::KeepCPUAccessible,
-        .ResourceArray = &Data,
+        .ResourceArray = nullptr,
         .DebugName = "ImGuiBufferStaging",
     };
 
@@ -232,7 +232,7 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
     FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
 
-    UpdateGeometry(DrawData);
+    UpdateGeometry(DrawData, CommandList);
 
     DrawData->ScaleClipRects(DrawData->FramebufferScale);
 
@@ -347,7 +347,7 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
     return true;
 }
 
-bool VulkanRHI_ImGui::UpdateGeometry(ImDrawData* DrawData)
+bool VulkanRHI_ImGui::UpdateGeometry(ImDrawData* DrawData, FFRHICommandList& CommandList)
 {
     ImGuiVertexBufferData.Resize(DrawData->TotalVtxCount);
     ImGuiIndexBufferData.Resize(DrawData->TotalIdxCount);
@@ -366,10 +366,24 @@ bool VulkanRHI_ImGui::UpdateGeometry(ImDrawData* DrawData)
     }
 
     bool bWasResized = false;
-    bWasResized |=
-        ReallocateBufferIfNeeded<ImDrawVert, EBufferUsageFlags::VertexBuffer>(ImGuiVertexBuffer, ImGuiVertexBufferData);
-    bWasResized |=
-        ReallocateBufferIfNeeded<ImDrawIdx, EBufferUsageFlags::IndexBuffer>(ImGuiIndexBuffer, ImGuiIndexBufferData);
+    bWasResized |= ReallocateBufferIfNeeded<ImDrawVert, EBufferUsageFlags::VertexBuffer>(
+        ImGuiVertexBuffer, ImGuiVertexBufferData.GetByteSize());
+    bWasResized |= ReallocateBufferIfNeeded<ImDrawIdx, EBufferUsageFlags::IndexBuffer>(
+        ImGuiIndexBuffer, ImGuiIndexBufferData.GetByteSize());
+
+    Ref<RRHIBuffer> ImGuiVertexBufferCast = this->ImGuiVertexBuffer;
+    CommandList.CopyResourceArrayToBuffer(&ImGuiVertexBufferData, ImGuiVertexBufferCast, 0, 0,
+                                          ImGuiVertexBufferData.GetByteSize());
+
+    Ref<RRHIBuffer> ImGuiIndexBufferCast = this->ImGuiIndexBuffer;
+    CommandList.CopyResourceArrayToBuffer(&ImGuiIndexBufferData, ImGuiIndexBufferCast, 0, 0,
+                                          ImGuiIndexBufferData.GetByteSize());
+
+    FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
+    FBarrier Barrier;
+    Barrier.AddMemoryBarrier(VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT, VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
+                             VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT);
+    Barrier.Execute(CommandContext->GetCommandManager()->GetActiveCmdBuffer()->GetHandle());
 
     return bWasResized;
 }
