@@ -85,7 +85,7 @@ void VulkanRHI_ImGui::Shutdown()
     {
         tex->SetTexID(0);
     }
-    ImGuiTexturesArray.Clear();
+    ImGuiTextures.Clear();
 
     ImGuiPipeline = nullptr;
     ImGui::DestroyContext();
@@ -152,7 +152,7 @@ static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, uint32 MinimalS
 bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& CommandList)
 {
     check(Texture);
-    check(Texture->GetTexID() == 0 || Texture->GetTexID() <= ImGuiTexturesArray.Size());
+    check(Texture->GetTexID() == 0 || ImGuiTextures.Contains(Texture->GetTexID()));
 
     Ref<RVulkanTexture> VulkanTexture;
     if (Texture->Status == ImTextureStatus_WantCreate)
@@ -163,19 +163,20 @@ bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& Co
             .Format = EImageFormat::R8G8B8A8_SRGB,
             .Extent = {static_cast<uint32>(Texture->Width), static_cast<uint32>(Texture->Height)},
             .NumSamples = 1,
-            .Name = std::format("ImGuiTexture.{}", ImGuiTexturesArray.Size()),
+            .Name = std::format("ImGuiTexture.{}", ImGuiTextures.Size()),
         };
-        ImGuiTexturesArray.Emplace(RHI::CreateTexture(TextureDesc));
-        // The actual index is "TexID - 1", because we need to reserve value 0 for "nothing"
-        Texture->SetTexID(ImGuiTexturesArray.Size());
-        VulkanTexture = ImGuiTexturesArray.Back();
+        VulkanTexture = RHI::CreateTexture(TextureDesc);
+        ImGuiTextures.Emplace(VulkanTexture->ID(), VulkanTexture);
+
+        Texture->SetTexID(VulkanTexture->ID());
+        Texture->SetStatus(ImTextureStatus_WantUpdates);
     }
     else
     {
-        VulkanTexture = ImGuiTexturesArray[Texture->GetTexID() - 1];
+        VulkanTexture = ImGuiTextures[Texture->GetTexID()];
     }
 
-    if (Texture->Status == ImTextureStatus_WantCreate || Texture->Status == ImTextureStatus_WantUpdates)
+    if (Texture->Status == ImTextureStatus_WantUpdates)
     {
         const int32 UploadX = (Texture->Status == ImTextureStatus_WantCreate) ? 0 : Texture->UpdateRect.x;
         const int32 UploadY = (Texture->Status == ImTextureStatus_WantCreate) ? 0 : Texture->UpdateRect.y;
@@ -207,13 +208,14 @@ bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& Co
         Device->GetImmediateContext()->SetLayout(VulkanTexture.Raw(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         Device->GetImmediateContext()->GetCommandManager()->SubmitUploadCmdBuffer();
         Device->WaitUntilIdle();    // TODO: Not that
-        Texture->Status = ImTextureStatus_OK;
+        Texture->SetStatus(ImTextureStatus_OK);
     }
 
     if (Texture->Status == ImTextureStatus_WantDestroy)
     {
-        // TODO: worry about that
-        ensure(false);
+        ImGuiTextures.Remove(Texture->GetTexID());
+        Texture->SetStatus(ImTextureStatus_Destroyed);
+        Texture->SetTexID(ImTextureID_Invalid);
     }
 
     return true;
@@ -327,8 +329,8 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                 const int startIndexLocation = pCmd->IdxOffset + idxOffset;
                 const int startVertexLocation = pCmd->VtxOffset + vtxOffset;
 
-                check(pCmd->GetTexID() == 0 || pCmd->GetTexID() <= ImGuiTexturesArray.Size());
-                DescriptorSetManager->SetInput("sTexture", ImGuiTexturesArray[pCmd->GetTexID() - 1]);
+                check(pCmd->GetTexID() == 0 || ImGuiTextures.Contains(pCmd->GetTexID()));
+                DescriptorSetManager->SetInput("sTexture", ImGuiTextures[pCmd->GetTexID()]);
                 DescriptorSetManager->InvalidateAndUpdate();
                 DescriptorSetManager->Bind(CommandContext->GetCommandManager()->GetActiveCmdBuffer()->GetHandle(),
                                            ImGuiPipeline->GetPipelineLayout(), VK_PIPELINE_BIND_POINT_GRAPHICS);

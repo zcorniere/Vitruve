@@ -44,7 +44,7 @@ private:
     Ref<RVulkanGraphicsPipeline> ImGuiPipeline = nullptr;
     std::unique_ptr<FDescriptorSetManager> DescriptorSetManager;
 
-    TArray<Ref<RVulkanTexture>> ImGuiTexturesArray;
+    TMap<uint64, Ref<RVulkanTexture>> ImGuiTextures;
 };
 
 }    // namespace VulkanRHI
