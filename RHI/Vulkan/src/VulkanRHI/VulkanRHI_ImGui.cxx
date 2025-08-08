@@ -319,8 +319,9 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
                 if (clipMax.x <= clipMin.x || clipMax.y <= clipMin.y)
                     continue;
 
-                CommandList.SetScissor({static_cast<int32>(clipMin.x), static_cast<int32>(clipMin.y)},
-                                       {static_cast<uint32>(clipMax.x), static_cast<uint32>(clipMax.y)});
+                CommandList.SetScissor(
+                    {static_cast<int32>(clipMin.x), static_cast<int32>(clipMin.y)},
+                    {static_cast<uint32>(clipMax.x - clipMin.x), static_cast<uint32>(clipMax.y - clipMin.y)});
 
                 int vertexCount = pCmd->ElemCount;
                 int startIndexLocation = pCmd->IdxOffset + idxOffset;
