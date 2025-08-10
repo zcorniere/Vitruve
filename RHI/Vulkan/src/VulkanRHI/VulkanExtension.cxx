@@ -14,10 +14,10 @@ static void AddToPNext(ExistingChainType& Existing, NewStructType& Added)
 namespace VulkanRHI
 {
 
-class DynamicRenderingExtension : public IDeviceVulkanExtension
+class FDynamicRenderingExtension : public IDeviceVulkanExtension
 {
 public:
-    DynamicRenderingExtension(): IDeviceVulkanExtension(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, true)
+    FDynamicRenderingExtension(): IDeviceVulkanExtension(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, true)
     {
         std::memset(&DynamicRenderingFeature, 0, sizeof(DynamicRenderingFeature));
         DynamicRenderingFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
@@ -33,10 +33,10 @@ private:
     VkPhysicalDeviceDynamicRenderingFeatures DynamicRenderingFeature{};
 };
 
-class Maintenance5Extensions : public IDeviceVulkanExtension
+class FMaintenance5Extension : public IDeviceVulkanExtension
 {
 public:
-    Maintenance5Extensions(): IDeviceVulkanExtension(VK_KHR_MAINTENANCE_5_EXTENSION_NAME, false)
+    FMaintenance5Extension(): IDeviceVulkanExtension(VK_KHR_MAINTENANCE_5_EXTENSION_NAME, false)
     {
         std::memset(&Maintenance5Feature, 0, sizeof(Maintenance5Feature));
         Maintenance5Feature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES_KHR;
@@ -55,6 +55,25 @@ public:
 
 private:
     VkPhysicalDeviceMaintenance5FeaturesKHR Maintenance5Feature{};
+};
+
+class FSynchronisation2Extension : public IDeviceVulkanExtension
+{
+public:
+    FSynchronisation2Extension(): IDeviceVulkanExtension(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME, true)
+    {
+        std::memset(&Synchronisation2Feature, 0, sizeof(Synchronisation2Feature));
+        Synchronisation2Feature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+        Synchronisation2Feature.synchronization2 = VK_TRUE;
+    }
+
+    void PreDeviceCreated(VkDeviceCreateInfo& DeviceInfo) override final
+    {
+        AddToPNext(DeviceInfo, Synchronisation2Feature);
+    }
+
+private:
+    VkPhysicalDeviceSynchronization2Features Synchronisation2Feature;
 };
 
 #define ADD_SIMPLE_EXTENSION(Array, ExtensionType, ExtensionName, Required) \
@@ -89,8 +108,9 @@ FVulkanDeviceExtensionArray FVulkanPlatform::GetDeviceExtensions() const
     ADD_SIMPLE_EXTENSION(DeviceExtension, IDeviceVulkanExtension, VK_KHR_SWAPCHAIN_EXTENSION_NAME, true);
     ADD_SIMPLE_EXTENSION(DeviceExtension, IDeviceVulkanExtension, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME, true);
 
-    ADD_COMPLEX_ENTENSION(DeviceExtension, DynamicRenderingExtension);
-    ADD_COMPLEX_ENTENSION(DeviceExtension, Maintenance5Extensions);
+    ADD_COMPLEX_ENTENSION(DeviceExtension, FDynamicRenderingExtension);
+    ADD_COMPLEX_ENTENSION(DeviceExtension, FMaintenance5Extension);
+    ADD_COMPLEX_ENTENSION(DeviceExtension, FSynchronisation2Extension);
 
     return DeviceExtension;
 }

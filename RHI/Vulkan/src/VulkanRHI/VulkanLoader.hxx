@@ -4,8 +4,15 @@
     LoadMacro(PFN_vkCmdBeginRenderingKHR, vkCmdBeginRenderingKHR); \
     LoadMacro(PFN_vkCmdEndRenderingKHR, vkCmdEndRenderingKHR);
 
+#define VK_ENTRYPOINT_SYNCHRONISATION2(LoadMacro)                \
+    LoadMacro(PFN_vkCmdPipelineBarrier2, vkCmdPipelineBarrier2); \
+    LoadMacro(PFN_vkCmdResetEvent2, vkCmdResetEvent2);           \
+    LoadMacro(PFN_vkCmdSetEvent2, vkCmdSetEvent2);               \
+    LoadMacro(PFN_vkCmdWaitEvents2, vkCmdWaitEvents2);           \
+    LoadMacro(PFN_vkCmdWriteTimestamp2, vkCmdWriteTimestamp2);   \
+    LoadMacro(PFN_vkQueueSubmit2, vkQueueSubmit2);
+
 #define VK_ENTRYPOINTS_INSTANCE(LoadMacro)                                                                         \
-    VK_ENTRYPOINT_DYNAMIC_RENDERING(LoadMacro);                                                                    \
     LoadMacro(PFN_vkDestroyInstance, vkDestroyInstance);                                                           \
     LoadMacro(PFN_vkEnumeratePhysicalDevices, vkEnumeratePhysicalDevices);                                         \
     LoadMacro(PFN_vkGetPhysicalDeviceFeatures, vkGetPhysicalDeviceFeatures);                                       \
@@ -175,11 +182,16 @@
     #define VK_ENTRYPOINTS_DEBUG_UTILS(LoadMacro)
 #endif    // !VULKAN_DEBUGGING_ENABLED
 
-#define VK_ENTRYPOINT_ALL(LoadMacro)       \
-    VK_ENTRYPOINTS_BASE(LoadMacro);        \
-    VK_ENTRYPOINTS_INSTANCE(LoadMacro);    \
-    VK_ENTRYPOINTS_DEBUG_UTILS(LoadMacro); \
+#define VK_ENTRYPOINT_EXTENSIONS(LoadMacro)     \
+    VK_ENTRYPOINT_DYNAMIC_RENDERING(LoadMacro); \
+    VK_ENTRYPOINT_SYNCHRONISATION2(LoadMacro);  \
+    VK_ENTRYPOINTS_DEBUG_UTILS(LoadMacro);      \
     VK_ENTRYPOINTS_SURFACE_INSTANCE(LoadMacro);
+
+#define VK_ENTRYPOINT_ALL(LoadMacro)    \
+    VK_ENTRYPOINTS_BASE(LoadMacro);     \
+    VK_ENTRYPOINTS_INSTANCE(LoadMacro); \
+    VK_ENTRYPOINT_EXTENSIONS(LoadMacro);
 
 #define RHI_VULKAN_VERSION VK_API_VERSION_1_3
 

@@ -27,9 +27,9 @@ public:
     void Execute(VkCommandBuffer CmdBuffer);
 
 private:
-    TArray<VkImageMemoryBarrier> ImageBarrier;
-    TArray<VkBufferMemoryBarrier> BufferBarrier;
-    TArray<VkMemoryBarrier> MemoryBarrier;
+    TArray<VkImageMemoryBarrier2> ImageBarrier;
+    TArray<VkBufferMemoryBarrier2> BufferBarrier;
+    TArray<VkMemoryBarrier2> MemoryBarrier;
 };
 
 class RSemaphore : public RObject, public IDeviceChild

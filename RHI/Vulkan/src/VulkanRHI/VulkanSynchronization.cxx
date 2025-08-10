@@ -178,23 +178,27 @@ FBarrier::FBarrier()
 void FBarrier::AddMemoryBarrier(VkAccessFlags SrcAccessFlags, VkAccessFlags DstAccessFlags,
                                 VkPipelineStageFlags SrcStageMask, VkPipelineStageFlags DstStageMask)
 {
-    VkMemoryBarrier& Barrier = MemoryBarrier.Emplace();
+    VkMemoryBarrier2& Barrier = MemoryBarrier.Emplace();
 
     std::memset(&Barrier, 0, sizeof(Barrier));
-    Barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    Barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER_2;
     Barrier.srcAccessMask = SrcAccessFlags;
     Barrier.dstAccessMask = DstAccessFlags;
+    Barrier.srcStageMask = SrcStageMask;
+    Barrier.dstStageMask = DstStageMask;
 }
 
 void FBarrier::TransitionLayout(VkImage Image, VkImageLayout OldLayout, VkImageLayout NewLayout,
                                 const VkImageSubresourceRange& SubresourceRange)
 {
-    VkImageMemoryBarrier& Barrier = ImageBarrier.Emplace();
+    VkImageMemoryBarrier2& Barrier = ImageBarrier.Emplace();
 
     std::memset(&Barrier, 0, sizeof(Barrier));
-    Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
     Barrier.srcAccessMask = GetVkAccessMaskForLayout(OldLayout);
     Barrier.dstAccessMask = GetVkAccessMaskForLayout(NewLayout);
+    Barrier.srcStageMask = GetVkStageFlagsForLayout(OldLayout);
+    Barrier.dstStageMask = GetVkStageFlagsForLayout(NewLayout);
     Barrier.oldLayout = OldLayout;
     Barrier.newLayout = NewLayout;
     Barrier.image = Image;
@@ -205,21 +209,24 @@ void FBarrier::TransitionLayout(VkImage Image, VkImageLayout OldLayout, VkImageL
 
 void FBarrier::Execute(VkCommandBuffer CmdBuffer)
 {
-    VkPipelineStageFlags SrcStageMask = 0;
-    VkPipelineStageFlags DstStageMask = 0;
-
-    for (const auto& Barrier: ImageBarrier)
+    if (MemoryBarrier.IsEmpty() && BufferBarrier.IsEmpty() && ImageBarrier.IsEmpty())
     {
-        SrcStageMask |= GetVkStageFlagsForLayout(Barrier.oldLayout);
-        DstStageMask |= GetVkStageFlagsForLayout(Barrier.newLayout);
+        return;
     }
 
-    if (!ImageBarrier.IsEmpty())
-    {
-        VulkanAPI::vkCmdPipelineBarrier(CmdBuffer, SrcStageMask, DstStageMask, 0, MemoryBarrier.Size(),
-                                        MemoryBarrier.Raw(), BufferBarrier.Size(), BufferBarrier.Raw(),
-                                        ImageBarrier.Size(), ImageBarrier.Raw());
-    }
+    VkDependencyInfo DependencyInfo{
+        .sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
+        .pNext = nullptr,
+        .dependencyFlags = 0,
+        .memoryBarrierCount = MemoryBarrier.Size(),
+        .pMemoryBarriers = MemoryBarrier.Raw(),
+        .bufferMemoryBarrierCount = BufferBarrier.Size(),
+        .pBufferMemoryBarriers = BufferBarrier.Raw(),
+        .imageMemoryBarrierCount = ImageBarrier.Size(),
+        .pImageMemoryBarriers = ImageBarrier.Raw(),
+    };
+
+    VulkanAPI::vkCmdPipelineBarrier2(CmdBuffer, &DependencyInfo);
 }
 
 RSemaphore::RSemaphore(FVulkanDevice* InDevice): IDeviceChild(InDevice), SemaphoreHandle(VK_NULL_HANDLE)

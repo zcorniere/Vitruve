@@ -151,6 +151,8 @@ static bool ReallocateBufferIfNeeded(Ref<RVulkanBuffer>& Buffer, uint32 MinimalS
 
 bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& CommandList)
 {
+    (void)CommandList;
+
     check(Texture);
     check(Texture->GetTexID() == 0 || ImGuiTextures.Contains(Texture->GetTexID()));
 
