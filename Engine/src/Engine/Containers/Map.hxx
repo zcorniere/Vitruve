@@ -43,7 +43,7 @@ private:
             CheckIsIteratorValid();
 
             check(CurrentBucket != nullptr);
-            return CurrentBucket->operator[](CurrentBucketIndex);
+            return &CurrentBucket->operator[](CurrentBucketIndex);
         }
 
         Iterator& operator++()
@@ -341,7 +341,7 @@ public:
         {
             const TPair<TKey, TValue>& Pair = CurrentBucket[i];
             const TSizeType PairHash = Hash(Pair.template Get<0>());
-            if (PairHash == HashValue)
+            if (PairHash == HashValue && Pair.template Get<0>() == Key)
             {
                 CurrentBucket.RemoveAt(i, RemovedValue);
                 NumElements--;
@@ -423,10 +423,11 @@ public:
         for (TPair<TKey, TValue>& Pair: CurrentBucket)
         {
             const TSizeType PairHash = Hash(Pair.template Get<0>());
-            if (PairHash == HashValue)
+            if (PairHash == HashValue && Pair.template Get<0>() == Key)
             {
                 return &Pair.template Get<1>();
             }
+            return nullptr;
         }
         return nullptr;
     }
@@ -448,7 +449,7 @@ public:
             {
                 const TSizeType HashValue = Hash(Pair.template Get<0>());
                 const TSizeType BucketIndex = HashValue % NewBuckets.Size();
-                NewBuckets[BucketIndex].Add(std::move(Pair));
+                NewBuckets[BucketIndex].Add(Pair);
             }
         }
         Buckets = std::move(NewBuckets);
@@ -488,23 +489,17 @@ public:
             return false;
         }
 
-        if (NumElements == 0)
+        // For each element in this map, check if it exists in the other map with the same value
+        for (const auto& pair: *this)
         {
-            return true;    // Both maps are empty
-        }
-
-        TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator It = begin();
-        TMap<TKey, TValue, THasher, FLoadFactor, TSizeType, MinimalSize>::ConstIterator OtherIt = Other.begin();
-
-        while (It != end() && OtherIt != Other.end())
-        {
-            if (*It != *OtherIt)
+            const TValue* otherValue = Other.Find(pair.template Get<0>());
+            if (!otherValue || *otherValue != pair.template Get<1>())
             {
                 return false;
             }
-            ++It;
-            ++OtherIt;
         }
+
+        return true;
     }
 
 private:
