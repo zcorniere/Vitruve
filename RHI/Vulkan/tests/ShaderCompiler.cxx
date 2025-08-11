@@ -249,7 +249,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "pointLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = 4,
+                                        .Size = sizeof(float),
                                         .Offset = 0,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -257,7 +257,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "directLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = 4,
+                                        .Size = sizeof(float),
                                         .Offset = 4,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -265,7 +265,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "spotLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = 4,
+                                        .Size = sizeof(float),
                                         .Offset = 8,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -273,7 +273,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "position",
                                         .Type = ::RTTI::EParameterType::Float,
-                                        .Size = 4,
+                                        .Size = sizeof(float),
                                         .Offset = 16,
                                         .Columns = 1,
                                         .Rows = 4,
@@ -346,7 +346,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                      .Parameter =
                          {
                              ::RTTI::FParameter{
-                                 .Name = "PointLight",
+                                 .Name = "LightBuffer",
                                  .Type = ::RTTI::EParameterType::Struct,
                                  .Size = 0,
                                  .Offset = 0,
@@ -366,7 +366,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "position",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 0,
                                                          .Columns = 1,
                                                          .Rows = 4,
@@ -375,7 +375,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "color",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 16,
                                                          .Columns = 1,
                                                          .Rows = 4,
@@ -384,7 +384,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "intensity",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 32,
                                                          .Columns = 1,
                                                          .Rows = 1,
@@ -393,7 +393,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "falloff",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 36,
                                                          .Columns = 1,
                                                          .Rows = 1,
@@ -424,7 +424,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                          {
                                              .Name = "spotLightArray",
                                              .Type = ::RTTI::EParameterType::Struct,
-                                             .Size = 60,
+                                             .Size = sizeof(SpotLight),
                                              .Offset = 0,
                                              .Columns = 1,
                                              .Rows = 1,
@@ -434,7 +434,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "position",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 0,
                                                          .Columns = 1,
                                                          .Rows = 4,
@@ -443,7 +443,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "direction",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 16,
                                                          .Columns = 1,
                                                          .Rows = 4,
@@ -452,7 +452,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "color",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 32,
                                                          .Columns = 1,
                                                          .Rows = 4,
@@ -461,7 +461,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "cutOff",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 48,
                                                          .Columns = 1,
                                                          .Rows = 1,
@@ -470,7 +470,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "outerCutOff",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 52,
                                                          .Columns = 1,
                                                          .Rows = 1,
@@ -479,7 +479,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                      {
                                                          .Name = "intensity",
                                                          .Type = ::RTTI::EParameterType::Float,
-                                                         .Size = 4,
+                                                         .Size = sizeof(float),
                                                          .Offset = 56,
                                                          .Columns = 1,
                                                          .Rows = 1,
@@ -491,49 +491,61 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                          },
                  });
 
-    DescriptorSet1Declaration.Emplace(
-        0, VulkanRHI::ShaderResource::FDescriptorSetInfo{
-               .Type = VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer,
-               .Parameter =
-                   {
-                       .Name = "DirectLight",
-                       .Type = ::RTTI::EParameterType::Struct,
-                       .Size = sizeof(DirectionalLight),
-                       .Offset = 0,
-                       .Columns = 1,
-                       .Rows = 1,
-                       .Members =
-                           {
-                               {
-                                   .Name = "orientation",
-                                   .Type = ::RTTI::EParameterType::Float,
-                                   .Size = 4,
-                                   .Offset = 0,
-                                   .Columns = 1,
-                                   .Rows = 4,
+    DescriptorSet1Declaration
+        .Emplace(0,
+                 VulkanRHI::ShaderResource::FDescriptorSetInfo{
+                     .Type = VulkanRHI::ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer,
+                     .Parameter =
+                         {
+                             .Name = "DirectLight",
+                             .Type = ::RTTI::EParameterType::Struct,
+                             .Size = 0,
+                             .Offset = 0,
+                             .Columns = 1,
+                             .Rows = 1,
+                             .Members =
+                                 {
+                                     {
+                                         .Name = "directionalLightArray",
+                                         .Type = ::RTTI::EParameterType::Struct,
+                                         .Size = sizeof(DirectionalLight),
+                                         .Offset = 0,
+                                         .Columns = 1,
+                                         .Rows = 1,
+                                         .Members =
+                                             {
+                                                 {
+                                                     .Name = "orientation",
+                                                     .Type = ::RTTI::EParameterType::Float,
+                                                     .Size = sizeof(float),
+                                                     .Offset = 0,
+                                                     .Columns = 1,
+                                                     .Rows = 4,
 
-                               },
-                               {
-                                   .Name = "color",
-                                   .Type = ::RTTI::EParameterType::Float,
-                                   .Size = 4,
-                                   .Offset = 16,
-                                   .Columns = 1,
-                                   .Rows = 4,
+                                                 },
+                                                 {
+                                                     .Name = "color",
+                                                     .Type = ::RTTI::EParameterType::Float,
+                                                     .Size = sizeof(float),
+                                                     .Offset = 16,
+                                                     .Columns = 1,
+                                                     .Rows = 4,
 
-                               },
-                               {
-                                   .Name = "intensity",
-                                   .Type = ::RTTI::EParameterType::Float,
-                                   .Size = 4,
-                                   .Offset = 32,
-                                   .Columns = 1,
-                                   .Rows = 1,
+                                                 },
+                                                 {
+                                                     .Name = "intensity",
+                                                     .Type = ::RTTI::EParameterType::Float,
+                                                     .Size = sizeof(float),
+                                                     .Offset = 32,
+                                                     .Columns = 1,
+                                                     .Rows = 1,
 
-                               },
-                           },
-                   },
-           });
+                                                 },
+                                             },
+                                     },
+                                 },
+                         },
+                 });
     ExpectedReflection.DescriptorSetDeclaration.Emplace(1, DescriptorSet1Declaration);
 
     TMap<uint32, VulkanRHI::ShaderResource::FDescriptorSetInfo> DescriptorSet2Declaration;
@@ -554,7 +566,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "alphaCutOff",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 0,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -563,7 +575,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "metallic",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 4,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -572,7 +584,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "roughness",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 8,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -581,7 +593,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "baseColor",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 16,
                                             .Columns = 1,
                                             .Rows = 4,
@@ -590,7 +602,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "baseColorFactor",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 32,
                                             .Columns = 1,
                                             .Rows = 4,
@@ -599,7 +611,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "emissiveFactor",
                                             .Type = ::RTTI::EParameterType::Float,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 48,
                                             .Columns = 1,
                                             .Rows = 4,
@@ -608,7 +620,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "baseColorTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 64,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -617,7 +629,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "metallicRoughnessTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 68,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -626,7 +638,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "normalTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 72,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -635,7 +647,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "occlusionTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 76,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -644,7 +656,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "emissiveTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 80,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -653,7 +665,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "specularGlossinessTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 84,
                                             .Columns = 1,
                                             .Rows = 1,
@@ -662,7 +674,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                         {
                                             .Name = "diffuseTexture",
                                             .Type = ::RTTI::EParameterType::Int32,
-                                            .Size = 4,
+                                            .Size = sizeof(float),
                                             .Offset = 88,
                                             .Columns = 1,
                                             .Rows = 1,

@@ -377,6 +377,8 @@ static ::RTTI::FParameter RecursiveTypeDescription(const spirv_cross::Compiler& 
     if (Type.member_types.size())
     {
         Parameter.Size = Compiler.get_declared_struct_size(Type);
+        // Realign the size to 16 bytes
+        Parameter.Size = (Parameter.Size + 16 - 1) & ~(16 - 1);
     }
     else
     {

@@ -1,19 +1,22 @@
 #version 450
 
-struct PointLight {
+struct PointLight
+{
     vec4 position;
     vec4 color;
     float intensity;
     float falloff;
 };
 
-struct DirectionalLight {
+struct DirectionalLight
+{
     vec4 orientation;
     vec4 color;
     float intensity;
 };
 
-struct SpotLight {
+struct SpotLight
+{
     vec4 position;
     vec4 direction;
     vec4 color;
@@ -22,7 +25,8 @@ struct SpotLight {
     float intensity;
 };
 
-struct Material {
+struct Material
+{
     float alphaCutOff;
     float metallic;
     float roughness;
@@ -38,7 +42,8 @@ struct Material {
     int diffuseTexture;
 };
 
-struct pushConstantStruct {
+struct pushConstantStruct
+{
     uint pointLightCount;
     uint directLightCount;
     uint spotLightCount;
@@ -96,7 +101,8 @@ omniLight;
 
 #define SAMPLE_OPTIONAL_WITH_DEFAULT_RGB(name, defaultValue) SAMPLE_OPTIONAL_WITH_DEFAULT(name, rgb, defaultValue)
 
-struct PBRInfo {
+struct PBRInfo
+{
     vec3 N;                       // Normal vector
     vec3 V;                       // Vector from surface point to camera
     float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
@@ -160,7 +166,8 @@ vec3 specularReflection(float dotVH, vec3 reflectance0, vec3 reflectance90)
 vec3 specularContribution(vec3 L, PBRInfo info)
 {
     // black metallic fix (temp) proper fix need implementation of IRB
-    if (info.reflectance0 == vec3(0)) {
+    if (info.reflectance0 == vec3(0))
+    {
         info.reflectance0 = vec3(10);
     }
 
@@ -172,7 +179,8 @@ vec3 specularContribution(vec3 L, PBRInfo info)
     float dotLH = clamp(dot(L, H), 0.0, 1.0);                     // cos angle between light direction and half vector
 
     vec3 color = vec3(0.0);
-    if (dotNL > 0.0) {
+    if (dotNL > 0.0)
+    {
         // Calculate the shading terms for the microfacet specular shading model
         vec3 F = specularReflection(dotVH, info.reflectance0, info.reflectance90);
         float G = geometricOcclusion(dotNL, dotNV, info.perceptualRoughness);
@@ -217,14 +225,16 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for (uint i = 0; i < cameraData.push.directLightCount; i++) {
+    for (uint i = 0; i < cameraData.push.directLightCount; i++)
+    {
         DirectionalLight light = directLight.directionalLightArray[i];
         vec3 radiance = light.color.rgb * light.intensity;
 
         vec3 L = normalize(-light.orientation.xyz);
         Lo += specularContribution(L, pbrInfo) * radiance;
     }
-    for (uint i = 0; i < cameraData.push.spotLightCount; i++) {
+    for (uint i = 0; i < cameraData.push.spotLightCount; i++)
+    {
         SpotLight light = spotLight.spotLightArray[i];
         vec3 L = normalize(light.position.xyz - fragPosition);
 
@@ -238,7 +248,8 @@ void main()
 
         Lo += specularContribution(L, pbrInfo) * radiance;
     }
-    for (uint i = 0; i < cameraData.push.pointLightCount; i++) {
+    for (uint i = 0; i < cameraData.push.pointLightCount; i++)
+    {
         PointLight light = omniLight.pointLightArray[i];
         vec3 L = normalize(light.position.xyz - fragPosition);
 
