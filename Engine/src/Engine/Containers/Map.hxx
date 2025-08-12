@@ -427,7 +427,6 @@ public:
             {
                 return &Pair.template Get<1>();
             }
-            return nullptr;
         }
         return nullptr;
     }
