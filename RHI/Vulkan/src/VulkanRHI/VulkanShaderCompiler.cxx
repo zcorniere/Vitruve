@@ -325,7 +325,7 @@ static bool GetStageReflection(const spirv_cross::SmallVector<spirv_cross::Resou
 
         const spirv_cross::SPIRType& ResourceType = Compiler.get_type(resource.base_type_id);
         std::optional<EVertexElementType> ElementType = Utils::SPRIVTypeToVertexElement(ResourceType);
-        if (!ensureMsg(ElementType.has_value(), "Unsuported Element Type for resource {}!", resource.name))
+        if (!ensureMsg(ElementType.has_value(), "Unsupported Element Type for resource {}!", resource.name))
         {
             return false;
         }

@@ -249,7 +249,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "pointLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = sizeof(float),
+                                        .Size = sizeof(uint32),
                                         .Offset = 0,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -257,7 +257,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "directLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = sizeof(float),
+                                        .Size = sizeof(uint32),
                                         .Offset = 4,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -265,7 +265,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                     {
                                         .Name = "spotLightCount",
                                         .Type = ::RTTI::EParameterType::Uint32,
-                                        .Size = sizeof(float),
+                                        .Size = sizeof(uint32),
                                         .Offset = 8,
                                         .Columns = 1,
                                         .Rows = 1,
@@ -629,7 +629,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "baseColorTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 64,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -638,7 +638,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "metallicRoughnessTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 68,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -647,7 +647,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "normalTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 72,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -656,7 +656,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "occlusionTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 76,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -665,7 +665,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "emissiveTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 80,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -674,7 +674,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "specularGlossinessTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 84,
                                                      .Columns = 1,
                                                      .Rows = 1,
@@ -683,7 +683,7 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
                                                  {
                                                      .Name = "diffuseTexture",
                                                      .Type = ::RTTI::EParameterType::Int32,
-                                                     .Size = sizeof(float),
+                                                     .Size = sizeof(int32),
                                                      .Offset = 88,
                                                      .Columns = 1,
                                                      .Rows = 1,
