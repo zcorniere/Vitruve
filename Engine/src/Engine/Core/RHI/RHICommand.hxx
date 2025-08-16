@@ -34,7 +34,7 @@ RHICOMMAND_MACRO(FRHIBeginDrawingViewport)
 {
 public:
     FRHIBeginDrawingViewport() = delete;
-    FRHIBeginDrawingViewport(Ref<RRHIViewport> InViewport);
+    explicit FRHIBeginDrawingViewport(Ref<RRHIViewport> InViewport);
     virtual ~FRHIBeginDrawingViewport() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -47,7 +47,7 @@ RHICOMMAND_MACRO(FRHIEndDrawningViewport)
 {
 public:
     FRHIEndDrawningViewport() = delete;
-    FRHIEndDrawningViewport(Ref<RRHIViewport> InViewport);
+    explicit FRHIEndDrawningViewport(Ref<RRHIViewport> InViewport);
     virtual ~FRHIEndDrawningViewport() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -59,7 +59,8 @@ private:
 RHICOMMAND_MACRO(FRHIPresetViewport)
 {
 public:
-    FRHIPresetViewport(Ref<RRHIViewport> InViewport);
+    FRHIPresetViewport() = delete;
+    explicit FRHIPresetViewport(Ref<RRHIViewport> InViewport);
     virtual ~FRHIPresetViewport() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -71,7 +72,8 @@ private:
 RHICOMMAND_MACRO(FRHIBeginRendering)
 {
 public:
-    FRHIBeginRendering(const FRHIRenderPassDescription& InDescription);
+    FRHIBeginRendering() = delete;
+    explicit FRHIBeginRendering(const FRHIRenderPassDescription& InDescription);
     virtual ~FRHIBeginRendering() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -92,7 +94,8 @@ public:
 RHICOMMAND_MACRO(FRHISetMaterial)
 {
 public:
-    FRHISetMaterial(Ref<RRHIMaterial> InMaterial);
+    FRHISetMaterial() = delete;
+    explicit FRHISetMaterial(Ref<RRHIMaterial> InMaterial);
     virtual ~FRHISetMaterial() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -104,7 +107,8 @@ private:
 RHICOMMAND_MACRO(FRHISetGraphicsPipeline)
 {
 public:
-    FRHISetGraphicsPipeline(Ref<RRHIGraphicsPipeline> InPipeline);
+    FRHISetGraphicsPipeline() = delete;
+    explicit FRHISetGraphicsPipeline(Ref<RRHIGraphicsPipeline> InPipeline);
     virtual ~FRHISetGraphicsPipeline() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -116,7 +120,8 @@ private:
 RHICOMMAND_MACRO(FRHISetVertexBuffer)
 {
 public:
-    FRHISetVertexBuffer(Ref<RRHIBuffer> InVertexBuffer, uint32 BufferIndex = 0, uint32 Offset = 0);
+    FRHISetVertexBuffer() = delete;
+    explicit FRHISetVertexBuffer(Ref<RRHIBuffer> InVertexBuffer, uint32 BufferIndex = 0, uint32 Offset = 0);
     virtual ~FRHISetVertexBuffer() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -130,7 +135,8 @@ private:
 RHICOMMAND_MACRO(FRHISetViewport)
 {
 public:
-    FRHISetViewport(FVector3 Min, FVector3 Max);
+    FRHISetViewport() = delete;
+    explicit FRHISetViewport(FVector3 Min, FVector3 Max);
     virtual ~FRHISetViewport() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -143,7 +149,8 @@ private:
 RHICOMMAND_MACRO(FRHISetScissor)
 {
 public:
-    FRHISetScissor(IVector2 Offset, UVector2 Size);
+    FRHISetScissor() = delete;
+    explicit FRHISetScissor(IVector2 Offset, UVector2 Size);
     virtual ~FRHISetScissor() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -156,7 +163,8 @@ private:
 RHICOMMAND_MACRO(FRHIBeginGPURegion)
 {
 public:
-    FRHIBeginGPURegion(const std::string& Name, const FColor& Color);
+    FRHIBeginGPURegion() = delete;
+    explicit FRHIBeginGPURegion(const std::string& Name, const FColor& Color);
     virtual ~FRHIBeginGPURegion() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -178,7 +186,8 @@ public:
 RHICOMMAND_MACRO(FRHIDraw)
 {
 public:
-    FRHIDraw(uint32 BaseVertexIndex, uint32 NumPrimitives, uint32 NumInstances);
+    FRHIDraw() = delete;
+    explicit FRHIDraw(uint32 BaseVertexIndex, uint32 NumPrimitives, uint32 NumInstances);
     virtual ~FRHIDraw() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -192,8 +201,9 @@ public:
 RHICOMMAND_MACRO(RHIDrawIndexed)
 {
 public:
-    RHIDrawIndexed(Ref<RRHIBuffer> InIndexBuffer, int32 BaseVertexIndex, uint32 FirstInstance, uint32 NumVertices,
-                   uint32 StartIndex, uint32 NumPrimitives, uint32 NumInstances);
+    RHIDrawIndexed() = delete;
+    explicit RHIDrawIndexed(Ref<RRHIBuffer> InIndexBuffer, int32 BaseVertexIndex, uint32 FirstInstance,
+                            uint32 NumVertices, uint32 StartIndex, uint32 NumPrimitives, uint32 NumInstances);
     virtual ~RHIDrawIndexed() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -211,8 +221,9 @@ private:
 RHICOMMAND_MACRO(RHICopyResourceArrayToBuffer)
 {
 public:
-    RHICopyResourceArrayToBuffer(IResourceArrayInterface* const Source, Ref<RRHIBuffer> Destination,
-                                 uint64 SourceOffset, uint64 DestinationOffset, uint64 Size);
+    RHICopyResourceArrayToBuffer() = delete;
+    explicit RHICopyResourceArrayToBuffer(IResourceArrayInterface* const Source, Ref<RRHIBuffer> Destination,
+                                          uint64 SourceOffset, uint64 DestinationOffset, uint64 Size);
     virtual ~RHICopyResourceArrayToBuffer() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -228,8 +239,9 @@ private:
 RHICOMMAND_MACRO(RHICopyBufferToBuffer)
 {
 public:
-    RHICopyBufferToBuffer(const Ref<RRHIBuffer> Source, Ref<RRHIBuffer> Destination, uint64 SourceOffset,
-                          uint64 DestinationOffset, uint64 Size);
+    RHICopyBufferToBuffer() = delete;
+    explicit RHICopyBufferToBuffer(const Ref<RRHIBuffer> Source, Ref<RRHIBuffer> Destination, uint64 SourceOffset,
+                                   uint64 DestinationOffset, uint64 Size);
     virtual ~RHICopyBufferToBuffer() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -245,8 +257,9 @@ private:
 RHICOMMAND_MACRO(RHICopyBufferToImage)
 {
 public:
-    RHICopyBufferToImage(const Ref<RRHIBuffer> Source, Ref<RRHITexture> Destination, uint64 SourceOffset,
-                         const IVector3& DestinationOffset, const UVector3& Size);
+    RHICopyBufferToImage() = delete;
+    explicit RHICopyBufferToImage(const Ref<RRHIBuffer> Source, Ref<RRHITexture> Destination, uint64 SourceOffset,
+                                  const IVector3& DestinationOffset, const UVector3& Size);
     virtual ~RHICopyBufferToImage() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;
@@ -262,8 +275,9 @@ private:
 RHICOMMAND_MACRO(RHICopyImageToImage)
 {
 public:
-    RHICopyImageToImage(Ref<RRHITexture> Source, Ref<RRHITexture> Destination, IVector2 SourceOffset,
-                        IVector2 DestinationOffset, UVector2 Size);
+    RHICopyImageToImage() = delete;
+    explicit RHICopyImageToImage(Ref<RRHITexture> Source, Ref<RRHITexture> Destination, IVector2 SourceOffset,
+                                 IVector2 DestinationOffset, UVector2 Size);
     virtual ~RHICopyImageToImage() = default;
 
     virtual void Execute(FFRHICommandList & CommandList) override final;

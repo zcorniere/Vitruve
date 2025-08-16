@@ -42,7 +42,9 @@ class RRHIBuffer : public RRHIResource
     RTTI_DECLARE_TYPEINFO(RRHIBuffer, RRHIResource);
 
 public:
-    RRHIBuffer(const FRHIBufferDesc& InDescription): RRHIResource(ERHIResourceType::Buffer), Description(InDescription)
+    explicit RRHIBuffer(const FRHIBufferDesc& InDescription)
+        : RRHIResource(ERHIResourceType::Buffer)
+        , Description(InDescription)
     {
     }
     virtual ~RRHIBuffer() = default;

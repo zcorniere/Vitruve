@@ -21,8 +21,8 @@ class FWindowsMisc : public FGenericMisc
 {
 public:
     /// @copydoc FGenericMisc::DisplayMessageBox
-    static EBoxReturnType DisplayMessageBox(EBoxMessageType MsgType, const std::string_view Text,
-                                            const std::string_view Caption);
+    static EBoxReturnType DisplayMessageBox(EBoxMessageType MsgType, const std::string_view& Text,
+                                            const std::string_view& Caption);
 
     /// @copydoc FGenericMisc::GetCPUInformation
     static const FCPUInformation& GetCPUInformation();

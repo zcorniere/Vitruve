@@ -11,7 +11,7 @@ namespace Serialization
 class FFileStreamWriter : public FStreamWriter
 {
 public:
-    FFileStreamWriter(const std::filesystem::path& Path);
+    explicit FFileStreamWriter(const std::filesystem::path& Path);
     FFileStreamWriter(const FFileStreamWriter&) = delete;
     virtual ~FFileStreamWriter();
 
@@ -31,7 +31,7 @@ class FFileStreamReader : public FStreamReader
 {
 
 public:
-    FFileStreamReader(const std::filesystem::path& Path);
+    explicit FFileStreamReader(const std::filesystem::path& Path);
     FFileStreamReader(const FFileStreamReader&) = delete;
     virtual ~FFileStreamReader();
 

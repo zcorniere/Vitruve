@@ -11,8 +11,8 @@
 #include <libloaderapi.h>
 #include <shlobj_core.h>
 
-EBoxReturnType FWindowsMisc::DisplayMessageBox(EBoxMessageType MsgType, const std::string_view Text,
-                                               const std::string_view Caption)
+EBoxReturnType FWindowsMisc::DisplayMessageBox(EBoxMessageType MsgType, const std::string_view& Text,
+                                               const std::string_view& Caption)
 {
     unsigned WindowFlags = MB_ICONWARNING;
     switch (MsgType)

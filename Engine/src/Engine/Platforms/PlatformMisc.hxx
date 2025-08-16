@@ -5,7 +5,8 @@
 #include <magic_enum/magic_enum.hpp>
 
 /// Structure that hold info about the CPU, things like instruction set, vendor named etc...
-struct FCPUInformation {
+struct FCPUInformation
+{
     char Vendor[12 + 1] = {0};
     char Brand[0x40] = {0};
     // Is the AVX512 extension supported ?
@@ -74,7 +75,7 @@ public:
     /// @param Title The Title of the message box
     /// @param Caption The content of the message box
     /// @return The answer of the user (@see EBoxReturnType)
-    static EBoxReturnType DisplayMessageBox(EBoxMessageType Type, const std::string Title, const std::string Text)
+    static EBoxReturnType DisplayMessageBox(EBoxMessageType Type, const std::string& Title, const std::string& Text)
     {
         LOG(LogPlatformMisc, Info, "{:s} Message Box: {:s} {:s}", magic_enum::enum_name(Type), Title, Text);
         return EBoxReturnType::Ok;

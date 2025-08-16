@@ -52,10 +52,6 @@ bool FCommandLine::Parse(const char* Key, std::string& Value)
 
     const char* ValueStartInStream = FoundKey + std::strlen(Key);
     const char* ValueEndInStream = nullptr;
-    if (ValueStartInStream == nullptr)
-    {
-        return false;
-    }
 
     const bool bArgumentQuoted = *ValueStartInStream == '"';
     if (bArgumentQuoted)

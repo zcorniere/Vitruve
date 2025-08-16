@@ -29,7 +29,7 @@ private:
     class WorkerPoolRuntime : public IThreadRuntime
     {
     public:
-        WorkerPoolRuntime(std::shared_ptr<FThreadPool::State> context);
+        explicit WorkerPoolRuntime(std::shared_ptr<FThreadPool::State> context);
 
         bool Init() override;
         std::uint32_t Run() override;

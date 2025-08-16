@@ -14,7 +14,7 @@ struct FGraphicsPipelineDescription
     struct FVertexBinding
     {
         uint32 Stride = 0;
-        uint16 Binding = 0;
+        uint32 Binding = 0;
         VkVertexInputRate InputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         void WriteInto(VkVertexInputBindingDescription& OutState) const;

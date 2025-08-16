@@ -15,7 +15,7 @@
 #define XDG_NO_EXCEPTION
 #include <xdg.hpp>
 
-EBoxReturnType FLinuxMisc::DisplayMessageBox(EBoxMessageType MsgType, const std::string Title, const std::string Text)
+EBoxReturnType FLinuxMisc::DisplayMessageBox(EBoxMessageType MsgType, const std::string& Title, const std::string& Text)
 {
     if (!RWindow::EnsureGLFWInit())
     {

@@ -84,7 +84,7 @@ private:
     using EventFn = std::function<bool(T&)>;
 
 public:
-    FEventDispatcher(FEvent& event): m_Event(event)
+    explicit FEventDispatcher(FEvent& event): m_Event(event)
     {
     }
 

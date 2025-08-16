@@ -385,14 +385,6 @@ public:
     }
 
     /// Find the index of the given element
-    /// @arg Index The index of the element if found
-    /// @return true if the index was found
-    [[nodiscard]] FORCEINLINE bool Find(const T& Item, TSize& Index) const
-    {
-        Index = this->Find(Item);
-        return Index != std::nullopt;
-    }
-    /// Find the index of the given element
     /// @note Support char* strings with strcmp
     ///
     /// @arg Item The element to find

@@ -25,7 +25,7 @@ class FLinuxMisc : public FGenericMisc
 {
 public:
     /// @copydoc GenericMisc::DisplayMessageBox
-    static EBoxReturnType DisplayMessageBox(EBoxMessageType MsgType, const std::string Title, const std::string Text);
+    static EBoxReturnType DisplayMessageBox(EBoxMessageType MsgType, const std::string& Title, const std::string& Text);
 
     /// @copydoc GenericMisc::GetCPUInformation
     static const FCPUInformation& GetCPUInformation();
