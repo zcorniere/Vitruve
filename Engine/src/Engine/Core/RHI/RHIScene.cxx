@@ -154,8 +154,11 @@ void RRHIScene::PreTick()
     }
     ActorThatNeedAttention.Clear();
 
-    AsyncTaskUpdateResult =
-        GEngine->GetThreadPool().Push([this, UpdateBatch](size_t) { Async_UpdateActorRepresentations(*UpdateBatch); });
+    if (!UpdateBatch->Actors.IsEmpty())
+    {
+        AsyncTaskUpdateResult = GEngine->GetThreadPool().Push([this, UpdateBatch](size_t)
+                                                              { Async_UpdateActorRepresentations(*UpdateBatch); });
+    }
 }
 
 void RRHIScene::PostTick(double DeltaTime)
