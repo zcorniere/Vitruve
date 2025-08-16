@@ -38,6 +38,21 @@ constexpr T Dot(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
     return Result;
 }
 
+template <typename T>
+constexpr T SizeSquared(const TVector<3, T>& Vector)
+{
+    return Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z;
+}
+
+constexpr float Size(const FVector3& Vector)
+{
+    return std::sqrtf(SizeSquared(Vector));
+}
+constexpr double Size(const DVector3& Vector)
+{
+    return std::sqrt(SizeSquared(Vector));
+}
+
 template <typename T, unsigned Size>
 constexpr TVector<Size, T> Normalize(const TVector<Size, T>& Vector)
 {
