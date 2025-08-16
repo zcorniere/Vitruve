@@ -14,7 +14,9 @@
             "request": "launch",
             "name": "Launch Vulkan RHI Tests",
             "program": "${workspaceFolder}/build/RHI/Vulkan/Debug/RaphaelRHIVulkan_Test",
-            "args": [],
+            "args": [
+                "--break"
+            ],
             "cwd": "${workspaceFolder}/build"
         },
         {
@@ -22,7 +24,9 @@
             "request": "launch",
             "name": "Launch Engine Tests",
             "program": "${workspaceFolder}/build//Engine/Debug/RaphaelEngine_Test",
-            "args": [],
+            "args": [
+                "--break"
+            ],
             "cwd": "${workspaceFolder}/build"
         }
     ]
