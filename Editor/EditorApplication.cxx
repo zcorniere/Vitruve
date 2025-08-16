@@ -117,6 +117,10 @@ bool EditorApplication::OnEngineInitialization()
         }
     }
 
+    Ref<AActor> Actor = World->CreateActor<AActor>("Floor", FTransform({0, 0, -10}, {}, {100, 100, 1}));
+    Actor->GetComponent<RMeshComponent>()->SetAsset(GEngine->AssetRegistry.GetCubeAsset());
+    Actor->GetComponent<RMeshComponent>()->SetMaterial(GEngine->AssetRegistry.GetMaterial("Shape Material"));
+
     return true;
 }
 
