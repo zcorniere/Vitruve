@@ -14,7 +14,6 @@ else()
     message(FATAL_ERROR "${RPH_SELECTED_RHI} is not supported !")
 endif()
 
-
 add_subdirectory(External/)
 
 if(WIN32)
@@ -93,11 +92,10 @@ target_compile_options(
             $<$<CXX_COMPILER_ID:MSVC>:
             /Zc:preprocessor
             /W4
-            /wd4267
-            /wd4201
-            /wd4244
-            /wd4324
-            /wd4702>
+            /wd4201 # unamed union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4702 # unreachable code
+            /wd5030> # unknown attribute
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/Engine/Raphael.hxx)
@@ -140,7 +138,6 @@ endif(RPH_ENABLE_PROFILING)
 if(OPTIMIZE_FOR_NATIVE)
     target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
 endif()
-
 
 option(RPH_NAN_CHECKS "Enable NaN checks in the engine" ON)
 if(RPH_NAN_CHECKS)

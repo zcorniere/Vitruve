@@ -107,21 +107,21 @@ static void GetCPUBrand(char (&OutBrandString)[0x40])
     std::memcpy(OutBrandString, BrandString, std::size(BrandString));
 }
 
-bool SupportAES()
+static bool SupportAES()
 {
     unsigned int eax, ebx, ecx, edx;
     __cpuid(1, eax, ebx, ecx, edx);
     return (ecx & 0x02000000) != 0;    // Check if AES is supported
 }
 
-bool SupportAVX512()
+static bool SupportAVX512()
 {
     unsigned int eax, ebx, ecx, edx;
     __cpuid_count(7, 0, eax, ebx, ecx, edx);
     return (ebx & (1 << 16)) != 0;    // Check if AVX512F is supported
 }
 
-bool SupportAVX2()
+static bool SupportAVX2()
 {
     unsigned int eax, ebx, ecx, edx;
     __cpuid_count(7, 0, eax, ebx, ecx, edx);

@@ -41,11 +41,10 @@ target_compile_options(
             $<$<CXX_COMPILER_ID:MSVC>:
             /Zc:preprocessor
             /W4
-            /wd4267
-            /wd4201
-            /wd4244
-            /wd4324
-            /wd4702>
+            /wd4201 # unamed union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4702 # unreachable code
+            /wd5030> # unknown attribute
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_VULKAN_NO_PROTOTYPES=1)

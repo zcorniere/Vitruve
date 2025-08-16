@@ -375,11 +375,11 @@ FVulkanDevice* FVulkanDynamicRHI::SelectDevice(VkInstance Instance)
     }
 
     // Remove all the other devices
-    for (FVulkanDevice* const Device: Devices)
+    for (FVulkanDevice* const DeviceToDelete: Devices)
     {
-        if (Device != SelectedDevice)
+        if (DeviceToDelete != SelectedDevice)
         {
-            delete Device;
+            delete DeviceToDelete;
         }
     }
 

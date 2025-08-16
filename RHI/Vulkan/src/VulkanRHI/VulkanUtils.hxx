@@ -55,6 +55,7 @@ FORCEINLINE VkPrimitiveTopology ConvertToVulkanType(const EPrimitiveTopology Top
         case EPrimitiveTopology::TriangleStrip:
             return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
     }
+    checkNoEntry();
 }
 
 /// Convert the RHI VertexElementType to VK_FORMAT_*

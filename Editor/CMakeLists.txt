@@ -14,10 +14,10 @@ target_compile_options(
             $<$<CXX_COMPILER_ID:MSVC>:
             /Zc:preprocessor
             /W4
-            /wd4267
-            /wd4201
-            /wd4244
-            /wd4324>
+            /wd4201 # unamed union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4702 # unreachable code
+            /wd5030> # unknown attribute
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 1)

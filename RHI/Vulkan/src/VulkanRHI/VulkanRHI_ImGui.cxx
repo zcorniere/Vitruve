@@ -14,9 +14,9 @@
 namespace VulkanRHI
 {
 
-void VulkanRHI_ImGui::Initialize(FVulkanDevice* Device)
+void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
 {
-    this->Device = Device;
+    this->Device = InDevice;
 
     IMGUI_CHECKVERSION();
 

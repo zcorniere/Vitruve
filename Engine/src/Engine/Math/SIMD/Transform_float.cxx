@@ -151,19 +151,19 @@ size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* RESTRICT Positi
         for (int j = 0; j < 16; ++j)
         {
             float* M = OutModelMatrix + (i + j) * 16;
-            M[0] = ((float*)&m00)[j];
-            M[1] = ((float*)&m01)[j];
-            M[2] = ((float*)&m02)[j];
+            M[0] = (reinterpret_cast<float*>(&m00))[j];
+            M[1] = (reinterpret_cast<float*>(&m01))[j];
+            M[2] = (reinterpret_cast<float*>(&m02))[j];
             M[3] = 0.0f;
 
-            M[4] = ((float*)&m10)[j];
-            M[5] = ((float*)&m11)[j];
-            M[6] = ((float*)&m12)[j];
+            M[4] = (reinterpret_cast<float*>(&m10))[j];
+            M[5] = (reinterpret_cast<float*>(&m11))[j];
+            M[6] = (reinterpret_cast<float*>(&m12))[j];
             M[7] = 0.0f;
 
-            M[8] = ((float*)&m20)[j];
-            M[9] = ((float*)&m21)[j];
-            M[10] = ((float*)&m22)[j];
+            M[8] = (reinterpret_cast<float*>(&m20))[j];
+            M[9] = (reinterpret_cast<float*>(&m21))[j];
+            M[10] = (reinterpret_cast<float*>(&m22))[j];
             M[11] = 0.0f;
 
             M[12] = PositionX[i + j];
