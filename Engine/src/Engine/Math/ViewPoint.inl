@@ -28,8 +28,6 @@ void TViewPoint<T>::ComputeViewMatrix(const TTransform<T>& InTransform)
     TVector4<T> Forward = Math::Normalize(RotationMatrix[1]);
     TVector4<T> Up = Math::Normalize(RotationMatrix[2]);
 
-    Forward = -Forward;
-
     // Create the final view matrix
     TMatrix4<T> NewViewMatrix(1.0);
     NewViewMatrix[0] = Right;
@@ -39,7 +37,7 @@ void TViewPoint<T>::ComputeViewMatrix(const TTransform<T>& InTransform)
     TVector4<T> Location = InTransform.GetLocation();
     NewViewMatrix[3, 0] = -Math::Dot(Right, Location);
     NewViewMatrix[3, 1] = -Math::Dot(Up, Location);
-    NewViewMatrix[3, 2] = Math::Dot(Forward, Location);
+    NewViewMatrix[3, 2] = -Math::Dot(Forward, Location);
     NewViewMatrix[3, 3] = 1.0;
 
     m_ViewMatrix = NewViewMatrix;
