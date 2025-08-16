@@ -14,6 +14,8 @@ target_compile_options(
             $<$<CXX_COMPILER_ID:MSVC>:
             /Zc:preprocessor
             /W4
+            /wd4267 # conversion from 'size_t' to 'T', possible loss of data
+            /wd4244 # conversion from 'T' to 'T', possible loss of data
             /wd4201 # unamed union
             /wd4324 # structure was padded due to alignment specifier
             /wd4702 # unreachable code
