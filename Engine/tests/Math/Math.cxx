@@ -146,3 +146,22 @@ TEMPLATE_TEST_CASE("Cross product", "[Math][CrossProduct]", float, double)
     CHECK_THAT(Result.y, Catch::Matchers::WithinRel(ExpectedResult.y, Epsilon));
     CHECK_THAT(Result.z, Catch::Matchers::WithinRel(ExpectedResult.z, Epsilon));
 }
+
+TEMPLATE_TEST_CASE("Size", "[Math]", float, double)
+{
+    const TestType Epsilon = TEpsilon<TestType>::Value;
+
+    SECTION("Size 3D")
+    {
+        const glm::vec<3, TestType> _v1{GENERATE(take(1, random(-50.0f, 50.0f))),
+                                        GENERATE(take(1, random(-50.0f, 50.0f))),
+                                        GENERATE(take(1, random(-50.0f, 50.0f)))};
+
+        const TVector3<TestType> v1(_v1.x, _v1.y, _v1.z);
+
+        const TestType Result = Math::Size(v1);
+        const TestType ExpectedResult = glm::length(_v1);
+
+        CHECK_THAT(Result, Catch::Matchers::WithinRel(ExpectedResult, Epsilon));
+    }
+}

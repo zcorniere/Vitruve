@@ -11,7 +11,7 @@
 
 #include "Common.hxx"
 
-TEMPLATE_TEST_CASE("Matrix", "[Math][Quaternion]", float, double)
+TEMPLATE_TEST_CASE("Matrix", "[Math][Matrix]", float, double)
 {
     const TestType Epsilon = TEpsilon<TestType>::Value;
 

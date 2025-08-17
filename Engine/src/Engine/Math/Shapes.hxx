@@ -18,6 +18,7 @@ public:
                  Max.x, Max.y, Max.z);
     }
 
+    /// Add a point to the bounding box, expanding it if necessary
     constexpr void AddPoint(const TVector<3, T>& Point)
     {
         Min.x = std::min(Min.x, Point.x);
@@ -29,14 +30,35 @@ public:
         Max.z = std::max(Max.z, Point.z);
     }
 
-    constexpr TArray<TVector<3, T>> GetCorners() const
+    /// Return the vertices of the bouding box
+    [[nodiscard]] constexpr TArray<TVector<3, T>> GetCorners() const
     {
         return {{Min.x, Min.y, Min.z}, {Max.x, Min.y, Min.z}, {Max.x, Max.y, Min.z}, {Min.x, Max.y, Min.z},
                 {Min.x, Min.y, Max.z}, {Max.x, Min.y, Max.z}, {Max.x, Max.y, Max.z}, {Min.x, Max.y, Max.z}};
     }
 
+    /// Return true if the point is inside the bounding box
+    constexpr bool IsInside(const TVector<3, T>& Point) const
+    {
+        return Point.x >= Min.x && Point.x <= Max.x && Point.y >= Min.y && Point.y <= Max.y && Point.z >= Min.z &&
+               Point.z <= Max.z;
+    }
+
+    /// Return true if the other bounding box is inside this bounding box
+    constexpr bool IsInside(const TBoundingBox<T>& Other) const
+    {
+        return IsInside(Other.Min) && IsInside(Other.Max);
+    }
+
+    /// Return true if this bounding box intersects with another bounding box
+    constexpr bool Intersects(const TBoundingBox<T>& Other) const
+    {
+        return !(Min.x > Other.Max.x || Max.x < Other.Min.x || Min.y > Other.Max.y || Max.y < Other.Min.y ||
+                 Min.z > Other.Max.z || Max.z < Other.Min.z);
+    }
+
     /// Transform the bounding box by the given Transform
-    constexpr TBoundingBox<T> Transform(const TTransform<T>& Transform) const
+    [[nodiscard]] constexpr TBoundingBox<T> Transform(const TTransform<T>& Transform) const
     {
         TBoundingBox<T> NewBox;
         NewBox.Min = Transform.GetLocation() + Transform.GetRotationMatrix() * Min;
@@ -91,7 +113,7 @@ public:
     /// Test if another sphere is inside this sphere
     constexpr bool IsInside(const TSphere<T>& Other) const
     {
-        const T DistanceSquared = Math::SizeSquared(Other - Center);
+        const T DistanceSquared = Math::SizeSquared(Other.Center - Center);
         const T RadiusSum = Radius + Other.Radius;
         return DistanceSquared <= RadiusSum * RadiusSum;
     }
@@ -105,7 +127,7 @@ public:
     }
 
     /// Transform the sphere by the given Transform
-    constexpr TSphere<T> Transform(const TTransform<T>& Transform)
+    [[nodiscard]] constexpr TSphere<T> Transform(const TTransform<T>& Transform)
     {
         TSphere<T> NewSphere;
         NewSphere.Center = Transform.GetLocation() + Transform.GetRotationMatrix() * Center;

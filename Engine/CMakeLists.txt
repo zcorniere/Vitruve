@@ -120,6 +120,7 @@ build_tests(
     tests/Math/Quaternion.cxx
     tests/Math/Vector.cxx
     tests/Math/Math.cxx
+    tests/Math/Shapes.cxx
     tests/Math/Matrix.cxx
     tests/Math/Transform.cxx
     tests/Math/ViewPoint.cxx
