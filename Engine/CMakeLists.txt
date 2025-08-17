@@ -117,6 +117,7 @@ build_tests(
     tests/Containers/ArrayView.cxx
     tests/Containers/Tuple.cxx
     tests/Containers/Map.cxx
+    tests/Containers/Tree.cxx
     tests/Math/Quaternion.cxx
     tests/Math/Vector.cxx
     tests/Math/Math.cxx

@@ -15,7 +15,7 @@ TEMPLATE_TEST_CASE("Bouding Box Tests", "[Math]", float, double)
 
     const TestType Epsilon = TEpsilon<TestType>::Value;
 
-    Math::TBoundingBox<TestType> Box(
+    Math::TBox<TestType> Box(
         Math::TVector<3, TestType>{GENERATE(take(1, random(-50.0f, 0.0f))), GENERATE(take(1, random(-50.0f, 0.0f))),
                                    GENERATE(take(1, random(-50.0f, 0.0f)))},
         Math::TVector<3, TestType>{GENERATE(take(1, random(0.0f, 50.0f))), GENERATE(take(1, random(0.0f, 50.0f))),
@@ -23,13 +23,13 @@ TEMPLATE_TEST_CASE("Bouding Box Tests", "[Math]", float, double)
 
     SECTION("Bounding Box Copy")
     {
-        Math::TBoundingBox<TestType> CopyBox = Box;
+        Math::TBox<TestType> CopyBox = Box;
         REQUIRE(Box == CopyBox);
     }
 
     SECTION("Bouding Box - AddPoint")
     {
-        Math::TBoundingBox<TestType> BodyBox;
+        Math::TBox<TestType> BodyBox;
 
         BodyBox.AddPoint({Box.Max.x, Box.Max.y, Box.Max.z});
         BodyBox.AddPoint({Box.Min.x, Box.Min.y, Box.Min.z});
@@ -58,8 +58,8 @@ TEMPLATE_TEST_CASE("Bouding Box Tests", "[Math]", float, double)
 
     SECTION("Bouding Box - Intersections")
     {
-        const Math::TBoundingBox<TestType> OtherBox(Math::TVector<3, TestType>{Box.Min.x, Box.Min.y, Box.Min.z},
-                                                    Math::TVector<3, TestType>{Box.Max.x, Box.Max.x, Box.Max.x});
+        const Math::TBox<TestType> OtherBox(Math::TVector<3, TestType>{Box.Min.x, Box.Min.y, Box.Min.z},
+                                            Math::TVector<3, TestType>{Box.Max.x, Box.Max.x, Box.Max.x});
 
         REQUIRE(Box.Intersects(OtherBox));
     }

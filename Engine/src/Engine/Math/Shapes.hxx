@@ -7,11 +7,65 @@ class TTransform;
 
 template <typename T>
 requires(std::is_floating_point_v<T>)
-class TBoundingBox
+class TRect
 {
 public:
-    TBoundingBox() = default;
-    constexpr TBoundingBox(const TVector<3, T>& InMin, const TVector<3, T>& InMax): Min(InMin), Max(InMax)
+    TRect() = default;
+    constexpr TRect(const TVector<2, T>& InMin, const TVector<2, T>& InMax): Min(InMin), Max(InMax)
+    {
+        checkMsg(Min.x <= Max.x && Min.y <= Max.y,
+                 "Invalid rectangle: Min ({}, {}) must be less than or equal to Max ({}, {})", Min.x, Min.y, Max.x,
+                 Max.y);
+    }
+
+    /// Return true if the point is inside the rectangle
+    constexpr bool IsInside(const TVector<2, T>& Point) const
+    {
+        return Point.x >= Min.x && Point.x <= Max.x && Point.y >= Min.y && Point.y <= Max.y;
+    }
+
+    /// Return true if the other rectangle is inside this rectangle
+    constexpr bool IsInside(const TRect<T>& Other) const
+    {
+        return IsInside(Other.Min) && IsInside(Other.Max);
+    }
+
+    /// Return true if this rectangle intersects with another rectangle
+    constexpr bool Intersects(const TRect<T>& Other) const
+    {
+        return !(Min.x > Other.Max.x || Max.x < Other.Min.x || Min.y > Other.Max.y || Max.y < Other.Min.y);
+    }
+
+    /// Transform the rectangle by the given Transform
+    [[nodiscard]] constexpr TRect<T> Transform(const TTransform<T>& Transform) const
+    {
+        TRect<T> NewRect;
+        NewRect.Min = Transform.GetLocation() + Transform.GetRotationMatrix() * Min;
+        NewRect.Max = Transform.GetLocation() + Transform.GetRotationMatrix() * Max;
+
+        // Scale the rectangle by the scale factor
+        const TVector<2, T> Scale = Transform.GetScale();
+        NewRect.Min.x *= Scale.x;
+        NewRect.Min.y *= Scale.y;
+        NewRect.Max.x *= Scale.x;
+        NewRect.Max.y *= Scale.y;
+        return NewRect;
+    }
+
+    bool operator==(const TRect<T>& Other) const = default;
+
+public:
+    TVector<2, T> Min = {0, 0};
+    TVector<2, T> Max = {0, 0};
+};
+
+template <typename T>
+requires(std::is_floating_point_v<T>)
+class TBox
+{
+public:
+    TBox() = default;
+    constexpr TBox(const TVector<3, T>& InMin, const TVector<3, T>& InMax): Min(InMin), Max(InMax)
     {
         checkMsg(Min.x <= Max.x && Min.y <= Max.y && Min.z <= Max.z,
                  "Invalid AABB: Min ({}, {}, {}) must be less than or equal to Max ({}, {}, {})", Min.x, Min.y, Min.z,
@@ -45,22 +99,22 @@ public:
     }
 
     /// Return true if the other bounding box is inside this bounding box
-    constexpr bool IsInside(const TBoundingBox<T>& Other) const
+    constexpr bool IsInside(const TBox<T>& Other) const
     {
         return IsInside(Other.Min) && IsInside(Other.Max);
     }
 
     /// Return true if this bounding box intersects with another bounding box
-    constexpr bool Intersects(const TBoundingBox<T>& Other) const
+    constexpr bool Intersects(const TBox<T>& Other) const
     {
         return !(Min.x > Other.Max.x || Max.x < Other.Min.x || Min.y > Other.Max.y || Max.y < Other.Min.y ||
                  Min.z > Other.Max.z || Max.z < Other.Min.z);
     }
 
     /// Transform the bounding box by the given Transform
-    [[nodiscard]] constexpr TBoundingBox<T> Transform(const TTransform<T>& Transform) const
+    [[nodiscard]] constexpr TBox<T> Transform(const TTransform<T>& Transform) const
     {
-        TBoundingBox<T> NewBox;
+        TBox<T> NewBox;
         NewBox.Min = Transform.GetLocation() + Transform.GetRotationMatrix() * Min;
         NewBox.Max = Transform.GetLocation() + Transform.GetRotationMatrix() * Max;
 
@@ -76,7 +130,7 @@ public:
         return NewBox;
     }
 
-    bool operator==(const TBoundingBox<T>& Other) const = default;
+    bool operator==(const TBox<T>& Other) const = default;
 
 public:
     TVector<3, T> Min = {0, 0, 0};
@@ -145,5 +199,8 @@ public:
 
 }    // namespace Math
 
-using FBoundingBox = Math::TBoundingBox<float>;
-using DBoundingBox = Math::TBoundingBox<double>;
+using FBox = Math::TBox<float>;
+using DBox = Math::TBox<double>;
+
+using FSphere = Math::TSphere<float>;
+using DSphere = Math::TSphere<double>;
