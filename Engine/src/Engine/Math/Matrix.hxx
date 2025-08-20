@@ -57,8 +57,10 @@ public:
     constexpr TVector<TColumns, T>& operator[](unsigned Index);
     constexpr const TVector<TColumns, T>& operator[](unsigned Index) const;
 
+#if __cpp_multidimensional_subscript
     constexpr T& operator[](unsigned Row, unsigned Column);
     constexpr T operator[](unsigned Row, unsigned Column) const;
+#endif    //__cpp_multidimensional_subscript
 
 private:
     Rowtype Data[Rows];

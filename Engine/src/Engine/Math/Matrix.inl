@@ -53,6 +53,7 @@ constexpr const TVector<TColumns, T>& TMatrix<TRows, TColumns, T>::operator[](un
     return Data[Index];
 }
 
+#if __cpp_multidimensional_subscript
 template <unsigned TRows, unsigned TColumns, typename T>
 requires(TRows > 0 && TColumns > 0)
 constexpr T& TMatrix<TRows, TColumns, T>::operator[](unsigned Row, unsigned Column)
@@ -68,6 +69,7 @@ constexpr T TMatrix<TRows, TColumns, T>::operator[](unsigned Row, unsigned Colum
     assert(Row < TRows && Column < TColumns);
     return Data[Row][Column];
 }
+#endif    // __cpp_multidimensional_subscript
 
 template <unsigned TRows, unsigned TColumns, typename T>
 requires(TRows > 0 && TColumns > 0)
