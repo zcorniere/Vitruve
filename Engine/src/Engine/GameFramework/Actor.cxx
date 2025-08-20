@@ -33,6 +33,11 @@ RSceneComponent* AActor::GetRootComponent()
     return RootComponent.Raw();
 }
 
+const RSceneComponent* AActor::GetRootComponent() const
+{
+    return RootComponent.Raw();
+}
+
 void AActor::SetRootComponent(Ref<RSceneComponent> InRootComponent)
 {
     RootComponent = InRootComponent;
@@ -67,4 +72,9 @@ void AActor::SetActorScale(const FVector3& Scale)
 void AActor::SetActorTransform(const FTransform& Transform)
 {
     GetRootComponent()->SetRelativeTransform(Transform);
+}
+
+const FTransform& AActor::GetRelativeTransform() const
+{
+    return GetRootComponent()->GetRelativeTransform();
 }

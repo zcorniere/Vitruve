@@ -5,6 +5,7 @@
 #include "Engine/Core/RHI/RHIScene.hxx"
 
 #include "Engine/GameFramework/Actor.hxx"
+#include "Engine/GameFramework/Components/PhysicsComponent.hxx"
 
 RWorld::RWorld()
 {
@@ -62,6 +63,12 @@ void RWorld::HandleActorTick(AActor* const Actor, double DeltaTime)
 
     Actor->Tick(DeltaTime);
 
+    RPhysicsComponent* Component = Actor->GetComponent<RPhysicsComponent>();
+    if (Component)
+    {
+        Component->HandlePhysicsTick(this, Actor, DeltaTime);
+    }
+
     RSceneComponent* const RootComponent = Actor->GetRootComponent();
     if (RootComponent->IsTransformDirty())
     {
@@ -81,4 +88,9 @@ void RWorld::UpdateActorLocation(uint64 ID, RSceneComponent* const RootComponent
 Ref<RRHIScene> RWorld::GetScene() const
 {
     return Scene;
+}
+
+FVector3 RWorld::GetGravity() const
+{
+    return Gravity;
 }

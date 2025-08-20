@@ -34,6 +34,7 @@ public:
     void Tick(double DeltaTime);
 
     Ref<RRHIScene> GetScene() const;
+    FVector3 GetGravity() const;
 
 private:
     void UpdateActorLocation(uint64 ID, RSceneComponent* const Component);
@@ -45,6 +46,8 @@ public:
 
 private:
     TArray<Ref<AActor>> Actors;
+
+    FVector3 Gravity = {0, 0, -9.807};    // Default gravity vector
 
     Ref<RRHIScene> Scene = nullptr;
 };

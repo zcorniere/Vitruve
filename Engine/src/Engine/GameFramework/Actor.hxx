@@ -17,6 +17,7 @@ public:
     RMeshComponent* GetMesh();
 
     RSceneComponent* GetRootComponent();
+    const RSceneComponent* GetRootComponent() const;
     void SetRootComponent(Ref<RSceneComponent> InRootComponent);
 
     void SetActorLocation(const FVector3& Location);

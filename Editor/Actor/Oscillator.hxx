@@ -2,6 +2,8 @@
 
 #include "Engine/GameFramework/Actor.hxx"
 
+class RPhysicsComponent;
+
 class AOscillator : public AActor
 {
     RTTI_DECLARE_TYPEINFO(AOscillator, AActor)
@@ -11,7 +13,12 @@ public:
 
     void Tick(double DeltaTime) override;
 
+protected:
+    virtual RObject* FindComponent(RTTI::FTypeId TypeId);
+
 public:
+    Ref<RPhysicsComponent> PhysicsComponent;
+
     float Multiplier = 1.0f;
     FVector3 Direction = {0.0f, 0.0f, 0.0f};
     FVector3 Maximum = {0.0f, 0.0f, 0.0f};
