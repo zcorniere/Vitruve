@@ -97,23 +97,35 @@ struct TVector<4, T>
 // TVector operations
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator+(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator+=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator-(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator-=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator-(const TVector<Size, T>& lhs);
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator*(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator*=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator/=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs);
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator*(const TVector<Size, T>& lhs, T scalar);
 template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator*=(TVector<Size, T>& lhs, T scalar);
+template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, T scalar);
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator/=(TVector<Size, T>& lhs, T scalar);
 
 template <unsigned Size, typename T>
 constexpr std::strong_ordering operator<=>(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs);

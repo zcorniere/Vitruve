@@ -176,6 +176,15 @@ constexpr TVector<Size, T> operator+(const TVector<Size, T>& lhs, const TVector<
     }
     return result;
 }
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator+=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] += rhs.data[i];
+    }
+    return lhs;
+}
 
 template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator-(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
@@ -186,6 +195,16 @@ constexpr TVector<Size, T> operator-(const TVector<Size, T>& lhs, const TVector<
         result.data[i] = lhs.data[i] - rhs.data[i];
     }
     return result;
+}
+
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator-=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] -= rhs.data[i];
+    }
+    return lhs;
 }
 
 template <unsigned Size, typename T>
@@ -211,6 +230,16 @@ constexpr TVector<Size, T> operator*(const TVector<Size, T>& lhs, const TVector<
 }
 
 template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator*=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] *= rhs.data[i];
+    }
+    return lhs;
+}
+
+template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
 {
     TVector<Size, T> result;
@@ -219,6 +248,16 @@ constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, const TVector<
         result.data[i] = lhs.data[i] / rhs.data[i];
     }
     return result;
+}
+
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator/=(TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] /= rhs.data[i];
+    }
+    return lhs;
 }
 
 template <unsigned Size, typename T>
@@ -233,6 +272,16 @@ constexpr TVector<Size, T> operator*(const TVector<Size, T>& lhs, T scalar)
 }
 
 template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator*=(TVector<Size, T>& lhs, T scalar)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] *= scalar;
+    }
+    return lhs;
+}
+
+template <unsigned Size, typename T>
 constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, T scalar)
 {
     TVector<Size, T> result;
@@ -242,6 +291,16 @@ constexpr TVector<Size, T> operator/(const TVector<Size, T>& lhs, T scalar)
     }
     return result;
 };
+
+template <unsigned Size, typename T>
+constexpr TVector<Size, T>& operator/=(TVector<Size, T>& lhs, T scalar)
+{
+    for (unsigned i = 0; i < Size; i++)
+    {
+        lhs.data[i] /= scalar;
+    }
+    return lhs;
+}
 
 template <unsigned Size, typename T>
 constexpr std::strong_ordering operator<=>(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
