@@ -14,7 +14,7 @@ public:
     void Tick(double DeltaTime) override;
 
 protected:
-    virtual RObject* FindComponent(RTTI::FTypeId TypeId);
+    virtual RObject* FindComponent(RTTI::FTypeId TypeId) override;
 
 public:
     Ref<RPhysicsComponent> PhysicsComponent;
