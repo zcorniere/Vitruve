@@ -54,6 +54,7 @@ add_library(
     src/Engine/GameFramework/Actor.cxx
     src/Engine/GameFramework/World.cxx
     src/Engine/GameFramework/Components/PhysicsComponent.cxx
+    src/Engine/GameFramework/Components/MeshComponent.cxx
     src/Engine/GameFramework/CameraActor.cxx
     src/Engine/AssetRegistry/AssetRegistry.cxx
     src/Engine/AssetRegistry/Asset.cxx

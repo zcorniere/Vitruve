@@ -5,12 +5,18 @@
 RAsset::RAsset(const std::filesystem::path& Path): bIsMemoryOnly(false), AssetPath(Path.string())
 {
     SetName(Path.stem().string());
+    checkNoEntry();    // Not implemented yet
 }
 
 RAsset::RAsset(const TResourceArray<FVertex>& Vertices, const TResourceArray<uint32>& Indices): bIsMemoryOnly(true)
 {
     VertexData = Vertices;
     IndexData = Indices;
+
+    for (const FVertex& Vertex: VertexData)
+    {
+        BoundingBox.AddPoint(Vertex.Position);
+    }
 }
 
 RAsset::~RAsset()

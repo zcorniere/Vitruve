@@ -2,6 +2,7 @@
 
 #include "Engine/AssetRegistry/Asset.hxx"
 #include "Engine/GameFramework/Components/SceneComponent.hxx"
+#include "Engine/Math/Shapes.hxx"
 
 class RMeshComponent : public RSceneComponent
 {
@@ -12,6 +13,8 @@ public:
 
     void SetAsset(Ref<RAsset> InAsset);
     void SetMaterial(Ref<RRHIMaterial> InMaterial);
+
+    FBox GetBoundingBox() const;
 
 public:
     Ref<RAsset> Asset = nullptr;

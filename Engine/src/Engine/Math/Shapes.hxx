@@ -114,9 +114,10 @@ public:
     /// Transform the bounding box by the given Transform
     [[nodiscard]] constexpr TBox<T> Transform(const TTransform<T>& Transform) const
     {
-        TBox<T> NewBox;
-        NewBox.Min = Transform.GetLocation() + Transform.GetRotationMatrix() * Min;
-        NewBox.Max = Transform.GetLocation() + Transform.GetRotationMatrix() * Max;
+        TVector4<T> NewMin = TVector4<T>(Transform.GetLocation()) + Transform.GetRotationMatrix() * TVector4<T>(Min);
+        TVector4<T> NewMax = TVector4<T>(Transform.GetLocation()) + Transform.GetRotationMatrix() * TVector4<T>(Max);
+
+        TBox<T> NewBox(TVector<3, T>(NewMin.x, NewMin.y, NewMin.z), TVector<3, T>(NewMax.x, NewMax.y, NewMax.z));
 
         // Scale the bounding box by the scale factor
         const TVector<3, T> Scale = Transform.GetScale();

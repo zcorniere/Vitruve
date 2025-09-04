@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/GameFramework/Components/MeshComponent.hxx"
+#include "Engine/Math/Shapes.hxx"
 
 class AActor : public RObject
 {
@@ -26,6 +27,7 @@ public:
     void SetActorTransform(const FTransform& Transform);
 
     const FTransform& GetRelativeTransform() const;
+    FBox GetBoundingBox() const;
 
     template <typename T>
     requires RTTI::IsRTTIApiAvailable<T>

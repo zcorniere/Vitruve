@@ -2,6 +2,7 @@
 
 #include "Engine/Containers/ResourceArray.hxx"
 #include "Engine/Core/RHI/Resources/RHIBuffer.hxx"
+#include "Engine/Math/Shapes.hxx"
 
 BEGIN_UNALIGNED_PARAMETER_STRUCT(FVertex)
 PARAMETER(FVector3, Position)
@@ -33,6 +34,11 @@ public:
     void Unload();
     void UnloadFromGPU();
 
+    FBox GetBoundingBox() const
+    {
+        return BoundingBox;
+    }
+
     bool IsLoaded() const
     {
         return VertexData.IsEmpty() && IndexData.IsEmpty();
@@ -62,6 +68,7 @@ private:
     bool bIsMemoryOnly = false;
     std::string AssetPath;
 
+    FBox BoundingBox;
     Ref<RRHIBuffer> VertexBuffer = nullptr;
     Ref<RRHIBuffer> IndexBuffer = nullptr;
 

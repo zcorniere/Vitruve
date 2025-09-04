@@ -78,3 +78,12 @@ const FTransform& AActor::GetRelativeTransform() const
 {
     return GetRootComponent()->GetRelativeTransform();
 }
+
+FBox AActor::GetBoundingBox() const
+{
+    if (MeshComponent)
+    {
+        return MeshComponent->GetBoundingBox();
+    }
+    return {};
+}
