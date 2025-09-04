@@ -240,7 +240,7 @@ void RVulkanSwapChain::Destroy(VulkanSwapChainRecreateInfo* RecreateInfo)
 
 RVulkanSwapChain::EStatus RVulkanSwapChain::Present(FVulkanQueue* PresentQueue, Ref<RSemaphore>& RenderingComplete)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     check(CurrentImageIndex != -1);
 
@@ -290,7 +290,7 @@ void RVulkanSwapChain::SetName(std::string_view InName)
 
 int32 RVulkanSwapChain::AcquireImageIndex(Ref<RSemaphore>& OutSemaphore)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     check(CurrentImageIndex == -1);
 

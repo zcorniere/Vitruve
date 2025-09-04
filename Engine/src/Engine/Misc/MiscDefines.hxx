@@ -9,7 +9,7 @@
 
 #define STR(x) #x
 
-#define RPH_NONCOPYABLE(Name)              \
+#define VIT_NONCOPYABLE(Name)              \
     Name(Name&&) = delete;                 \
     Name(const Name&) = delete;            \
     Name& operator=(const Name&) = delete; \
@@ -59,7 +59,7 @@ concept CHashable = requires(T a) {
 
 /// Is the template argument a function pointer ?
 template <typename T>
-concept CIsFunctionPointer = requires { std::is_pointer_v<T>&& std::is_function_v<typename std::remove_pointer<T>>; };
+concept CIsFunctionPointer = requires { std::is_pointer_v<T> && std::is_function_v<typename std::remove_pointer<T>>; };
 
 /// Is the types compatibles ?
 template <typename TSource, typename TDest>

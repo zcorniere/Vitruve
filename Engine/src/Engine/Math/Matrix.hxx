@@ -1,8 +1,8 @@
 #pragma once
 
-#if RPH_NAN_CHECKS
+#if VIT_NAN_CHECKS
     #include <cmath>
-#endif    // RPH_NAN_CHECKS
+#endif    // VIT_NAN_CHECKS
 
 namespace Math
 {

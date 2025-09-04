@@ -163,12 +163,12 @@ inline TRenderSceneLock<LockType>::TRenderSceneLock(WeakRef<RRHIScene> InScene):
 {
     if constexpr (LockType == ERenderSceneLockType::Read)
     {
-        RPH_PROFILE_FUNC("TRenderSceneLock - Read Lock");
+        VIT_PROFILE_FUNC("TRenderSceneLock - Read Lock");
         Scene->ContextLock.ReadLock();
     }
     else
     {
-        RPH_PROFILE_FUNC("TRenderSceneLock - Write Lock");
+        VIT_PROFILE_FUNC("TRenderSceneLock - Write Lock");
         Scene->ContextLock.WriteLock();
     }
 }
@@ -178,12 +178,12 @@ inline TRenderSceneLock<LockType>::~TRenderSceneLock()
 {
     if constexpr (LockType == ERenderSceneLockType::Read)
     {
-        RPH_PROFILE_FUNC("TRenderSceneLock - Read Unlock");
+        VIT_PROFILE_FUNC("TRenderSceneLock - Read Unlock");
         Scene->ContextLock.ReadUnlock();
     }
     else
     {
-        RPH_PROFILE_FUNC("TRenderSceneLock - Write Unlock");
+        VIT_PROFILE_FUNC("TRenderSceneLock - Write Unlock");
         Scene->ContextLock.WriteUnlock();
     }
 }

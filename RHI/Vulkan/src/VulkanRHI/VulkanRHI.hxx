@@ -8,7 +8,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Trace);
 
-// Raphael classes
+// Vitruve classes
 class RRHIResource;
 
 namespace VulkanRHI
@@ -24,7 +24,7 @@ static FORCEINLINE const VkAllocationCallbacks* GetMemoryAllocator()
     return &GAllocationCallbacks;
 }
 
-/// @brief Vulkan RHI implementation for Raphael
+/// @brief Vulkan RHI implementation for Vitruve
 class FVulkanDynamicRHI : public FGenericRHI
 {
 public:

@@ -37,12 +37,12 @@ void RWorld::RemoveFromWorld(Ref<AActor> Actor)
 
 void RWorld::Tick(double DeltaTime)
 {
-    RPH_PROFILE_FUNC();
+    VIT_PROFILE_FUNC();
 
     Scene->PreTick();
 
     {
-        RPH_PROFILE_FUNC("Actor Tick - parallel");
+        VIT_PROFILE_FUNC("Actor Tick - parallel");
         std::shared_ptr<std::latch> Latch =
             GEngine->GetThreadPool().ParallelFor(Actors.Size(),
                                                  [this, DeltaTime](unsigned i)
@@ -58,7 +58,7 @@ void RWorld::Tick(double DeltaTime)
 
 void RWorld::HandleActorTick(AActor* const Actor, double DeltaTime)
 {
-    RPH_PROFILE_FUNC();
+    VIT_PROFILE_FUNC();
 
     Actor->Tick(DeltaTime);
 
@@ -72,7 +72,7 @@ void RWorld::HandleActorTick(AActor* const Actor, double DeltaTime)
 
 void RWorld::UpdateActorLocation(uint64 ID, RSceneComponent* const RootComponent)
 {
-    RPH_PROFILE_FUNC();
+    VIT_PROFILE_FUNC();
 
     const FTransform RelativeTransform = RootComponent->GetRelativeTransform();
     Scene->UpdateActorLocation(ID, RelativeTransform);

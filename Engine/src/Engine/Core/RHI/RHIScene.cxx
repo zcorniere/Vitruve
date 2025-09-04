@@ -99,7 +99,7 @@ void RRHIScene::SetRenderPassTarget(const FRHIRenderPassTarget& InRenderPassTarg
 
 void RRHIScene::PreTick()
 {
-    RPH_PROFILE_FUNC("RRHIScene::PreTick - Take care of the new actors")
+    VIT_PROFILE_FUNC("RRHIScene::PreTick - Take care of the new actors")
 
     auto UpdateBatch = std::make_shared<FRHISceneUpdateBatch>(ActorThatNeedAttention.Size());
 
@@ -163,7 +163,7 @@ void RRHIScene::PreTick()
 
 void RRHIScene::PostTick(double DeltaTime)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     (void)DeltaTime;
     ensure(CameraComponents.Size() == 1);
@@ -176,7 +176,7 @@ void RRHIScene::PostTick(double DeltaTime)
     UpdateCameraAspectRatio();
     if (CameraComponent->IsTransformDirty() || CameraComponent->IsRenderStateDirty())
     {
-        RPH_PROFILE_FUNC("RRHIScene::Tick - UpdateCameraBuffer")
+        VIT_PROFILE_FUNC("RRHIScene::Tick - UpdateCameraBuffer")
 
         CameraData.View = CameraComponent->GetViewMatrix();
         CameraData.Projection = CameraComponent->GetProjectionMatrix();
@@ -192,7 +192,7 @@ void RRHIScene::PostTick(double DeltaTime)
             });
     }
     {
-        RPH_PROFILE_FUNC("RRHIScene::Tick - Update Transform Buffers - Wait")
+        VIT_PROFILE_FUNC("RRHIScene::Tick - Update Transform Buffers - Wait")
         if (AsyncTaskUpdateResult.valid())
         {
             AsyncTaskUpdateResult.wait();
@@ -201,7 +201,7 @@ void RRHIScene::PostTick(double DeltaTime)
     }
 
     {
-        RPH_PROFILE_FUNC("RRHIScene::Tick - Update Transform Buffers")
+        VIT_PROFILE_FUNC("RRHIScene::Tick - Update Transform Buffers")
         for (auto& [AssetName, TransformArrays]: TransformResourceArray)
         {
             Ref<RRHIBuffer>& TransformBuffer = TransformBuffers.FindOrAdd(AssetName);
@@ -232,7 +232,7 @@ void RRHIScene::PostTick(double DeltaTime)
 
 void RRHIScene::UpdateActorLocation(uint64 Id, const FTransform& NewTransform)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     std::unique_lock Lock(ActorAttentionMutex);
     ActorThatNeedAttention.FindOrAdd(Id) = FActorRepresentationUpdateRequest{
@@ -243,7 +243,7 @@ void RRHIScene::UpdateActorLocation(uint64 Id, const FTransform& NewTransform)
 
 void RRHIScene::TickRenderer(FFRHICommandList& CommandList)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     UVector2 Size;
     TArray<FRHIRenderTarget> ColorTargets;
@@ -290,7 +290,7 @@ void RRHIScene::TickRenderer(FFRHICommandList& CommandList)
     CommandList.BeginRendering(Description);
 
     {
-        RPH_PROFILE_FUNC("RRHIScene::TickRenderer - Draw")
+        VIT_PROFILE_FUNC("RRHIScene::TickRenderer - Draw")
         for (auto& [Key, Requests]: RenderCalls)
         {
             if (!Key.Asset->IsLoadedOnGPU())
@@ -340,7 +340,7 @@ void RRHIScene::UpdateCameraAspectRatio()
 
 void RRHIScene::Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Math::ComputeModelMatrixBatch(Batch.Actors.Size(), Batch.PositionX.Raw(), Batch.PositionY.Raw(),
                                   Batch.PositionZ.Raw(), Batch.QuaternionX.Raw(), Batch.QuaternionY.Raw(),
@@ -349,7 +349,7 @@ void RRHIScene::Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch)
 
     for (unsigned i = 0; i < Batch.Actors.Size();)
     {
-        RPH_PROFILE_FUNC("Update Actor Representations")
+        VIT_PROFILE_FUNC("Update Actor Representations")
 
         uint64 ActorId = Batch.Actors[i];
         TRenderSceneLock<ERenderSceneLockType::Read> Lock(this);

@@ -34,7 +34,7 @@ EditorApplication::~EditorApplication()
 
 bool EditorApplication::OnEngineInitialization()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Super::OnEngineInitialization();
 
@@ -129,7 +129,7 @@ void EditorApplication::OnEngineDestruction()
 
 void EditorApplication::Tick(const double DeltaTime)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Super::Tick(DeltaTime);
 

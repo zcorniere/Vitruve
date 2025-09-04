@@ -42,7 +42,7 @@ FORCEINLINE int EngineLoop()
     FrameLimiter Limiter;
     while (!Utils::HasRequestedExit(ExitStatus) || GEngine->ShouldExit())
     {
-        RPH_PROFILE_FUNC("Engine Tick")
+        VIT_PROFILE_FUNC("Engine Tick")
         Limiter.BeginFrame();
 
         GEngine->PreTick();
@@ -66,7 +66,7 @@ FORCEINLINE int EngineLoop()
 
         DeltaTime = Limiter.EndFrame();
         // Must be on the last line of the engine loop
-        RPH_PROFILE_MARK_FRAME
+        VIT_PROFILE_MARK_FRAME
     }
     // Only destroy if the return value is ok
     if (ExitStatus == 0)

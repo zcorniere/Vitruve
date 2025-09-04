@@ -1,4 +1,4 @@
-set(CMAKE_FOLDER "Raphael/External")
+set(CMAKE_FOLDER "Vitruve/External")
 
 # tracy
 set(TRACY_ENABLE
@@ -11,7 +11,7 @@ set(TRACY_ON_DEMAND
 )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy EXCLUDE_FROM_ALL)
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
 
 add_library(
     imgui STATIC

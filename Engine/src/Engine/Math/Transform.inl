@@ -104,7 +104,7 @@ TMatrix4<T> TTransform<T>::GetModelMatrix()
         return ModelMatrix;
     }
 
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     ModelMatrix = GetTranslationMatrix() * Rotation.GetRotationMatrix() * GetScaleMatrix();
 
     Math::CheckNaN(ModelMatrix);

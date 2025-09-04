@@ -192,7 +192,7 @@ void FVulkanShaderCompiler::SetOptimizationLevel(EOptimizationLevel InLevel)
 
 Ref<RVulkanShader> FVulkanShaderCompiler::Get(std::filesystem::path Path, bool bForceCompile)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Ref<RVulkanShader> ShaderUnit = nullptr;
     ShaderCompileResult Result{
@@ -252,7 +252,7 @@ Ref<RVulkanShader> FVulkanShaderCompiler::CheckCache(ShaderCompileResult& Result
 
 bool FVulkanShaderCompiler::LoadShaderSourceFile(ShaderCompileResult& Result)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Result.Status = ECompilationStatus::Loading;
 
@@ -274,7 +274,7 @@ bool FVulkanShaderCompiler::LoadShaderSourceFile(ShaderCompileResult& Result)
 
 bool FVulkanShaderCompiler::CompileShader(ShaderCompileResult& Result)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     shaderc::Compiler ShaderCompiler;
 
@@ -465,7 +465,7 @@ static void GetDescriptorSetReflectionForType(
 
 bool FVulkanShaderCompiler::GenerateReflection(ShaderCompileResult& Result)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     Result.Status = ECompilationStatus::Reflection;
     LOG(LogVulkanShaderCompiler, Info, "===========================");

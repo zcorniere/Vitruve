@@ -1,5 +1,5 @@
-# Raphael
-Raphael is a game engine focused on letting me having fun. If you see something weird going on in the code, it is probably on purpose 'cause I find it funny.
+# Vitruve
+Vitruve is a game engine focused on letting me having fun. If you see something weird going on in the code, it is probably on purpose 'cause I find it funny.
 
 ## Feature
 - Rendering backend throught a RHI

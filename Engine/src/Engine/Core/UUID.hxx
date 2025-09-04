@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raphael
+namespace Vitruve
 {
 
 class FUUID
@@ -24,9 +24,9 @@ private:
     const uint64 m_UUID;
 };
 
-}    // namespace Raphael
+}    // namespace Vitruve
 
-FORCEINLINE bool operator==(const Raphael::FUUID& lhs, const Raphael::FUUID& rhs)
+FORCEINLINE bool operator==(const Vitruve::FUUID& lhs, const Vitruve::FUUID& rhs)
 {
     return lhs.ID() == rhs.ID();
 }
@@ -35,9 +35,9 @@ namespace std
 {
 
 template <>
-struct hash<Raphael::FUUID>
+struct hash<Vitruve::FUUID>
 {
-    std::size_t operator()(const Raphael::FUUID& uuid) const
+    std::size_t operator()(const Vitruve::FUUID& uuid) const
     {
         // uuid is already a randomly generated number, and is suitable as a hash key as-is.
         return uuid;

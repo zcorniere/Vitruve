@@ -173,7 +173,7 @@ template <unsigned TRows, unsigned TColumns, typename T>
 requires(TRows > 0 && TColumns > 0 && std::is_floating_point_v<T>)
 void CheckNaN(const TMatrix<TRows, TColumns, T>& m)
 {
-#if RPH_NAN_CHECKS
+#if VIT_NAN_CHECKS
     for (unsigned i = 0; i < TRows; i++)
     {
         for (unsigned j = 0; j < TColumns; j++)
@@ -184,7 +184,7 @@ void CheckNaN(const TMatrix<TRows, TColumns, T>& m)
     }
 #else
     (void)m;
-#endif    // RPH_NAN_CHECKS
+#endif    // VIT_NAN_CHECKS
 }
 
 }    // namespace Math

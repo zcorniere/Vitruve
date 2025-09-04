@@ -15,7 +15,7 @@
 /// Manage a set of thread for scheduling work
 class FThreadPool
 {
-    RPH_NONCOPYABLE(FThreadPool)
+    VIT_NONCOPYABLE(FThreadPool)
 private:
     using WorkUnits = std::function<void(unsigned id)>;
 

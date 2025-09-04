@@ -1,17 +1,17 @@
-project(RaphaelEngine)
-set(CMAKE_FOLDER "Raphael/Engine")
+project(VitruveEngine)
+set(CMAKE_FOLDER "Vitruve/Engine")
 
-set(RPH_SELECTED_RHI
+set(VIT_SELECTED_RHI
     "Vulkan"
     CACHE STRING "Select the RHI to use"
 )
 
 add_library(RHI_Selector INTERFACE)
-if(RPH_SELECTED_RHI STREQUAL "Vulkan")
-    target_link_libraries(RHI_Selector INTERFACE RaphaelRHIVulkan)
-    target_compile_definitions(RHI_Selector INTERFACE RAPHAEL_SELECTED_RHI_VULKAN=1)
+if(VIT_SELECTED_RHI STREQUAL "Vulkan")
+    target_link_libraries(RHI_Selector INTERFACE VitruveRHIVulkan)
+    target_compile_definitions(RHI_Selector INTERFACE Vitruve_SELECTED_RHI_VULKAN=1)
 else()
-    message(FATAL_ERROR "${RPH_SELECTED_RHI} is not supported !")
+    message(FATAL_ERROR "${VIT_SELECTED_RHI} is not supported !")
 endif()
 
 add_subdirectory(External/)
@@ -100,8 +100,8 @@ target_compile_options(
             /wd5030> # unknown attribute
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_precompile_headers(${PROJECT_NAME} PRIVATE src/Engine/Raphael.hxx)
-target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:RPH_POISON_ALLOCATION>)
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/Engine/Vitruve.hxx)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
 target_disable_rtti(${PROJECT_NAME})
 
@@ -129,23 +129,23 @@ build_tests(
 )
 target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
 
-if(RPH_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_ENABLE_PROFILING=1)
-    if(RPH_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_ENABLE_MEMORY_PROFILING=1)
-    endif(RPH_ENABLE_MEMORY_PROFILING)
+if(VIT_ENABLE_PROFILING)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
+    if(VIT_ENABLE_MEMORY_PROFILING)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
+    endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
-endif(RPH_ENABLE_PROFILING)
+endif(VIT_ENABLE_PROFILING)
 
 if(OPTIMIZE_FOR_NATIVE)
     target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
 endif()
 
-option(RPH_NAN_CHECKS "Enable NaN checks in the engine" ON)
-if(RPH_NAN_CHECKS)
-    message(STATUS "RPH - NaN checks enabled")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_NAN_CHECKS=1)
+option(VIT_NAN_CHECKS "Enable NaN checks in the engine" ON)
+if(VIT_NAN_CHECKS)
+    message(STATUS "VIT - NaN checks enabled")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=1)
 else()
-    message(STATUS "RPH - NaN checks disabled")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_NAN_CHECKS=0)
-endif(RPH_NAN_CHECKS)
+    message(STATUS "VIT - NaN checks disabled")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=0)
+endif(VIT_NAN_CHECKS)

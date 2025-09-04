@@ -16,7 +16,7 @@ class FVulkanCmdBuffer : public FNamedClass, public IDeviceChild
 /// This class encapsulate a Vulkan command buffer
 {
     RTTI_DECLARE_TYPEINFO(FVulkanCmdBuffer, FNamedClass)
-    RPH_NONCOPYABLE(FVulkanCmdBuffer)
+    VIT_NONCOPYABLE(FVulkanCmdBuffer)
 
 public:
     /// The state of the command buffer
@@ -121,7 +121,7 @@ private:
 class VulkanCommandBufferPool : public FNamedClass, public IDeviceChild
 {
     RTTI_DECLARE_TYPEINFO(VulkanCommandBufferPool, FNamedClass)
-    RPH_NONCOPYABLE(VulkanCommandBufferPool)
+    VIT_NONCOPYABLE(VulkanCommandBufferPool)
 public:
     VulkanCommandBufferPool() = delete;
     VulkanCommandBufferPool(FVulkanDevice* InDevice);
@@ -155,7 +155,7 @@ private:
 /// - The upload command buffer, used for uploading resources to the GPU
 class VulkanCommandBufferManager : public IDeviceChild, public FNamedClass
 {
-    RPH_NONCOPYABLE(VulkanCommandBufferManager)
+    VIT_NONCOPYABLE(VulkanCommandBufferManager)
 public:
     VulkanCommandBufferManager() = delete;
     /// Construct a command buffer manager for the given queue

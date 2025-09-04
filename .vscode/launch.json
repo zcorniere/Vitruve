@@ -4,8 +4,8 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch Raphael Editor",
-            "program": "${workspaceFolder}/build/Editor/Debug/RaphaelEditor",
+            "name": "Launch Vitruve Editor",
+            "program": "${workspaceFolder}/build/Editor/Debug/VitruveEditor",
             "args": [],
             "cwd": "${workspaceFolder}/build"
         },
@@ -13,7 +13,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch Vulkan RHI Tests",
-            "program": "${workspaceFolder}/build/RHI/Vulkan/Debug/RaphaelRHIVulkan_Test",
+            "program": "${workspaceFolder}/build/RHI/Vulkan/Debug/VitruveRHIVulkan_Test",
             "args": [
                 "--break"
             ],
@@ -23,7 +23,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch Engine Tests",
-            "program": "${workspaceFolder}/build//Engine/Debug/RaphaelEngine_Test",
+            "program": "${workspaceFolder}/build//Engine/Debug/VitruveEngine_Test",
             "args": [
                 "--break"
             ],

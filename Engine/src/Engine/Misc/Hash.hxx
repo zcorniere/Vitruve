@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace Raphael
+namespace Vitruve
 {
 
 template <typename T>
@@ -15,4 +15,4 @@ FORCEINLINE void HashCombine(std::size_t& Source, const T Value)
     Source ^= H(Value) + Magic + (Source << 6) + (Source >> 2);
 }
 
-}    // namespace Raphael
+}    // namespace Vitruve

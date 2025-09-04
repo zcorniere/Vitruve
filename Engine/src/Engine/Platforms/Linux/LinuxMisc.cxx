@@ -188,6 +188,6 @@ std::filesystem::path FLinuxMisc::GetConfigPath()
 #ifndef NDEBUG
     return std::filesystem::current_path();
 #else
-    return xdg::ConfigHomeDir() / "RaphaelEngine";
+    return xdg::ConfigHomeDir() / "VitruveEngine";
 #endif
 }

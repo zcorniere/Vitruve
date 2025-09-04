@@ -26,7 +26,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // Enable Docking
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows
 
-    io.BackendRendererName = "Raphael ImGui Render";
+    io.BackendRendererName = "Vitruve ImGui Render";
     // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
     // We can honor ImGuiPlatformIO::Textures[] requests during render.
@@ -106,7 +106,7 @@ void VulkanRHI_ImGui::EndFrame(FFRHICommandList&)
 
 void VulkanRHI_ImGui::Render(FFRHICommandList& CommandList, RRHIViewport* BackBuffer)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     ImGui::Render();
 
     {
@@ -226,7 +226,7 @@ bool VulkanRHI_ImGui::UpdateTexture(ImTextureData* Texture, FFRHICommandList& Co
 bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandList& CommandList,
                                           RRHIViewport* RenderingViewport)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     ImDrawData* const DrawData = ImGui::GetDrawData();
     // Nothing to draw, yay
     if (DrawData->TotalVtxCount == 0)

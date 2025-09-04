@@ -26,7 +26,7 @@ static constexpr auto VulkanLibraryName = "libvulkan.so.1";
 
 bool FVulkanPlatform::LoadVulkanLibrary()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     if (VulkanModuleHandle)
     {
@@ -66,7 +66,7 @@ bool FVulkanPlatform::LoadVulkanLibrary()
 
 bool FVulkanPlatform::LoadVulkanInstanceFunctions(VkInstance inInstance)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     bool bFoundAllEntryPoints = true;
 #define CHECK_VK_ENTRYPOINTS(Type, Func)                                     \

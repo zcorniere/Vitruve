@@ -26,7 +26,7 @@ public:
     virtual bool SupportPoison() const = 0;
 };
 
-namespace Raphael
+namespace Vitruve
 {
 
 /// @brief STL-compliant allocator
@@ -83,7 +83,7 @@ public:
     }
 };
 
-}    // namespace Raphael
+}    // namespace Vitruve
 
 void* operator new(std::size_t n);
 void* operator new(std::size_t n, const std::nothrow_t& tag) noexcept;

@@ -14,7 +14,7 @@ size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT Position
                                     const float* RESTRICT ScaleY, const float* RESTRICT ScaleZ,
                                     float* RESTRICT OutModelMatrix)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     size_t i = 0;
     for (; i + 7 < Count; i += 8)
     {
@@ -99,7 +99,7 @@ size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* RESTRICT Positi
                                       const float* RESTRICT ScaleY, const float* RESTRICT ScaleZ,
                                       float* RESTRICT OutModelMatrix)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     size_t i = 0;
     for (; i + 15 < Count; i += 16)
     {
@@ -181,7 +181,7 @@ void ComputeModelMatrixBatch(const size_t Count, const float* PositionX, const f
                              const float* QuaternionW, const float* ScaleX, const float* ScaleY, const float* ScaleZ,
                              TMatrix4<float>* OutModelMatrix)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
     check(Count > 0);
     ensure(PositionX && PositionY && PositionZ && QuaternionX && QuaternionY && QuaternionZ && QuaternionW && ScaleX &&
            ScaleY && ScaleZ && OutModelMatrix);

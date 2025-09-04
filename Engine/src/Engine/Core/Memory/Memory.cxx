@@ -21,7 +21,7 @@ static void EnsureAllocatorIsSetup()
         }
         GMalloc = reinterpret_cast<IMallocInterface*>(AllocatorMemory);
 
-#if RPH_POISON_ALLOCATION
+#if VIT_POISON_ALLOCATION
         if (GMalloc->SupportPoison())
         {
             static char PoisonAllocatorMemory[sizeof(FAllocatorPoison)];
@@ -37,7 +37,7 @@ void* Memory::Malloc(uint32 Size, uint32 Alignment)
     EnsureAllocatorIsSetup();
 
     void* const Memory = GMalloc->Alloc(Size, Alignment);
-    RPH_PROFILE_ALLOC(Memory, Size);
+    VIT_PROFILE_ALLOC(Memory, Size);
     return Memory;
 }
 void* Memory::Realloc(void* Original, uint32 Size, uint32 Alignment)
@@ -46,10 +46,10 @@ void* Memory::Realloc(void* Original, uint32 Size, uint32 Alignment)
 
     if (!Original)
     {
-        RPH_PROFILE_FREE(Original);
+        VIT_PROFILE_FREE(Original);
     }
     void* const Memory = GMalloc->Realloc(Original, Size, Alignment);
-    RPH_PROFILE_ALLOC(Memory, Size);
+    VIT_PROFILE_ALLOC(Memory, Size);
     return Memory;
 }
 
@@ -57,7 +57,7 @@ void Memory::Free(void* Ptr)
 {
     EnsureAllocatorIsSetup();
 
-    RPH_PROFILE_FREE(Ptr);
+    VIT_PROFILE_FREE(Ptr);
     return GMalloc->Free(Ptr);
 }
 

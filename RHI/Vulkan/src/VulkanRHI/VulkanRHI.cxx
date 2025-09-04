@@ -21,7 +21,7 @@
 // RHI Creation Implementation
 extern "C" FGenericRHI* RHI_CreateRHI()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     return new VulkanRHI::FVulkanDynamicRHI;
 }
@@ -127,7 +127,7 @@ VkPhysicalDevice FVulkanDynamicRHI::RHIGetVkPhysicalDevice() const
 
 void FVulkanDynamicRHI::Init()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     TArray<const char*> ValidationLayers;
 #if VULKAN_DEBUGGING_ENABLED
@@ -225,7 +225,7 @@ VkInstance FVulkanDynamicRHI::CreateInstance(const TArray<const char*>& Validati
 {
     VkApplicationInfo AppInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-        .pEngineName = "RaphaelEngine",
+        .pEngineName = "VitruveEngine",
         .apiVersion = RHI_VULKAN_VERSION,
     };
 

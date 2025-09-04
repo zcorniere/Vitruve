@@ -23,11 +23,11 @@ FBaseApplication::~FBaseApplication()
 
 bool FBaseApplication::OnEngineInitialization()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     FWindowDefinition WindowDef{
         .AppearsInTaskbar = true,
-        .Title = "Raphael Engine",
+        .Title = "Vitruve Engine",
         .EventCallback = [this](FEvent& event) { WindowEventHandler(event); },
     };
     MainWindow = Ref<RWindow>::Create();
@@ -43,7 +43,7 @@ bool FBaseApplication::OnEngineInitialization()
 
 void FBaseApplication::OnEngineDestruction()
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     MainViewport = nullptr;
 
@@ -66,7 +66,7 @@ void FBaseApplication::WindowEventHandler(FEvent& Event)
 
 void FBaseApplication::Tick(const double DeltaTime)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     (void)DeltaTime;
     MainWindow->ProcessEvents();
@@ -74,7 +74,7 @@ void FBaseApplication::Tick(const double DeltaTime)
 
 bool FBaseApplication::OnWindowResize(FWindowResizeEvent& E)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     const uint32 width = E.GetWidth();
     const uint32 height = E.GetHeight();

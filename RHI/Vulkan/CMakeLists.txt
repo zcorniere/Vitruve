@@ -1,9 +1,9 @@
-project(RaphaelRHIVulkan)
-set(CMAKE_FOLDER "Raphael/RHI/Vulkan")
+project(VitruveRHIVulkan)
+set(CMAKE_FOLDER "Vitruve/RHI/Vulkan")
 
 add_subdirectory(External/)
 
-option(RPH_ENABLE_VULKAN_DEBUGGING "" ON)
+option(VIT_ENABLE_VULKAN_DEBUGGING "" ON)
 
 file(
     GLOB
@@ -29,7 +29,7 @@ target_link_libraries(
             Vulkan::UtilityHeaders
             Vulkan::Headers
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC RaphaelEngine)
+target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine)
 target_disable_rtti(${PROJECT_NAME})
 
 target_compile_options(
@@ -50,7 +50,7 @@ target_compile_options(
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_VULKAN_NO_PROTOTYPES=1)
-if(RPH_ENABLE_VULKAN_DEBUGGING)
+if(VIT_ENABLE_VULKAN_DEBUGGING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_DEBUGGING_ENABLED=1)
 endif()
 
@@ -65,10 +65,10 @@ target_precompile_headers(${PROJECT_NAME}_Test PRIVATE VulkanRHI.pch.hxx)
 target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
 target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
 
-if(RPH_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_ENABLE_PROFILING=1)
-    if(RPH_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC RPH_ENABLE_MEMORY_PROFILING=1)
-    endif(RPH_ENABLE_MEMORY_PROFILING)
+if(VIT_ENABLE_PROFILING)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
+    if(VIT_ENABLE_MEMORY_PROFILING)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
+    endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
-endif(RPH_ENABLE_PROFILING)
+endif(VIT_ENABLE_PROFILING)

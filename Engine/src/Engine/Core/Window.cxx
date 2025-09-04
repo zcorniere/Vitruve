@@ -56,9 +56,9 @@ void RWindow::Initialize(const FWindowDefinition& InDefinition)
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-#if RAPHAEL_SELECTED_RHI_VULKAN == 1
+#if Vitruve_SELECTED_RHI_VULKAN == 1
     check(glfwVulkanSupported());
-#endif    // RAPHAEL_SELECTED_RHI_VULKAN
+#endif    // Vitruve_SELECTED_RHI_VULKAN
 
     glfwWindowHint(GLFW_RESIZABLE, InDefinition.HasSizingFrame);
     glfwWindowHint(GLFW_DECORATED, InDefinition.HasOsWindowBorder);

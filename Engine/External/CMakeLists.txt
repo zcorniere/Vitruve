@@ -1,4 +1,4 @@
-set(CMAKE_FOLDER "Raphael/Engine/External")
+set(CMAKE_FOLDER "Vitruve/Engine/External")
 
 # logger
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/logger-cpp EXCLUDE_FROM_ALL)
@@ -28,11 +28,10 @@ set(MI_BUILD_SHARED
     OFF
     CACHE INTERNAL "" FORCE
 )
-set(MI_TRACK_VALGRIND "$<IF:$<AND:$<CONFIG:Debug>,$<NOT:$<BOOL:${RPH_ENABLE_ASAN}>>>,ON,OFF>")
-set(MI_TRACK_ASAN ${RPH_ENABLE_ASAN})
+set(MI_TRACK_VALGRIND "$<IF:$<AND:$<CONFIG:Debug>,$<NOT:$<BOOL:${VIT_ENABLE_ASAN}>>>,ON,OFF>")
+set(MI_TRACK_ASAN ${VIT_ENABLE_ASAN})
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mimalloc)
-
 
 # glfw
 set(GLFW_BUILD_EXAMPLES
@@ -52,7 +51,7 @@ set(GLFW_INSTALL
     CACHE INTERNAL "" FORCE
 )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glfw EXCLUDE_FROM_ALL)
-if(RPH_SELECTED_RHI STREQUAL "Vulkan")
+if(VIT_SELECTED_RHI STREQUAL "Vulkan")
     target_link_libraries(glfw INTERFACE Vulkan::Headers)
     target_compile_definitions(glfw INTERFACE GLFW_INCLUDE_NONE)
 endif()
@@ -65,4 +64,3 @@ target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Mode
 
 # glm
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glm EXCLUDE_FROM_ALL)
-

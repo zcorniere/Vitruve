@@ -48,7 +48,7 @@ public:
 
     virtual void DoTask(FFRHICommandList& CommandList) override final
     {
-        RPH_PROFILE_SCOPE_DYNAMIC(TNameType::Str());
+        VIT_PROFILE_SCOPE_DYNAMIC(TNameType::Str());
         LOG(LogRenderCommand, Trace, "Running task: {:s}", TNameType::Str());
 
         Execute(CommandList);
@@ -72,7 +72,7 @@ public:
 
     virtual void DoTask(FFRHICommandList& CommandList) override final
     {
-        RPH_PROFILE_SCOPE_DYNAMIC(TTypeString::Str());
+        VIT_PROFILE_SCOPE_DYNAMIC(TTypeString::Str());
         LOG(LogRenderCommand, Trace, "Running task: {:s}", TTypeString::Str());
         DoTaskImpl(CommandList, std::index_sequence_for<ArgsType...>{});
     }

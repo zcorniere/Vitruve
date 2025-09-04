@@ -29,7 +29,7 @@ bool AreThereAnyLiveObject(bool bPrintObjects = true);
 
 }    // namespace RObjectUtils
 
-class FNamedClass : public RTTI::FEnable, public Raphael::FUUID
+class FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
 {
     RTTI_DECLARE_TYPEINFO(FNamedClass);
 

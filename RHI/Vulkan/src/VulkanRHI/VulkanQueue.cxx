@@ -22,7 +22,7 @@ FVulkanQueue::~FVulkanQueue()
 
 void FVulkanQueue::Submit(FVulkanCmdBuffer* CmdBuffer, uint32 NumSignaledSemaphores, VkSemaphore* SignalSemaphores)
 {
-    RPH_PROFILE_FUNC()
+    VIT_PROFILE_FUNC()
 
     check(CmdBuffer && CmdBuffer->HasEnded());
 

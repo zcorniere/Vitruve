@@ -2,7 +2,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogAssert, Trace)
 
-bool Raphael::Debug::HandleCheckFailure(const std::string& Message, bool bShouldAbort)
+bool Vitruve::Debug::HandleCheckFailure(const std::string& Message, bool bShouldAbort)
 {
     if constexpr (ShouldCheckPrintStackTrace())
     {
@@ -26,7 +26,7 @@ bool Raphael::Debug::HandleCheckFailure(const std::string& Message, bool bShould
     return FPlatform::isDebuggerPresent();
 }
 
-void Raphael::Debug::CollectAndPrintStackTrace(void* ReturnAddress)
+void Vitruve::Debug::CollectAndPrintStackTrace(void* ReturnAddress)
 {
     static bool bIsAlreadyHandlerAssertions = false;
 
