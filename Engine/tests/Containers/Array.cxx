@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
-TEST_CASE("Array: Basic Operation")
+TEST_CASE("Array: Basic Operation", "[Containers]")
 {
     int Value1 = GENERATE(take(2, random(-42, 50)));
     int Value2 = GENERATE(take(2, random(-4200, 420)));
@@ -138,7 +138,7 @@ bool operator==(const ComplexType& Lhs, const ComplexType& Rhs)
     return Lhs.Value == Rhs.Value;
 }
 
-TEST_CASE("Array: Test Advanced Type")
+TEST_CASE("Array: Test Advanced Type", "[Containers]")
 {
     int DtorCounter = 0;
 

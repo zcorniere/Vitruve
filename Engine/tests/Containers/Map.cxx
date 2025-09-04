@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
-TEST_CASE("Map Tests")
+TEST_CASE("Map Tests", "[Containers]")
 {
     TMap<int, std::string> TestMap;
 
@@ -65,7 +65,7 @@ TEST_CASE("Map Tests")
     }
 }
 
-TEST_CASE("Map Iterators")
+TEST_CASE("Map Iterators", "[Containers]")
 {
     // Lower the min bucket size, to force rehashing
     TMap<int, std::string, std::hash<int>, 0.75f, uint32, 2> TestMap;

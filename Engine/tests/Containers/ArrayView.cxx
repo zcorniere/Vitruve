@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
-TEST_CASE("TArrayView")
+TEST_CASE("TArrayView", "[Containers]")
 {
     int Value1 = GENERATE(take(2, random(-42, 50)));
     int Value2 = GENERATE(take(2, random(-4200, 420)));

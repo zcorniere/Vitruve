@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
-TEST_CASE("Tuple Tests")
+TEST_CASE("Tuple Tests", "[Containers]")
 {
 
     SECTION("Test Get")
