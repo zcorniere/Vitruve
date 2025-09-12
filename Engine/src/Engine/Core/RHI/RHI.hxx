@@ -52,7 +52,7 @@ void Destroy();
 /// This function is used to defer the deletion of resources to the next frame, this is useful when the resource is in
 /// use and cannot be deleted immediately
 void DeferedDeletion(std::function<void()>&& InDeletionFunction);
-void FlushDeletionQueue();
+void FlushDeletionQueue(bool bAsync);
 
 /// -------------- RHI Operations --------------
 

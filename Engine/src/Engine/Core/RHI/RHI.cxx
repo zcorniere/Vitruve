@@ -16,7 +16,7 @@ void RHI::Destroy()
 {
     GEngine->AssetRegistry.Purge();
 
-    RHI::FlushDeletionQueue();
+    RHI::FlushDeletionQueue(false);
     GDynamicRHI->Shutdown();
 
     delete GDynamicRHI;
@@ -49,9 +49,16 @@ void RHI::DeferedDeletion(std::function<void()>&& InDeletionFunction)
     RHI::Get()->DeferedDeletion(std::move(InDeletionFunction));
 }
 
-void RHI::FlushDeletionQueue()
+void RHI::FlushDeletionQueue(bool bAsync)
 {
-    RHI::Get()->FlushDeletionQueue();
+    if (bAsync)
+    {
+        RHI::Get()->FlushDeletionQueueAsync();
+    }
+    else
+    {
+        RHI::Get()->FlushDeletionQueue();
+    }
 }
 
 void RHI::RHIWaitUntilIdle()

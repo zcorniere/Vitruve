@@ -42,7 +42,8 @@ public:
     /// This function is used to defer the deletion of resources to the next frame, this is useful when the resource is
     /// in use and cannot be deleted immediately
     virtual void DeferedDeletion(std::function<void()>&& InDeletionFunction) = 0;
-    virtual void FlushDeletionQueue(bool bAsync = true) = 0;
+    virtual void FlushDeletionQueue() = 0;
+    virtual void FlushDeletionQueueAsync() = 0;
 
     virtual void RegisterScene(WeakRef<RRHIScene> Scene) = 0;
     virtual void UnregisterScene(WeakRef<RRHIScene> Scene) = 0;

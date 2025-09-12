@@ -99,7 +99,7 @@ void RWindow::BringToFront(bool bForce)
 
 void RWindow::Destroy()
 {
-    RHI::FlushDeletionQueue();
+    RHI::FlushDeletionQueue(false);
 
     LOG(LogWindow, Info, "Destroying GLFW Window '{:p}'", (void*)p_Handle);
     glfwDestroyWindow(p_Handle);
