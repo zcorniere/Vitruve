@@ -62,7 +62,7 @@ FORCEINLINE int EngineLoop()
 
         // End the frame on the RHI side
         RHI::EndFrame();
-        RHI::FlushDeletionQueue();
+        RHI::FlushDeletionQueue(true);
 
         DeltaTime = Limiter.EndFrame();
         // Must be on the last line of the engine loop
