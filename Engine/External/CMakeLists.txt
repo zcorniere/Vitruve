@@ -1,6 +1,14 @@
 set(CMAKE_FOLDER "Vitruve/Engine/External")
 
 # logger
+set(CPPLOGGER_NO_EXCEPTIONS
+    ON
+    CACHE BOOL "" FORCE
+)
+set(CPPLOGGER_SHARED_LIB
+    ON
+    CACHE BOOL "" FORCE
+)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/logger-cpp EXCLUDE_FROM_ALL)
 
 # magic_enum
