@@ -118,6 +118,15 @@ void FVulkanDynamicRHI::PostFrame()
 {
 }
 
+void FVulkanDynamicRHI::OnWindowCreated(RWindow* Window)
+{
+    ImGui_ImplGlfw_InitForVulkan(Window->GetHandle(), true);
+}
+void FVulkanDynamicRHI::OnWindowDeleted(RWindow*)
+{
+    ImGui_ImplGlfw_Shutdown();
+}
+
 VkDevice FVulkanDynamicRHI::RHIGetVkDevice() const
 {
     return Device->GetHandle();
@@ -151,11 +160,11 @@ void FVulkanDynamicRHI::Init()
 
     ShaderCompiler = std::make_unique<FVulkanShaderCompiler>();
     ShaderCompiler->SetOptimizationLevel(FVulkanShaderCompiler::EOptimizationLevel::PerfWithDebug);
+    ImGuiStuff.Initialize(Device.get());
 }
 
 void FVulkanDynamicRHI::PostInit()
 {
-    ImGuiStuff.Initialize(Device.get());
 }
 
 void FVulkanDynamicRHI::FlushDeletionQueue()

@@ -21,6 +21,7 @@ public:
     bool ShouldExit() const;
 
     bool Initialisation();
+    void OnApplicationDestruction();
     void Destroy();
 
     void PreTick();

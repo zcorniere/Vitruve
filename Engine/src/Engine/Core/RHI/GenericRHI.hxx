@@ -36,6 +36,15 @@ public:
         return ERHIInterfaceType::Null;
     }
 
+    // #TODO: make it a global, proper event
+    virtual void OnWindowCreated(RWindow*)
+    {
+    }
+
+    virtual void OnWindowDeleted(RWindow*)
+    {
+    }
+
     /// @brief Defer the execution of the given function to the next frame
     /// @param InDeletionFunction The function to defer
     ///
