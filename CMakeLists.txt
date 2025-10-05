@@ -44,7 +44,7 @@ else()
     message(STATUS "LTO not supported")
 endif()
 
-option(OPTIMIZE_FOR_NATIVE "Build with -march=native" ON)
+option(OPTIMIZE_FOR_NATIVE "Build with -march=native" OFF)
 if(OPTIMIZE_FOR_NATIVE)
     message(STATUS "Building with -march=native")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
