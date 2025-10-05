@@ -1,6 +1,6 @@
-#include "Engine/Core/RHI/RHICommandList.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHICommand.hxx"
+#include "Engine/RHI/RHICommandList.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHICommand.hxx"
 
 FFRHICommandList::FFRHICommandList()
 {

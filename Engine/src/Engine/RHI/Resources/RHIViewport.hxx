@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIResource.hxx"
+#include "Engine/RHI/RHIResource.hxx"
 
 class RRHITexture;
 

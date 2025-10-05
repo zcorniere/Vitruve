@@ -10,9 +10,9 @@
 #include "VulkanRHI/VulkanCommandsObjects.hxx"
 #include "VulkanRHI/VulkanDevice.hxx"
 
-#include "Engine/Core/RHI/RHICommandList.hxx"
 #include "Engine/Core/Window.hxx"
 #include "Engine/Misc/DataLocation.hxx"
+#include "Engine/RHI/RHICommandList.hxx"
 
 namespace VulkanRHI
 {

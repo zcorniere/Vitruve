@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIDefinitions.hxx"
-#include "Engine/Core/RHI/RHIResource.hxx"
+#include "Engine/RHI/RHIDefinitions.hxx"
+#include "Engine/RHI/RHIResource.hxx"
 
 // Include other VulkanResources
 #include "VulkanRHI/Resources/VulkanBuffer.hxx"

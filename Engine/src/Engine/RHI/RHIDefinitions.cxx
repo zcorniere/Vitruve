@@ -1,4 +1,4 @@
-#include "Engine/Core/RHI/RHIDefinitions.hxx"
+#include "Engine/RHI/RHIDefinitions.hxx"
 
 uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
 {

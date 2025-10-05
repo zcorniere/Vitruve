@@ -1,6 +1,6 @@
 #include "AssetRegistry/Asset.hxx"
 
-#include "Engine/Core/RHI/RHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 RAsset::RAsset(const std::filesystem::path& Path): bIsMemoryOnly(false), AssetPath(Path.string())
 {

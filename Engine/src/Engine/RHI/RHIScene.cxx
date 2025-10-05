@@ -1,8 +1,8 @@
-#include "Engine/Core/RHI/RHIScene.hxx"
+#include "Engine/RHI/RHIScene.hxx"
 
 #include "Engine/Core/Engine.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHI.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 #include "Engine/GameFramework/Actor.hxx"
 #include "Engine/GameFramework/Components/MeshComponent.hxx"

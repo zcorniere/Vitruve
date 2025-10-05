@@ -3,7 +3,7 @@
 #include "Engine/Misc/EnumFlags.hxx"
 
 #include "Engine/Containers/ResourceArray.hxx"
-#include "Engine/Core/RHI/RHIResource.hxx"
+#include "Engine/RHI/RHIResource.hxx"
 
 enum class EBufferUsageFlags : uint32
 {

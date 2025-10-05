@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIResource.hxx"
-#include <Engine/Core/RHI/RHICommandList.hxx>
+#include "Engine/RHI/RHIResource.hxx"
+#include <Engine/RHI/RHICommandList.hxx>
 
 #include <future>
 

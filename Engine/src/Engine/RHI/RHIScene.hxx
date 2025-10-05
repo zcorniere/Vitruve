@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHICommandList.hxx"
-#include "Engine/Core/RHI/RHIContext.hxx"
-#include "Engine/Core/RHI/Resources/RHITexture.hxx"
 #include "Engine/GameFramework/Components/CameraComponent.hxx"
 #include "Engine/Math/Transform.hxx"
+#include "Engine/RHI/RHICommandList.hxx"
+#include "Engine/RHI/RHIContext.hxx"
+#include "Engine/RHI/Resources/RHITexture.hxx"
 #include "Engine/Threading/Lock.hxx"
 
 #include <future>
