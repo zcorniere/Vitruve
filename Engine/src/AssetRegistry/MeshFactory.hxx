@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/AssetRegistry/Asset.hxx"
+#include "AssetRegistry/Asset.hxx"
 
 namespace MeshFactory
 {

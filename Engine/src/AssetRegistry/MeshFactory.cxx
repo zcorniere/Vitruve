@@ -1,4 +1,4 @@
-#include "Engine/AssetRegistry/MeshFactory.hxx"
+#include "AssetRegistry/MeshFactory.hxx"
 
 #include <numbers>
 

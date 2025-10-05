@@ -1,4 +1,4 @@
-#include "Engine/AssetRegistry/Asset.hxx"
+#include "AssetRegistry/Asset.hxx"
 
 #include "Engine/Core/RHI/RHI.hxx"
 
