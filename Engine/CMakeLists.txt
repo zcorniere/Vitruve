@@ -6,13 +6,9 @@ set(VIT_SELECTED_RHI
     CACHE STRING "Select the RHI to use"
 )
 
-add_library(RHI_Selector INTERFACE)
-if(VIT_SELECTED_RHI STREQUAL "Vulkan")
-    target_link_libraries(RHI_Selector INTERFACE VitruveRHIVulkan)
-    target_compile_definitions(RHI_Selector INTERFACE Vitruve_SELECTED_RHI_VULKAN=1)
-else()
-    message(FATAL_ERROR "${VIT_SELECTED_RHI} is not supported !")
-endif()
+# add_library(RHI_Selector INTERFACE) if(VIT_SELECTED_RHI STREQUAL "Vulkan") target_link_libraries(RHI_Selector
+# INTERFACE VitruveRHIVulkan) target_compile_definitions(RHI_Selector INTERFACE Vitruve_SELECTED_RHI_VULKAN=1) else()
+# message(FATAL_ERROR "${VIT_SELECTED_RHI} is not supported !") endif()
 
 add_subdirectory(External/)
 
@@ -35,7 +31,7 @@ else()
 endif()
 
 add_library(
-    ${PROJECT_NAME} STATIC
+    ${PROJECT_NAME} SHARED
     src/Engine/Main.cxx
     src/Engine/Core/Log.cxx
     src/Engine/Core/UUID.cxx
@@ -54,9 +50,6 @@ add_library(
     src/Engine/GameFramework/Actor.cxx
     src/Engine/GameFramework/World.cxx
     src/Engine/GameFramework/CameraActor.cxx
-    src/Engine/AssetRegistry/AssetRegistry.cxx
-    src/Engine/AssetRegistry/Asset.cxx
-    src/Engine/AssetRegistry/MeshFactory.cxx
     src/Engine/Serialization/StreamWriter.cxx
     src/Engine/Serialization/StreamReader.cxx
     src/Engine/Serialization/FileStream.cxx
@@ -76,7 +69,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC cpplogger
-           RHI_Selector
+           # RHI_Selector
            magic_enum
            glfw
            mimalloc-static
@@ -149,3 +142,13 @@ else()
     message(STATUS "VIT - NaN checks disabled")
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=0)
 endif(VIT_NAN_CHECKS)
+
+set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
+add_library(
+    ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
+                                         src/AssetRegistry/MeshFactory.cxx
+)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}_AssetRegistry REUSE_FROM ${PROJECT_NAME})
+target_disable_rtti(${PROJECT_NAME}_AssetRegistry)

@@ -1,6 +1,6 @@
-#include "Engine/AssetRegistry/AssetRegistry.hxx"
+#include "AssetRegistry/AssetRegistry.hxx"
 
-#include "Engine/AssetRegistry/MeshFactory.hxx"
+#include "AssetRegistry/MeshFactory.hxx"
 
 DECLARE_LOGGER_CATEGORY(Core, LogAssetRegistry, Info)
 
