@@ -10,6 +10,7 @@ include(cmake/find_linker.cmake)
 include(cmake/CompileShaders.cmake)
 include(cmake/StripDebugFile.cmake)
 include(cmake/disable_rtti.cmake)
+include(cmake/generate_header.cmake)
 
 # Option to force colored output of the compiler
 option(VIT_FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)

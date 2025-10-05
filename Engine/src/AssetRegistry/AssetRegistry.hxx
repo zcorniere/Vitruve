@@ -2,7 +2,7 @@
 
 #include "AssetRegistry/Asset.hxx"
 
-class FAssetRegistry
+class ASSETREGISTRY_API FAssetRegistry
 {
 public:
     FAssetRegistry();

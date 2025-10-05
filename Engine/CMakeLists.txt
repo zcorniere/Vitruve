@@ -30,6 +30,7 @@ else()
     message(FATAL_ERROR "Compiler not supported !")
 endif()
 
+generate_export_header(ENGINE_API ${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx)
 add_library(
     ${PROJECT_NAME} SHARED
     src/Engine/Main.cxx
@@ -66,6 +67,7 @@ add_library(
     ${COMPILER_SOURCE_FILE}
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC cpplogger
@@ -93,9 +95,12 @@ target_compile_options(
             /wd5030> # unknown attribute
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_precompile_headers(${PROJECT_NAME} PRIVATE src/Engine/Vitruve.hxx)
+target_precompile_headers(
+    ${PROJECT_NAME} PUBLIC "src/Engine/Vitruve.hxx" "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+)
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE VITRUVE_ENGINE_EXPORTS)
 target_disable_rtti(${PROJECT_NAME})
 
 if(UNIX)
@@ -143,12 +148,21 @@ else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=0)
 endif(VIT_NAN_CHECKS)
 
+# ---------- Asset Registry Module ----------
+
 set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
+generate_export_header(ASSETREGISTRY_API ${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx)
 add_library(
     ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
                                          src/AssetRegistry/MeshFactory.cxx
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+target_compile_definitions(${PROJECT_NAME}_AssetRegistry PRIVATE VITRUVE_ENGINE_EXPORTS)
+set_target_properties(${PROJECT_NAME}_AssetRegistry PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
+
 target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
-target_precompile_headers(${PROJECT_NAME}_AssetRegistry REUSE_FROM ${PROJECT_NAME})
+target_precompile_headers(
+    ${PROJECT_NAME}_AssetRegistry PUBLIC "src/Engine/Vitruve.hxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx"
+)
 target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
