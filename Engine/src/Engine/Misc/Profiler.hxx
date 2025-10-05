@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef VIT_ENABLE_PROFILING
+#if VIT_ENABLE_PROFILING
     #define TracyFunction ::RTTI::FunctionName()
     #define TracyFile __FILE__
     #define TracyLine __LINE__
@@ -14,7 +14,7 @@
         ZoneName(Name, strlen(Name));
     #define VIT_PROFILE_THREAD(...) tracy::SetThreadName(__VA_ARGS__);
 
-    #ifdef VIT_ENABLE_MEMORY_PROFILING
+    #if VIT_ENABLE_MEMORY_PROFILING
         #define VIT_PROFILE_ALLOC(Pointer, Size) TracyAlloc(Pointer, Size);
         #define VIT_PROFILE_FREE(Pointer) TracyFree(Pointer);
     #else

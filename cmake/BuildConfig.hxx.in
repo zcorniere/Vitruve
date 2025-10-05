@@ -4,5 +4,13 @@
 #define VITRUVE_GIT_HASH "@GBCH_GIT_HASH@"
 
 #if !defined(VITRUVE_BUILD_TYPE)
-    #define VITRUVE_BUILD_TYPE "Unknowned"
+    #define VITRUVE_BUILD_TYPE "Unknown"
 #endif // !defined(VITRUVE_BUILD_TYPE)
+
+#cmakedefine01 VITRUVE_BUILD_MONOLITHIC
+#cmakedefine01 VIT_NAN_CHECKS
+
+
+// Profiling
+#cmakedefine01 VIT_ENABLE_PROFILING
+#cmakedefine01 VIT_ENABLE_MEMORY_PROFILING

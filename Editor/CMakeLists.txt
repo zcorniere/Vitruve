@@ -7,6 +7,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine VitruveEngine_AssetR
 target_precompile_headers(
     ${PROJECT_NAME}
     PRIVATE
+    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx"
@@ -37,10 +38,6 @@ if(MSVC)
 endif()
 
 if(VIT_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
-    if(VIT_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
-    endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 endif(VIT_ENABLE_PROFILING)
 
