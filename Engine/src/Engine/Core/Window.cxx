@@ -3,11 +3,11 @@
 #include "Engine/Core/Events/ApplicationEvent.hxx"
 #include "Engine/Core/Events/KeyEvent.hxx"
 #include "Engine/Core/Events/MouseEvent.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/MiscDefines.hxx"
 #include "Engine/Misc/Utils.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 #include <GLFW/glfw3.h>
 

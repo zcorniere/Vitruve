@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIContext.hxx"
+#include "Engine/RHI/RHIContext.hxx"
 
 #define ENQUEUE_RENDER_COMMAND(Type)              \
     struct MACRO_EXPENDER(Type##String, __LINE__) \

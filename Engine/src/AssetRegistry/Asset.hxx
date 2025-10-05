@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Engine/Containers/ResourceArray.hxx"
-#include "Engine/Core/RHI/Resources/RHIBuffer.hxx"
+#include "Engine/RHI/Resources/RHIBuffer.hxx"
 
 BEGIN_UNALIGNED_PARAMETER_STRUCT(FVertex)
 PARAMETER(FVector3, Position)

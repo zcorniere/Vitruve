@@ -1,9 +1,9 @@
-#include "Engine/Core/RHI/RHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 #include "Engine/Core/Engine.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHICommandList.hxx"
 #include "Engine/Core/Window.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHICommandList.hxx"
 
 #include "AssetRegistry/AssetRegistry.hxx"
 

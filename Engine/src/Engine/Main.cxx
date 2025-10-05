@@ -1,11 +1,11 @@
 #include "Engine/Core/Application.hxx"
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Core/Log.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/Timer.hxx"
 #include "Engine/Misc/Utils.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 #ifdef PLATFORM_WINDOWS
     #include <windows.h>

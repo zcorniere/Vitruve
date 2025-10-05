@@ -39,11 +39,11 @@ add_library(
     src/Engine/Core/Engine.cxx
     src/Engine/Core/Application.cxx
     src/Engine/Core/Window.cxx
-    src/Engine/Core/RHI/RHI.cxx
-    src/Engine/Core/RHI/RHIDefinitions.cxx
-    src/Engine/Core/RHI/RHICommandList.cxx
-    src/Engine/Core/RHI/RHICommand.cxx
-    src/Engine/Core/RHI/RHIScene.cxx
+    src/Engine/RHI/RHI.cxx
+    src/Engine/RHI/RHIDefinitions.cxx
+    src/Engine/RHI/RHICommandList.cxx
+    src/Engine/RHI/RHICommand.cxx
+    src/Engine/RHI/RHIScene.cxx
     src/Engine/Core/Memory/Memory.cxx
     src/Engine/Core/Memory/MiMalloc.cxx
     src/Engine/Core/Memory/StdMalloc.cxx

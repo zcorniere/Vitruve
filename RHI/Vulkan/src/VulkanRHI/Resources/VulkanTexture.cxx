@@ -1,6 +1,6 @@
 #include "VulkanRHI/Resources/VulkanTexture.hxx"
 
-#include "Engine/Core/RHI/RHICommandList.hxx"
+#include "Engine/RHI/RHICommandList.hxx"
 #include "VulkanRHI/VulkanCommandContext.hxx"
 #include "VulkanRHI/VulkanCommandsObjects.hxx"
 #include "VulkanRHI/VulkanDevice.hxx"
