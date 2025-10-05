@@ -26,6 +26,7 @@ target_precompile_headers(
     "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
     "VulkanRHI.pch.hxx"
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
@@ -68,10 +69,6 @@ if(OPTIMIZE_FOR_NATIVE)
 endif(OPTIMIZE_FOR_NATIVE)
 
 if(VIT_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
-    if(VIT_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
-    endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 endif(VIT_ENABLE_PROFILING)
 
@@ -84,6 +81,7 @@ target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
 target_precompile_headers(
     ${PROJECT_NAME}_Test
     PRIVATE
+    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
     "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically

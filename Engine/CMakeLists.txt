@@ -114,10 +114,6 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 if(VIT_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
-    if(VIT_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
-    endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 endif(VIT_ENABLE_PROFILING)
 
@@ -128,10 +124,8 @@ endif()
 option(VIT_NAN_CHECKS "Enable NaN checks in the engine" ON)
 if(VIT_NAN_CHECKS)
     message(STATUS "VIT - NaN checks enabled")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=1)
 else()
     message(STATUS "VIT - NaN checks disabled")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_NAN_CHECKS=0)
 endif(VIT_NAN_CHECKS)
 
 # ---------- Asset Registry Module ----------
@@ -149,6 +143,7 @@ target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
 target_precompile_headers(
     ${PROJECT_NAME}_AssetRegistry
     PRIVATE
+    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
