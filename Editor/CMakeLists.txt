@@ -2,7 +2,7 @@ project(VitruveEditor)
 set(CMAKE_FOLDER "Vitruve")
 
 add_executable(${PROJECT_NAME} EditorApplication.cxx Actor/Oscillator.cxx)
-add_dependencies(${PROJECT_NAME} VitruveRHIVulkan)
+add_dependencies(${PROJECT_NAME} VitruveEngine_VulkanRHI)
 target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine VitruveEngine_AssetRegistry imgui)
 target_precompile_headers(
     ${PROJECT_NAME}
