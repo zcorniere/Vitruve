@@ -3,13 +3,13 @@
 #include "Engine/Platforms/PlatformMisc.hxx"
 // IWYU pragma: private, include "FPlatformMisc.hxx"
 
-class ENGINE_API RWindowsExternalModule : public IExternalModule
+class ENGINE_API FWindowsExternalModule : public IExternalModule
 {
-    RTTI_DECLARE_TYPEINFO(RWindowsExternalModule, IExternalModule);
+    RTTI_DECLARE_TYPEINFO(FWindowsExternalModule, IExternalModule);
 
 public:
-    RWindowsExternalModule(std::string_view ModulePath);
-    virtual ~RWindowsExternalModule();
+    FWindowsExternalModule(std::string_view ModulePath);
+    virtual ~FWindowsExternalModule();
 
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const override;
 
@@ -31,7 +31,7 @@ public:
     static bool BaseAllocator(void* TargetMemory);
 
     /// @copydoc FGenericMisc::LoadExternalModule
-    static Ref<IExternalModule> LoadExternalModule(const std::string& ModuleName);
+    static IExternalModule* LoadExternalModule(const std::string& ModuleName);
 
     /// @copydoc FGenericMisc::GetConfigPath
     static std::filesystem::path GetConfigPath();

@@ -97,7 +97,7 @@ void FVulkanPlatform::FreeVulkanLibrary()
 #define CLEAR_VK_ENTRYPOINTS(Type, Func) VulkanAPI::Func = nullptr;
         VK_ENTRYPOINT_ALL(CLEAR_VK_ENTRYPOINTS);
 #undef CLEAR_VK_ENTRYPOINTS
-
+        delete VulkanModuleHandle;
         VulkanModuleHandle = nullptr;
     }
 }

@@ -9,9 +9,23 @@
 
 ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
+static IExternalModule* s_RHIModuleHandle = nullptr;
+
 void RHI::Create()
 {
-    GDynamicRHI = RHI_CreateRHI();
+    const char* VulkanRHIName = "VitruveRHIVulkan";
+    std::string ModulePath =
+        std::format("{:s}/RHI/Vulkan/{:s}", std::filesystem::current_path().string(), VITRUVE_BUILD_TYPE);
+
+#if defined(PLATFORM_WINDOWS)
+    s_RHIModuleHandle = FPlatformMisc::LoadExternalModule(std::format("{}/{:s}.dll", ModulePath, VulkanRHIName));
+#elif defined(PLATFORM_LINUX)
+    s_RHIModuleHandle = FPlatformMisc::LoadExternalModule(std::format("{}/lib{:s}.so", ModulePath, VulkanRHIName));
+#endif
+
+    check(s_RHIModuleHandle->IsValid());
+    FGenericRHI* (*CreateRHI_Funct)() = s_RHIModuleHandle->GetSymbol<FGenericRHI* (*)()>("RHI_CreateRHI");
+    GDynamicRHI = CreateRHI_Funct();
 }
 
 void RHI::Destroy()
@@ -23,6 +37,8 @@ void RHI::Destroy()
 
     delete GDynamicRHI;
     GDynamicRHI = nullptr;
+    delete s_RHIModuleHandle;
+    s_RHIModuleHandle = nullptr;
 }
 
 void RHI::BeginFrame()
