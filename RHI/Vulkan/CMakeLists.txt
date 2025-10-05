@@ -67,12 +67,6 @@ if(OPTIMIZE_FOR_NATIVE)
     target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
 endif(OPTIMIZE_FOR_NATIVE)
 
-build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx) # Give the tests access to the RHI headers
-target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_precompile_headers(${PROJECT_NAME}_Test PRIVATE VulkanRHI.pch.hxx)
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
-target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
-
 if(VIT_ENABLE_PROFILING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
     if(VIT_ENABLE_MEMORY_PROFILING)
@@ -80,3 +74,18 @@ if(VIT_ENABLE_PROFILING)
     endif(VIT_ENABLE_MEMORY_PROFILING)
     target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 endif(VIT_ENABLE_PROFILING)
+
+# ------------- Tests -------------
+
+build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx) # Give the tests access to the RHI headers
+target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
+target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
+target_precompile_headers(
+    ${PROJECT_NAME}_Test
+    PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx"
+    "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
+    "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "VulkanRHI.pch.hxx"
+)

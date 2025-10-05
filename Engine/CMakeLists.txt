@@ -112,23 +112,6 @@ elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
 endif()
 
-build_tests(
-    ${PROJECT_NAME}
-    tests/Containers/Array.cxx
-    tests/Containers/ArrayView.cxx
-    tests/Containers/Tuple.cxx
-    tests/Containers/Map.cxx
-    tests/Math/Quaternion.cxx
-    tests/Math/Vector.cxx
-    tests/Math/Math.cxx
-    tests/Math/Matrix.cxx
-    tests/Math/Transform.cxx
-    tests/Math/ViewPoint.cxx
-    tests/Core/RTTI/RTTI.cxx
-    tests/Core/RTTI/RTTIParameter.cxx
-    tests/CommandLine.cxx
-)
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
 target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 if(VIT_ENABLE_PROFILING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
@@ -171,3 +154,31 @@ target_precompile_headers(
     "src/Engine/Vitruve.hxx"
 )
 target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
+
+# ------------- Tests -------------
+
+build_tests(
+    ${PROJECT_NAME}
+    tests/Containers/Array.cxx
+    tests/Containers/ArrayView.cxx
+    tests/Containers/Tuple.cxx
+    tests/Containers/Map.cxx
+    tests/Math/Quaternion.cxx
+    tests/Math/Vector.cxx
+    tests/Math/Math.cxx
+    tests/Math/Matrix.cxx
+    tests/Math/Transform.cxx
+    tests/Math/ViewPoint.cxx
+    tests/Core/RTTI/RTTI.cxx
+    tests/Core/RTTI/RTTIParameter.cxx
+    tests/CommandLine.cxx
+)
+target_precompile_headers(
+    ${PROJECT_NAME}_Test
+    PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/BuildConfig.hxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "src/Engine/Vitruve.hxx"
+)
+target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm ${PROJECT_NAME}_AssetRegistry)

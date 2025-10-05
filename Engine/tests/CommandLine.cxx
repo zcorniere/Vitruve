@@ -36,3 +36,10 @@ TEST_CASE("Command line with multiple argument")
     }
     FCommandLine::Reset();
 }
+
+// #TOREMOVE: when application is properly decoupled from engine
+#include "Engine/Core/Application.hxx"
+extern "C" IApplication* GetApplication()
+{
+    return nullptr;
+}
