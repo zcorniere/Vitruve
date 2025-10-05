@@ -9,6 +9,14 @@ set(TRACY_ON_DEMAND
     ON
     CACHE BOOL ""
 )
+set(TRACY_STATIC
+    OFF
+    CACHE BOOL ""
+)
+set(TRACY_LTO
+    ON
+    CACHE BOOL ""
+)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy EXCLUDE_FROM_ALL)
 
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
