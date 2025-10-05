@@ -98,6 +98,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sr
 target_precompile_headers(
     ${PROJECT_NAME} PUBLIC "src/Engine/Vitruve.hxx" "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
 )
+force_include_api_macro_header(${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx")
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
 target_compile_definitions(${PROJECT_NAME} PRIVATE VITRUVE_ENGINE_EXPORTS)
@@ -164,5 +165,8 @@ target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
 target_precompile_headers(
     ${PROJECT_NAME}_AssetRegistry PUBLIC "src/Engine/Vitruve.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx"
+)
+force_include_api_macro_header(
+    ${PROJECT_NAME}_AssetRegistry "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx"
 )
 target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
