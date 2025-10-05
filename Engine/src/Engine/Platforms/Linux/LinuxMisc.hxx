@@ -4,14 +4,19 @@
 // IWYU pragma: private, include "FPlatformMisc.hxx"
 
 /// @brief Linux implementation of the IExternalModule interface
-class ENGINE_API RLinuxExternalModule : public IExternalModule
+class ENGINE_API FLinuxExternalModule final : public IExternalModule
 {
-    RTTI_DECLARE_TYPEINFO(RLinuxExternalModule, IExternalModule);
+    RTTI_DECLARE_TYPEINFO(FLinuxExternalModule, IExternalModule);
 
 public:
     /// @copydoc IExternalModule::IExternalModule
-    explicit RLinuxExternalModule(std::string_view ModulePath);
-    virtual ~RLinuxExternalModule();
+    explicit FLinuxExternalModule(std::string_view ModulePath);
+    virtual ~FLinuxExternalModule();
+
+    virtual bool IsValid() const override
+    {
+        return ModuleHandle != nullptr;
+    }
 
 private:
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const override;
@@ -34,7 +39,7 @@ public:
     static bool BaseAllocator(void* TargetMemory);
 
     /// @copydoc GenericMisc::LoadExternalModule
-    static Ref<IExternalModule> LoadExternalModule(const std::string& ModuleName);
+    static IExternalModule* LoadExternalModule(const std::string& ModuleName);
 
     /// @brief Return the XDG_CONFIG path
     static std::filesystem::path GetConfigPath();

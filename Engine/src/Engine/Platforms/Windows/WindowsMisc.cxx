@@ -134,19 +134,17 @@ const FCPUInformation& FWindowsMisc::GetCPUInformation()
 }
 // ------------------ Windows External Module --------------------------
 
-static TMap<std::string, WeakRef<RWindowsExternalModule>> s_ModuleStorage;
-
-RWindowsExternalModule::RWindowsExternalModule(std::string_view ModulePath): IExternalModule(ModulePath)
+FWindowsExternalModule::FWindowsExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = ::LoadLibrary(ModulePath.data());
 }
 
-RWindowsExternalModule::~RWindowsExternalModule()
+FWindowsExternalModule::~FWindowsExternalModule()
 {
     ::FreeLibrary(HMODULE(ModuleHandle));
 }
 
-void* RWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
+void* FWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
     return ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
 }
@@ -159,17 +157,11 @@ bool FWindowsMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-Ref<IExternalModule> FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
 {
-    WeakRef<RWindowsExternalModule>* Iter = s_ModuleStorage.Find(ModuleName);
-
-    if (Iter == nullptr || !Iter->IsValid())
-    {
-        Ref<RWindowsExternalModule> Module = Ref<RWindowsExternalModule>::Create(ModuleName);
-        s_ModuleStorage.FindOrAdd(ModuleName) = Module;
-        return Module;
-    }
-    return Iter->Pin();
+    IExternalModule* Module = new FWindowsExternalModule(ModuleName);
+    Module->SetName(ModuleName);
+    return Module;
 }
 
 std::filesystem::path FWindowsMisc::GetConfigPath()

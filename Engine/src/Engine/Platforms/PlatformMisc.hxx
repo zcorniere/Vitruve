@@ -34,21 +34,13 @@ enum class EBoxReturnType
 };
 
 /// @brief Interface that represent a manually loaded shared library
-class ENGINE_API IExternalModule : public RObject
+class ENGINE_API IExternalModule : public FNamedClass
 {
-    RTTI_DECLARE_TYPEINFO(IExternalModule, RObject);
+    RTTI_DECLARE_TYPEINFO(IExternalModule, FNamedClass);
 
 public:
-    IExternalModule() = delete;
-    /// @brief  Construct a new module, and load the library
-    /// @param  Name The name of the shared library
-    IExternalModule(std::string_view Name)
-    {
-        SetName(Name);
-    }
-    virtual ~IExternalModule()
-    {
-    }
+    IExternalModule() = default;
+    virtual ~IExternalModule() = default;
 
     /// @brief Find the requested function pointer
     /// @tparam T The Function pointer type to return
@@ -59,6 +51,8 @@ public:
     {
         return (T)GetSymbol_Internal(SymbolName);
     }
+
+    virtual bool IsValid() const = 0;
 
 private:
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const = 0;

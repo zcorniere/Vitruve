@@ -148,17 +148,17 @@ const FCPUInformation& FLinuxMisc::GetCPUInformation()
 
 // ------------------ Linux External Module --------------------------
 
-RLinuxExternalModule::RLinuxExternalModule(std::string_view ModulePath): IExternalModule(ModulePath)
+FLinuxExternalModule::FLinuxExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = dlopen(ModulePath.data(), RTLD_NOW | RTLD_LOCAL);
 }
 
-RLinuxExternalModule::~RLinuxExternalModule()
+FLinuxExternalModule::~FLinuxExternalModule()
 {
     dlclose(ModuleHandle);
 }
 
-void* RLinuxExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
+void* FLinuxExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
     return dlsym(ModuleHandle, SymbolName.data());
 }
@@ -178,9 +178,11 @@ bool FLinuxMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-Ref<IExternalModule> FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
 {
-    return Ref<RLinuxExternalModule>::CreateNamed(ModuleName, ModuleName);
+    IExternalModule* Module = new FLinuxExternalModule(ModuleName);
+    Module->SetName(ModuleName);
+    return Module;
 }
 
 std::filesystem::path FLinuxMisc::GetConfigPath()

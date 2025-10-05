@@ -1,0 +1,8 @@
+#pragma once
+
+#define VITRUVE_APP_VERSION "@GBCH_VERSION@"
+#define VITRUVE_GIT_HASH "@GBCH_GIT_HASH@"
+
+#if !defined(VITRUVE_BUILD_TYPE)
+    #define VITRUVE_BUILD_TYPE "Unknowned"
+#endif // !defined(VITRUVE_BUILD_TYPE)

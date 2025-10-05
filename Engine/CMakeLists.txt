@@ -1,15 +1,6 @@
 project(VitruveEngine)
 set(CMAKE_FOLDER "Vitruve/Engine")
 
-set(VIT_SELECTED_RHI
-    "Vulkan"
-    CACHE STRING "Select the RHI to use"
-)
-
-# add_library(RHI_Selector INTERFACE) if(VIT_SELECTED_RHI STREQUAL "Vulkan") target_link_libraries(RHI_Selector
-# INTERFACE VitruveRHIVulkan) target_compile_definitions(RHI_Selector INTERFACE Vitruve_SELECTED_RHI_VULKAN=1) else()
-# message(FATAL_ERROR "${VIT_SELECTED_RHI} is not supported !") endif()
-
 add_subdirectory(External/)
 
 if(WIN32)
@@ -30,7 +21,15 @@ else()
     message(FATAL_ERROR "Compiler not supported !")
 endif()
 
-generate_export_header(ENGINE_API ${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx)
+generate_export_header(ENGINE_API "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx")
+generate_build_config_header(
+    OUTPUT_PATH
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/BuildConfig.hxx"
+    VERSION
+    "0.0.1"
+    TEMPLATE
+    "${CMAKE_SOURCE_DIR}/cmake/BuildConfig.hxx.in"
+)
 add_library(
     ${PROJECT_NAME} SHARED
     src/Engine/Main.cxx
@@ -94,9 +93,11 @@ target_compile_options(
             /wd5030> # unknown attribute
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+target_compile_definitions(${PROJECT_NAME} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
 target_precompile_headers(
     ${PROJECT_NAME}
     PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/BuildConfig.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
