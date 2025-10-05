@@ -25,7 +25,7 @@ static FORCEINLINE const VkAllocationCallbacks* GetMemoryAllocator()
 }
 
 /// @brief Vulkan RHI implementation for Vitruve
-class FVulkanDynamicRHI : public FGenericRHI
+class FVulkanDynamicRHI final : public FGenericRHI
 {
 public:
     // FGenericRHI implementation
@@ -43,6 +43,9 @@ public:
     {
         return ERHIInterfaceType::Vulkan;
     }
+
+    virtual void OnWindowCreated(RWindow* Window) final override;
+    virtual void OnWindowDeleted(RWindow* Window) final override;
 
     virtual void DeferedDeletion(std::function<void()>&& InDeletionFunction) final override;
     virtual void FlushDeletionQueue() final override;

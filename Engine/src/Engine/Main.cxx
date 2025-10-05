@@ -72,6 +72,7 @@ FORCEINLINE int EngineLoop()
     if (ExitStatus == 0)
     {
         RHI::RHIWaitUntilIdle();
+        GEngine->OnApplicationDestruction();
         Application->OnEngineDestruction();
         RHI::Destroy();
         GEngine->Destroy();

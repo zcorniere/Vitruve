@@ -48,9 +48,13 @@ bool FEngine::Initialisation()
     return true;
 }
 
-void FEngine::Destroy()
+void FEngine::OnApplicationDestruction()
 {
     m_ThreadPool.Stop();
+}
+
+void FEngine::Destroy()
+{
 }
 
 void FEngine::PreTick()
