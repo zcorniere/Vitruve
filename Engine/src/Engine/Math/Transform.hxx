@@ -43,24 +43,27 @@ public:
 };
 
 template <typename T>
-void ComputeModelMatrixBatch(const size_t Count, const T* LocationX, const T* LocationY, const T* LocationZ,
-                             const T* QuaternionX, const T* QuaternionY, const T* QuaternionZ, const T* QuaternionW,
-                             const T* ScaleX, const T* ScaleY, const T* ScaleZ, TMatrix4<T>* OutModelMatrix);
+void ENGINE_API ComputeModelMatrixBatch(const size_t Count, const T* LocationX, const T* LocationY, const T* LocationZ,
+                                        const T* QuaternionX, const T* QuaternionY, const T* QuaternionZ,
+                                        const T* QuaternionW, const T* ScaleX, const T* ScaleY, const T* ScaleZ,
+                                        TMatrix4<T>* OutModelMatrix);
 
 // Do not call these directly, they are only exposed for unit testing
 template <typename T>
-size_t ComputeModelMatrixBatch_AVX512(size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
-                                      const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX,
-                                      const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
-                                      const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX, const T* RESTRICT ScaleY,
-                                      const T* RESTRICT ScaleZ, T* RESTRICT OutModelMatrix);
+size_t ENGINE_API ComputeModelMatrixBatch_AVX512(size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
+                                                 const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX,
+                                                 const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
+                                                 const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
+                                                 const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ,
+                                                 T* RESTRICT OutModelMatrix);
 
 template <typename T>
-size_t ComputeModelMatrixBatch_AVX2(size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
-                                    const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX,
-                                    const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
-                                    const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX, const T* RESTRICT ScaleY,
-                                    const T* RESTRICT ScaleZ, T* RESTRICT OutModelMatrix);
+size_t ENGINE_API ComputeModelMatrixBatch_AVX2(size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
+                                               const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX,
+                                               const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
+                                               const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
+                                               const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ,
+                                               T* RESTRICT OutModelMatrix);
 
 }    // namespace Math
 
