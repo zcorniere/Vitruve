@@ -26,7 +26,7 @@ public:
     virtual void Tick(const double DeltaTime) = 0;
 };
 
-class FBaseApplication : public IApplication
+class ENGINE_API FBaseApplication : public IApplication
 {
     RTTI_DECLARE_TYPEINFO(FBaseApplication, IApplication)
 public:

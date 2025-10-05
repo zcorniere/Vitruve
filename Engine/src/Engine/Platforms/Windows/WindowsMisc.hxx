@@ -3,7 +3,7 @@
 #include "Engine/Platforms/PlatformMisc.hxx"
 // IWYU pragma: private, include "FPlatformMisc.hxx"
 
-class RWindowsExternalModule : public IExternalModule
+class ENGINE_API RWindowsExternalModule : public IExternalModule
 {
     RTTI_DECLARE_TYPEINFO(RWindowsExternalModule, IExternalModule);
 
@@ -17,7 +17,7 @@ private:
     void* ModuleHandle = nullptr;
 };
 
-class FWindowsMisc : public FGenericMisc
+class ENGINE_API FWindowsMisc : public FGenericMisc
 {
 public:
     /// @copydoc FGenericMisc::DisplayMessageBox

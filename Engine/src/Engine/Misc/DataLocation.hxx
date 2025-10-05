@@ -1,7 +1,7 @@
 #pragma once
 
 /// @brief Helper class to find location of files, like config and shader
-class DataLocationFinder
+class ENGINE_API DataLocationFinder
 {
 public:
     /// @brief Return the path to the folder containing the shaders

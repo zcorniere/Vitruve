@@ -39,7 +39,7 @@ struct FWindowDefinition
 };
 
 /// @brief A holder for GLFW to make sure it stays initialized
-struct GLFWHolder
+struct ENGINE_API GLFWHolder
 {
     GLFWHolder();
     ~GLFWHolder();
@@ -48,7 +48,7 @@ struct GLFWHolder
 /// @class Window
 ///
 /// @brief A class allowing some abstraction over the GLFW library
-class RWindow : public RObject
+class ENGINE_API RWindow : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RWindow, RObject);
 

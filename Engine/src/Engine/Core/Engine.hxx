@@ -1,12 +1,12 @@
 #pragma once
 
-#include "AssetRegistry/AssetRegistry.hxx"
+#include "AssetRegistry/AssetRegistry_Forward.hxx"
 #include "Engine/GameFramework/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
 
 extern class FEngine* GEngine;
 
-class FEngine
+class ENGINE_API FEngine
 {
 public:
     FEngine();
@@ -31,7 +31,7 @@ public:
     Ref<RWorld> GetWorld() const;
 
 public:
-    FAssetRegistry AssetRegistry;
+    std::unique_ptr<FAssetRegistry> AssetRegistry;
     FThreadPool m_ThreadPool;
 
 private:

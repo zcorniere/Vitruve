@@ -34,7 +34,7 @@ enum class EBoxReturnType
 };
 
 /// @brief Interface that represent a manually loaded shared library
-class IExternalModule : public RObject
+class ENGINE_API IExternalModule : public RObject
 {
     RTTI_DECLARE_TYPEINFO(IExternalModule, RObject);
 
@@ -67,7 +67,7 @@ private:
 DECLARE_LOGGER_CATEGORY(Core, LogPlatformMisc, Info);
 
 /// @brief Miscellaneous platform agnostic function
-class FGenericMisc
+class ENGINE_API FGenericMisc
 {
 public:
     /// @brief Display a simple message box

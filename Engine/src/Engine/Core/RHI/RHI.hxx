@@ -15,17 +15,14 @@ enum class ERHIInterfaceType
     Vulkan,
 };
 
-class FFRHICommandList;
-
 class FGenericRHI;
-
 extern FGenericRHI* GDynamicRHI;
 
 /// @brief This function create the RHI, and must be implemented individually by every RHI
 extern "C" FGenericRHI* RHI_CreateRHI();
 
 /// Wrapper function around the RHI function
-namespace RHI
+namespace ENGINE_API RHI
 {
 
 /// @brief Return the current RHI
@@ -78,4 +75,4 @@ Ref<RRHIGraphicsPipeline> CreateGraphicsPipeline(const FRHIGraphicsPipelineSpeci
 /// Create a new RHI Material - through the current RHI
 Ref<RRHIMaterial> CreateMaterial(const WeakRef<RRHIGraphicsPipeline>& Pipeline);
 
-};    // namespace RHI
+};    // namespace ENGINE_API RHI

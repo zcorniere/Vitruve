@@ -38,7 +38,7 @@ struct StacktraceContent
 static_assert(std::is_trivial<StacktraceContent>::value, "StacktraceContent must be trivial");
 
 /// Generic stacktrace collection
-class FGenericStacktrace
+class ENGINE_API FGenericStacktrace
 {
 public:
     /// @brief Return a stacktrace of the current running process

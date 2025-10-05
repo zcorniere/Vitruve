@@ -9,7 +9,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogBaseApplication, Info)
 
-IApplication* GApplication = nullptr;
+ENGINE_API IApplication* GApplication = nullptr;
 
 FBaseApplication::FBaseApplication()
 {

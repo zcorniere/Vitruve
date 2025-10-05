@@ -84,14 +84,14 @@ FORCEINLINE int EngineLoop()
 }
 
 #ifdef PLATFORM_WINDOWS
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int ENGINE_API WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     (void)hInstance;
     (void)hPrevInstance;
     (void)nShowCmd;
     FCommandLine::Set(lpCmdLine);
 #else
-int main(int ac, char** av)
+int ENGINE_API main(int ac, char** av)
 {
     FCommandLine::Set(ac, av);
 #endif    // !PLATFORM_WINDOWS

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Core/RHI/RHIContext.hxx"
 
 #define ENQUEUE_RENDER_COMMAND(Type)              \
@@ -88,7 +87,7 @@ private:
     std::tuple<std::decay_t<ArgsType>...> Args;
 };
 
-class FFRHICommandList : public FNamedClass
+class ENGINE_API FFRHICommandList : public FNamedClass
 {
 
 public:
@@ -230,7 +229,7 @@ private:
     FRHIRenderCommandBase* m_CommandListTail = nullptr;
 };
 
-class FRHICommandListExecutor
+class ENGINE_API FRHICommandListExecutor
 {
 public:
     static FRHICommandListExecutor& Get()

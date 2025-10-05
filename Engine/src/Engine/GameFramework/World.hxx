@@ -7,7 +7,7 @@ class AActor;
 class RSceneComponent;
 class RRHIScene;
 
-class RWorld : public RObject
+class ENGINE_API RWorld : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RWorld, RObject)
 public:

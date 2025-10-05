@@ -17,11 +17,11 @@ namespace RObjectUtils
 DECLARE_LOGGER_CATEGORY(Core, LogRObject, Warning)
 
 /// Mark the RObject as a live ref
-void AddToLiveReferences(RObject* instance);
+ENGINE_API void AddToLiveReferences(RObject* instance);
 /// Mark the RObject as dead
-void RemoveFromLiveReferences(RObject* instance);
+ENGINE_API void RemoveFromLiveReferences(RObject* instance);
 /// Is the RObject live ?
-bool IsLive(RObject* instance);
+ENGINE_API bool IsLive(RObject* instance);
 
 /// @brief check is there is any live RObject
 /// @return true is a RObject was not deleted
@@ -29,7 +29,7 @@ bool AreThereAnyLiveObject(bool bPrintObjects = true);
 
 }    // namespace RObjectUtils
 
-class FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
+class ENGINE_API FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
 {
     RTTI_DECLARE_TYPEINFO(FNamedClass);
 
@@ -69,7 +69,7 @@ private:
 };
 
 /// Custom Ref Counting class
-class RObject : public FNamedClass
+class ENGINE_API RObject : public FNamedClass
 {
     RTTI_DECLARE_TYPEINFO(RObject, FNamedClass);
 

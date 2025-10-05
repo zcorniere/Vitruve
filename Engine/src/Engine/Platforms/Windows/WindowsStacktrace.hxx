@@ -3,7 +3,7 @@
 #include "Engine/Platforms/PlatformStacktrace.hxx"
 // IWYU pragma: private, include "PlatformStacktrace.hxx"
 
-class FWindowsStacktrace : public FGenericStacktrace
+class ENGINE_API FWindowsStacktrace : public FGenericStacktrace
 {
 public:
     /// @brief Return a stacktrace of the current running process

@@ -4,7 +4,7 @@
 
 #include "Engine/GameFramework/Components/CameraComponent.hxx"
 
-class ACameraActor : public AActor
+class ENGINE_API ACameraActor : public AActor
 {
     RTTI_DECLARE_TYPEINFO(ACameraActor, AActor)
 

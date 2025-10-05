@@ -13,7 +13,7 @@
 #include "Engine/Threading/ThreadRuntime.hxx"
 
 /// Manage a set of thread for scheduling work
-class FThreadPool
+class ENGINE_API FThreadPool
 {
     VIT_NONCOPYABLE(FThreadPool)
 private:

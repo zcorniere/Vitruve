@@ -1,15 +1,15 @@
 #pragma once
 
-struct Memory
+namespace ENGINE_API Memory
 {
-    static void* Malloc(uint32 Size, uint32 Alignment = 0);
-    static void* Realloc(void* Original, uint32 Size, uint32 Alignment = 0);
+void* Malloc(uint32 Size, uint32 Alignment = 0);
+void* Realloc(void* Original, uint32 Size, uint32 Alignment = 0);
 
-    static void Free(void* Ptr);
+void Free(void* Ptr);
 
-    static bool GetAllocationSize(void* Ptr, uint32& OutSize);
-    static const char* GetAllocatorName();
-};
+bool GetAllocationSize(void* Ptr, uint32& OutSize);
+const char* GetAllocatorName();
+};    // namespace ENGINE_API Memory
 
 /// Allocator Interface
 class IMallocInterface
