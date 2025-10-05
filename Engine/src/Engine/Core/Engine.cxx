@@ -5,13 +5,15 @@
 
 #include "Engine/Math/Math.hxx"
 
-uint64 GFrameCounter = 0;
+#include "AssetRegistry/AssetRegistry.hxx"
 
-FEngine* GEngine = nullptr;
+ENGINE_API uint64 GFrameCounter = 0;
+
+ENGINE_API FEngine* GEngine = nullptr;
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 
-FEngine::FEngine()
+FEngine::FEngine(): AssetRegistry(std::make_unique<FAssetRegistry>())
 {
     GEngine = this;
 
@@ -21,7 +23,7 @@ FEngine::FEngine()
         Math::Cross(Math::UpVector, Math::FrontVector));
     check(Math::RightVector == Math::Cross(Math::UpVector, Math::FrontVector));
 
-    const FCPUInformation &CPUInfo = FPlatformMisc::GetCPUInformation();
+    const FCPUInformation& CPUInfo = FPlatformMisc::GetCPUInformation();
     LOG(LogEngine, Info, "Running on {:s} ({:s})", CPUInfo.Vendor, CPUInfo.Brand);
     LOG(LogEngine, Info, "CPU features: ");
     LOG(LogEngine, Info, "- AVX2 is {}available", CPUInfo.AVX2 ? "" : "not ");

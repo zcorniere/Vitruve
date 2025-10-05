@@ -165,7 +165,7 @@ struct TypeInfo
 };
 
 /// Parent type for types at the base of an open RTTI hierarchy
-struct FEnable
+struct ENGINE_API FEnable
 {
     virtual ~FEnable() = default;
 

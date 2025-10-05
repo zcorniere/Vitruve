@@ -1,5 +1,6 @@
 #include "Oscillator.hxx"
 
+#include "AssetRegistry/AssetRegistry.hxx"
 #include "Engine/Core/Engine.hxx"
 
 AOscillator::AOscillator()
@@ -11,15 +12,15 @@ AOscillator::AOscillator()
     Ref<RAsset> UsedAsset;
     if (rand() % 2)
     {
-        UsedAsset = GEngine->AssetRegistry.GetCapsuleAsset();
+        UsedAsset = GEngine->AssetRegistry->GetCapsuleAsset();
     }
     else
     {
-        UsedAsset = GEngine->AssetRegistry.GetCubeAsset();
+        UsedAsset = GEngine->AssetRegistry->GetCubeAsset();
     }
 
     GetMesh()->SetAsset(UsedAsset);
-    GetMesh()->SetMaterial(GEngine->AssetRegistry.GetMaterial("Shape Material"));
+    GetMesh()->SetMaterial(GEngine->AssetRegistry->GetMaterial("Shape Material"));
 }
 
 AOscillator::~AOscillator()

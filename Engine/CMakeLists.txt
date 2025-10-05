@@ -71,7 +71,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VI
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC cpplogger
-           # RHI_Selector
            magic_enum
            glfw
            mimalloc-static
@@ -96,12 +95,14 @@ target_compile_options(
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 target_precompile_headers(
-    ${PROJECT_NAME} PUBLIC "src/Engine/Vitruve.hxx" "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+    ${PROJECT_NAME}
+    PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "src/Engine/Vitruve.hxx"
 )
-force_include_api_macro_header(${PROJECT_NAME} "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx")
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
-target_compile_definitions(${PROJECT_NAME} PRIVATE VITRUVE_ENGINE_EXPORTS)
 target_disable_rtti(${PROJECT_NAME})
 
 if(UNIX)
@@ -127,7 +128,7 @@ build_tests(
     tests/CommandLine.cxx
 )
 target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
-
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 if(VIT_ENABLE_PROFILING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
     if(VIT_ENABLE_MEMORY_PROFILING)
@@ -158,15 +159,14 @@ add_library(
                                          src/AssetRegistry/MeshFactory.cxx
 )
 target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_compile_definitions(${PROJECT_NAME}_AssetRegistry PRIVATE VITRUVE_ENGINE_EXPORTS)
 set_target_properties(${PROJECT_NAME}_AssetRegistry PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
-
+target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETREGISTRY_EXPORTS)
 target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
 target_precompile_headers(
-    ${PROJECT_NAME}_AssetRegistry PUBLIC "src/Engine/Vitruve.hxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx"
-)
-force_include_api_macro_header(
-    ${PROJECT_NAME}_AssetRegistry "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx"
+    ${PROJECT_NAME}_AssetRegistry
+    PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "src/Engine/Vitruve.hxx"
 )
 target_disable_rtti(${PROJECT_NAME}_AssetRegistry)

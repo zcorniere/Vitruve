@@ -2,9 +2,12 @@
 
 #include "Engine/Core/RHI/RHICommandList.hxx"
 #include "Engine/Core/RHI/RHIContext.hxx"
+#include "Engine/Core/RHI/Resources/RHITexture.hxx"
 #include "Engine/GameFramework/Components/CameraComponent.hxx"
 #include "Engine/Math/Transform.hxx"
 #include "Engine/Threading/Lock.hxx"
+
+#include <future>
 
 class RMeshComponent;
 class RWorld;
@@ -74,7 +77,7 @@ private:
     WeakRef<RRHIScene> Scene = nullptr;
 };
 
-class RRHIScene : public RObject
+class ENGINE_API RRHIScene : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RRHIScene, RObject);
 

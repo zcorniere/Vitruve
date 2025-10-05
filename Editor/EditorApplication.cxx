@@ -1,8 +1,10 @@
 #include "EditorApplication.hxx"
 
 #include "Engine/Core/Engine.hxx"
+#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Core/RHI/RHIScene.hxx"
 
+#include "AssetRegistry/AssetRegistry.hxx"
 #include <Engine/Core/Log.hxx>
 #include <Engine/Core/RHI/RHICommandList.hxx>
 #include <Engine/Core/RHI/Resources/RHIViewport.hxx>
@@ -82,7 +84,7 @@ bool EditorApplication::OnEngineInitialization()
     Ref<RRHIGraphicsPipeline> Pipeline = RHI::CreateGraphicsPipeline(Spec);
     Ref<RRHIMaterial> Material = RHI::CreateMaterial(Pipeline);
     Material->SetName("Shape Material");
-    GEngine->AssetRegistry.RegisterMemoryOnlyMaterial(Material);
+    GEngine->AssetRegistry->RegisterMemoryOnlyMaterial(Material);
 
     FRHITextureSpecification DepthTexture = MainViewport->GetBackbuffer()->GetDescription();
     DepthTexture.Format = EImageFormat::D32_SFLOAT;

@@ -11,7 +11,7 @@ PARAMETER(FVector3, Binormal)
 PARAMETER(UVector2, Texcoord)
 END_PARAMETER_STRUCT();
 
-class RAsset : public RObject
+class ASSETREGISTRY_API RAsset : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RAsset, RObject);
 

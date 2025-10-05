@@ -104,7 +104,7 @@ enum class ERenderTargetStoreAction : uint8
 namespace RHI
 {
 
-uint32 GetSizeOfElementType(EVertexElementType Type);
-uint32 GetSizeOfImageFormat(EImageFormat Format);
+uint32 ENGINE_API GetSizeOfElementType(EVertexElementType Type);
+uint32 ENGINE_API GetSizeOfImageFormat(EImageFormat Format);
 
 }    // namespace RHI

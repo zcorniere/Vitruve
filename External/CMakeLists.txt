@@ -13,16 +13,12 @@ set(TRACY_STATIC
     OFF
     CACHE BOOL ""
 )
-set(TRACY_LTO
-    ON
-    CACHE BOOL ""
-)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy EXCLUDE_FROM_ALL)
 
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
 
 add_library(
-    imgui STATIC
+    imgui SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui_draw.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui_widgets.cpp

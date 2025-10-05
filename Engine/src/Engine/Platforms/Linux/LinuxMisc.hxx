@@ -4,7 +4,7 @@
 // IWYU pragma: private, include "FPlatformMisc.hxx"
 
 /// @brief Linux implementation of the IExternalModule interface
-class RLinuxExternalModule : public IExternalModule
+class ENGINE_API RLinuxExternalModule : public IExternalModule
 {
     RTTI_DECLARE_TYPEINFO(RLinuxExternalModule, IExternalModule);
 
@@ -21,7 +21,7 @@ private:
 };
 
 /// @brief Miscellaneous Linux feature
-class FLinuxMisc : public FGenericMisc
+class ENGINE_API FLinuxMisc : public FGenericMisc
 {
 public:
     /// @copydoc GenericMisc::DisplayMessageBox

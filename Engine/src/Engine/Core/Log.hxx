@@ -5,7 +5,7 @@
 extern uint64 GFrameCounter;
 
 /// Class to manage the Log startup and shutdown sequence
-class Log
+class ENGINE_API Log
 {
 public:
     class ColorFormatter

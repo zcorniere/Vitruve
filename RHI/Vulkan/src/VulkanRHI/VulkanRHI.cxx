@@ -19,11 +19,14 @@
 #include "VulkanRHI/VulkanUtils.hxx"
 
 // RHI Creation Implementation
-extern "C" FGenericRHI* RHI_CreateRHI()
+extern "C"
 {
-    VIT_PROFILE_FUNC()
+    VULKAN_RHI_API FGenericRHI* RHI_CreateRHI()
+    {
+        VIT_PROFILE_FUNC()
 
-    return new VulkanRHI::FVulkanDynamicRHI;
+        return new VulkanRHI::FVulkanDynamicRHI;
+    }
 }
 //
 

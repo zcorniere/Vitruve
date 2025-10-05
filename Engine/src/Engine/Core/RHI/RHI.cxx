@@ -5,7 +5,9 @@
 #include "Engine/Core/RHI/RHICommandList.hxx"
 #include "Engine/Core/Window.hxx"
 
-FGenericRHI* GDynamicRHI = nullptr;
+#include "AssetRegistry/AssetRegistry.hxx"
+
+ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
 void RHI::Create()
 {
@@ -14,7 +16,7 @@ void RHI::Create()
 
 void RHI::Destroy()
 {
-    GEngine->AssetRegistry.Purge();
+    GEngine->AssetRegistry->Purge();
 
     RHI::FlushDeletionQueue(false);
     GDynamicRHI->Shutdown();

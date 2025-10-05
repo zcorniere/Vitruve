@@ -5,7 +5,6 @@
 #include "Engine/Core/RHI/RHI.hxx"
 
 #include "Engine/GameFramework/Actor.hxx"
-#include "Engine/GameFramework/CameraActor.hxx"
 #include "Engine/GameFramework/Components/MeshComponent.hxx"
 #include "Engine/GameFramework/World.hxx"
 

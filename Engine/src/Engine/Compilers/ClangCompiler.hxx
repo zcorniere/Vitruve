@@ -21,7 +21,7 @@ static_assert(false, "Clang Compiler header included without compiling with clan
 ///
 /// @brief Wrapper around clang intrinsics function
 ///
-class ClangCompiler : public GenericCompiler
+class ENGINE_API ClangCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,

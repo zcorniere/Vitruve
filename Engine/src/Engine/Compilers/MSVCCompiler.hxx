@@ -28,7 +28,7 @@ static_assert(false, "MSVC Compiler header included without compiling with MSVC"
 ///
 /// @brief Wrapper around MSCV intrinsics functions
 ///
-class MSVCCompiler : public GenericCompiler
+class ENGINE_API MSVCCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,
