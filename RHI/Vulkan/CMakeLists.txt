@@ -1,4 +1,4 @@
-project(VitruveRHIVulkan)
+project(VitruveEngine_VulkanRHI)
 set(CMAKE_FOLDER "Vitruve/RHI/Vulkan")
 
 add_subdirectory(External/)

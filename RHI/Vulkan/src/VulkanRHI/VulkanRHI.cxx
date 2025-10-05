@@ -18,17 +18,28 @@
 #include "VulkanRHI/VulkanShaderCompiler.hxx"
 #include "VulkanRHI/VulkanUtils.hxx"
 
-// RHI Creation Implementation
-extern "C"
+#include "Engine/Core/Memory/Memory.hxx"
+#include "Engine/Modules/ImplementationMacros.hxx"
+#include "Engine/Modules/ModuleInterface.hxx"
+
+class FRHIVulkanModule final : public IRHIModule
 {
-    VULKAN_RHI_API FGenericRHI* RHI_CreateRHI()
+public:
+    virtual void StartupModule() override
+    {
+    }
+
+    virtual void ShutdownModule() override
+    {
+    }
+    virtual FGenericRHI* CreateRHI() override
     {
         VIT_PROFILE_FUNC()
-
         return new VulkanRHI::FVulkanDynamicRHI;
     }
-}
-//
+};
+
+IMPLEMENT_MODULE(FRHIVulkanModule)
 
 static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platform,
                                         TArray<const char*> VulkanExtensions);

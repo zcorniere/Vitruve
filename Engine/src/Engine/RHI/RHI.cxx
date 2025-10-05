@@ -6,26 +6,20 @@
 #include "Engine/RHI/RHICommandList.hxx"
 
 #include "AssetRegistry/AssetRegistry.hxx"
+#include "Engine/Modules/ModuleInterface.hxx"
+#include "Engine/Modules/ModuleManager.hxx"
 
 ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
-static IExternalModule* s_RHIModuleHandle = nullptr;
-
 void RHI::Create()
 {
-    const char* VulkanRHIName = "VitruveRHIVulkan";
-    std::string ModulePath =
-        std::format("{:s}/RHI/Vulkan/{:s}", std::filesystem::current_path().string(), VITRUVE_BUILD_TYPE);
+    FModuleManager::Get().AddDLLSearchPath(std::filesystem::current_path() / "RHI/Vulkan");
+    IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
+    check(ModuleInterface);
 
-#if defined(PLATFORM_WINDOWS)
-    s_RHIModuleHandle = FPlatformMisc::LoadExternalModule(std::format("{}/{:s}.dll", ModulePath, VulkanRHIName));
-#elif defined(PLATFORM_LINUX)
-    s_RHIModuleHandle = FPlatformMisc::LoadExternalModule(std::format("{}/lib{:s}.so", ModulePath, VulkanRHIName));
-#endif
-
-    check(s_RHIModuleHandle->IsValid());
-    FGenericRHI* (*CreateRHI_Funct)() = s_RHIModuleHandle->GetSymbol<FGenericRHI* (*)()>("RHI_CreateRHI");
-    GDynamicRHI = CreateRHI_Funct();
+    IRHIModule* const RHIModuleInterface = ModuleInterface->Cast<IRHIModule>();
+    check(RHIModuleInterface);
+    GDynamicRHI = RHIModuleInterface->CreateRHI();
 }
 
 void RHI::Destroy()
@@ -37,8 +31,8 @@ void RHI::Destroy()
 
     delete GDynamicRHI;
     GDynamicRHI = nullptr;
-    delete s_RHIModuleHandle;
-    s_RHIModuleHandle = nullptr;
+
+    FModuleManager::Get().UnloadModule("VulkanRHI");
 }
 
 void RHI::BeginFrame()

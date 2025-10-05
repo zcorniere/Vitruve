@@ -47,6 +47,7 @@ add_library(
     src/Engine/Core/Memory/Memory.cxx
     src/Engine/Core/Memory/MiMalloc.cxx
     src/Engine/Core/Memory/StdMalloc.cxx
+    src/Engine/Modules/ModuleManager.cxx
     src/Engine/GameFramework/Actor.cxx
     src/Engine/GameFramework/World.cxx
     src/Engine/GameFramework/CameraActor.cxx
