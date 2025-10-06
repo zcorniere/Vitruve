@@ -1,15 +1,15 @@
 #pragma once
 
-namespace ENGINE_API Memory
+namespace  Memory
 {
-void* Malloc(uint32 Size, uint32 Alignment = 0);
-void* Realloc(void* Original, uint32 Size, uint32 Alignment = 0);
+ENGINE_API void* Malloc(uint32 Size, uint32 Alignment = 0);
+ENGINE_API void* Realloc(void* Original, uint32 Size, uint32 Alignment = 0);
 
-void Free(void* Ptr);
+ENGINE_API void Free(void* Ptr);
 
-bool GetAllocationSize(void* Ptr, uint32& OutSize);
-const char* GetAllocatorName();
-};    // namespace ENGINE_API Memory
+ENGINE_API bool GetAllocationSize(void* Ptr, uint32& OutSize);
+ENGINE_API const char* GetAllocatorName();
+};    // namespace Memory
 
 /// Allocator Interface
 class IMallocInterface

@@ -6,7 +6,7 @@
 
 IMallocInterface* GMalloc = 0;
 
-static ENGINE_API void EnsureAllocatorIsSetup()
+static void EnsureAllocatorIsSetup()
 {
     // Note: must manually allocate the memory
     if (!GMalloc) [[unlikely]]

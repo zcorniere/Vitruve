@@ -3,7 +3,7 @@
 #include "Engine/Platforms/PlatformMisc.hxx"
 // IWYU pragma: private, include "FPlatformMisc.hxx"
 
-class ENGINE_API FWindowsExternalModule : public IExternalModule
+class ENGINE_API FWindowsExternalModule final : public IExternalModule
 {
     RTTI_DECLARE_TYPEINFO(FWindowsExternalModule, IExternalModule);
 
@@ -12,6 +12,10 @@ public:
     virtual ~FWindowsExternalModule();
 
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const override;
+    virtual bool IsValid() const override
+    {
+       return ModuleHandle != nullptr;
+    }
 
 private:
     void* ModuleHandle = nullptr;

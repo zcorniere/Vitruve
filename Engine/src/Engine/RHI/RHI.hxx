@@ -18,11 +18,8 @@ enum class ERHIInterfaceType
 class FGenericRHI;
 extern FGenericRHI* GDynamicRHI;
 
-/// @brief This function create the RHI, and must be implemented individually by every RHI
-extern "C" FGenericRHI* RHI_CreateRHI();
-
 /// Wrapper function around the RHI function
-namespace ENGINE_API RHI
+namespace RHI
 {
 
 /// @brief Return the current RHI
