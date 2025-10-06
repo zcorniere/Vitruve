@@ -8,7 +8,7 @@ namespace Utils
 
 /// Read a whole file into a vector of byte.
 template <typename T = std::byte>
-ENGINE_API bool ReadBinaryFile(const std::filesystem::path& filename, TArray<T>& FileContent)
+bool ReadBinaryFile(const std::filesystem::path& filename, TArray<T>& FileContent)
 {
     const size_t fileSize = std::filesystem::file_size(filename);
     std::ifstream file(filename, std::ios::binary);
@@ -25,7 +25,7 @@ ENGINE_API bool ReadBinaryFile(const std::filesystem::path& filename, TArray<T>&
 ENGINE_API std::string ReadFile(const std::filesystem::path& filename);
 
 template <typename T = std::byte>
-ENGINE_API std::size_t WriteBinaryFile(const std::filesystem::path& filename, const std::span<const T>& code)
+std::size_t WriteBinaryFile(const std::filesystem::path& filename, const std::span<const T>& code)
 {
     std::ofstream file(filename, std::ios::binary);
     file.write(reinterpret_cast<const char*>(code.data()), code.size_bytes());

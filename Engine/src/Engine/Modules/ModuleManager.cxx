@@ -108,7 +108,7 @@ void FModuleManager::LoadModuleWithPath(const std::string_view& ModuleName, cons
         }
 
         // Load the library object
-        OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(Entry.path());
+        OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(Entry.path().string());
         if (!OutHolder.LibraryHolder->IsValid())
         {
             OutHolder.State = EModuleState::Error;

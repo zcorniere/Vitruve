@@ -28,7 +28,7 @@ static_assert(false, "MSVC Compiler header included without compiling with MSVC"
 ///
 /// @brief Wrapper around MSCV intrinsics functions
 ///
-class ENGINE_API MSVCCompiler : public GenericCompiler
+class  MSVCCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,
@@ -43,7 +43,7 @@ public:
         __assume(false);
     }
 
-    static std::string Demangle(const std::string_view& name);
+    ENGINE_API static std::string Demangle(const std::string_view& name);
 };
 
 /// Alias of the correct compiler currently used

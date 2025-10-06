@@ -100,6 +100,7 @@ target_precompile_headers(
     PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated/BuildConfig.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+	"${CMAKE_BINARY_DIR}/RHI/Vulkan/generated/VulkanRHI_Export.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
 )

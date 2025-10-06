@@ -1,17 +1,17 @@
 #pragma once
 
-namespace ENGINE_API FCommandLine
+namespace  FCommandLine
 {
 
-const char* Get();
+ENGINE_API const char* Get();
 
-void Set(const char* CommandLine);
-void Set(const int argc, const char* const* const argv);
+ENGINE_API void Set(const char* CommandLine);
+ENGINE_API void Set(const int argc, const char* const* const argv);
 
-void Reset();
+ENGINE_API void Reset();
 
-bool Param(const char* Key);
-bool Parse(const char* Key, int& Value);
-bool Parse(const char* Key, std::string& Value);
+ENGINE_API bool Param(const char* Key);
+ENGINE_API bool Parse(const char* Key, int& Value);
+ENGINE_API bool Parse(const char* Key, std::string& Value);
 
 };    // namespace ENGINE_API FCommandLine
