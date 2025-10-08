@@ -58,6 +58,10 @@ set(GLFW_INSTALL
     OFF
     CACHE INTERNAL "" FORCE
 )
+set(GLFW_LIBRARY_TYPE
+    "SHARED"
+    CACHE STRING "" FORCE
+)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glfw EXCLUDE_FROM_ALL)
 if(VIT_SELECTED_RHI STREQUAL "Vulkan")
     target_link_libraries(glfw INTERFACE Vulkan::Headers)
