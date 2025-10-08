@@ -40,6 +40,7 @@ target_link_libraries(
             Vulkan::UtilityHeaders
             Vulkan::Headers
 )
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
 target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine)
 target_disable_rtti(${PROJECT_NAME})
 
