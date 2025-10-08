@@ -133,9 +133,9 @@ static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ <= 16, "Expecting 16-byte default
 
 #define MODULE_BOILERPLATE UE_DEFINE_FMEMORY_WRAPPERS REPLACEMENT_OPERATOR_NEW_AND_DELETE
 
-#define IMPLEMENT_MODULE(ModuleClass)                      \
-    extern "C" ENGINE_API IModuleInterface* CreateModule() \
-    {                                                      \
-        return new ModuleClass();                          \
-    }                                                      \
+#define IMPLEMENT_MODULE(ExportMacro, ModuleClass)          \
+    extern "C" ExportMacro IModuleInterface* CreateModule() \
+    {                                                       \
+        return new ModuleClass();                           \
+    }                                                       \
     MODULE_BOILERPLATE
