@@ -39,7 +39,7 @@ public:
     }
 };
 
-IMPLEMENT_MODULE(FRHIVulkanModule)
+IMPLEMENT_MODULE(VULKAN_RHI_API, FRHIVulkanModule)
 
 static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platform,
                                         TArray<const char*> VulkanExtensions);
