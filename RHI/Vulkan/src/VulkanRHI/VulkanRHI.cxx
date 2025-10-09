@@ -34,7 +34,6 @@ public:
     }
     virtual FGenericRHI* CreateRHI() override
     {
-        VIT_PROFILE_FUNC()
         return new VulkanRHI::FVulkanDynamicRHI;
     }
 };

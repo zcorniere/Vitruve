@@ -180,6 +180,8 @@ bool FLinuxMisc::BaseAllocator(void* TargetMemory)
 
 IExternalModule* FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
 {
+    VIT_PROFILE_FUNC()
+
     IExternalModule* Module = new FLinuxExternalModule(ModuleName);
     Module->SetName(ModuleName);
     return Module;

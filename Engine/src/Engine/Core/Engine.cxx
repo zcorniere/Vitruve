@@ -41,6 +41,7 @@ bool FEngine::ShouldExit() const
 
 bool FEngine::Initialisation()
 {
+    VIT_PROFILE_FUNC()
     RWindow::EnsureGLFWInit();
 
     m_ThreadPool.Start();

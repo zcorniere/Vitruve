@@ -13,6 +13,8 @@ ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
 void RHI::Create()
 {
+    VIT_PROFILE_FUNC()
+
     FModuleManager::Get().AddDLLSearchPath(std::filesystem::current_path() / "RHI/Vulkan");
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
     check(ModuleInterface);
@@ -24,6 +26,8 @@ void RHI::Create()
 
 void RHI::Destroy()
 {
+    VIT_PROFILE_FUNC()
+
     GEngine->AssetRegistry->Purge();
 
     RHI::FlushDeletionQueue(false);
@@ -46,6 +50,8 @@ void RHI::Tick(float fDeltaTime)
 
 void RHI::EndFrame()
 {
+    VIT_PROFILE_FUNC()
+
     // Run the command list
     RHI::Get()->PostFrame();
 
@@ -69,6 +75,8 @@ void RHI::FlushDeletionQueue(bool bAsync)
     }
     else
     {
+        VIT_PROFILE_FUNC()
+
         RHI::Get()->FlushDeletionQueue();
     }
 }
