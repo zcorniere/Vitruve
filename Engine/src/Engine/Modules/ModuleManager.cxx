@@ -21,6 +21,8 @@ void FModuleManager::AddDLLSearchPath(const std::filesystem::path& Path)
 
 IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
 {
+    VIT_PROFILE_FUNC()
+
     FModuleHolder& Holder = Modules.FindOrAdd(std::string(ModuleName));
     if (Holder.State == EModuleState::Loaded)
     {
@@ -66,6 +68,8 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
 
 void FModuleManager::UnloadModule(const std::string_view& ModuleName)
 {
+    VIT_PROFILE_FUNC()
+
     LOG(LogModuleManager, Info, "Unloading module {:s}", ModuleName);
     TPair<std::string, FModuleHolder> Pair;
     if (!Modules.Remove(std::string(ModuleName), &Pair))
@@ -91,6 +95,8 @@ void FModuleManager::UnloadModule(const std::string_view& ModuleName)
 void FModuleManager::LoadModuleWithPath(const std::string_view& ModuleName, const std::filesystem::path& Path,
                                         FModuleHolder& OutHolder)
 {
+    VIT_PROFILE_FUNC()
+
     const std::string FullPath = std::format("libVitruveEngine_{:s}.{:s}", ModuleName,
 #if defined(PLATFORM_WINDOWS)
                                              "dll"

@@ -159,6 +159,8 @@ bool FWindowsMisc::BaseAllocator(void* TargetMemory)
 
 IExternalModule* FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
 {
+    VIT_PROFILE_FUNC()
+
     IExternalModule* Module = new FWindowsExternalModule(ModuleName);
     Module->SetName(ModuleName);
     return Module;
