@@ -32,8 +32,8 @@ struct TVector<2, T>
     constexpr TVector(T scalar);
     constexpr TVector(const TVector<2, T>& other);
 
-    T& operator[](unsigned index);
-    T operator[](unsigned index) const;
+    constexpr T& operator[](unsigned index);
+    constexpr T operator[](unsigned index) const;
 };
 
 template <typename T>
@@ -60,8 +60,8 @@ struct TVector<3, T>
     constexpr TVector(const TVector<3, T>& other);
     constexpr TVector(const TVector<2, T>& other, T z = 0);
 
-    T& operator[](unsigned index);
-    T operator[](unsigned index) const;
+    constexpr T& operator[](unsigned index);
+    constexpr T operator[](unsigned index) const;
 };
 
 template <typename T>
@@ -90,8 +90,8 @@ struct TVector<4, T>
     constexpr TVector(const TVector<2, T>& other, T z = 0, T w = 0);
     constexpr TVector(const TVector<2, T>& other1, const TVector<2, T>& other2);
 
-    T& operator[](unsigned index);
-    T operator[](unsigned index) const;
+    constexpr T& operator[](unsigned index);
+    constexpr T operator[](unsigned index) const;
 };
 
 // TVector operations
@@ -122,7 +122,7 @@ constexpr bool operator==(const TVector<Size, T>& lhs, const TVector<Size, T>& r
 
 template <unsigned Size, typename T>
 requires std::is_floating_point_v<T>
-void CheckNaN(const TVector<Size, T>& v);
+constexpr void CheckNaN(const TVector<Size, T>& v);
 
 }    // namespace Math
 
