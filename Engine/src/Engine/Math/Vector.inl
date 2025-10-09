@@ -1,3 +1,6 @@
+#pragma once
+#include "Vector.hxx"
+
 namespace Math
 {
 
@@ -28,14 +31,14 @@ constexpr TVector<2, T>::TVector(const TVector<2, T>& other): x(other.x)
 }
 
 template <typename T>
-T& TVector<2, T>::operator[](unsigned index)
+constexpr T& TVector<2, T>::operator[](unsigned index)
 {
     assert(index < 2);
     return data[index];
 }
 
 template <typename T>
-T TVector<2, T>::operator[](unsigned index) const
+constexpr T TVector<2, T>::operator[](unsigned index) const
 {
     assert(index < 2);
     return data[index];
@@ -79,14 +82,14 @@ constexpr TVector<3, T>::TVector(const TVector<2, T>& other, T z): x(other.x)
 }
 
 template <typename T>
-T& TVector<3, T>::operator[](unsigned index)
+constexpr T& TVector<3, T>::operator[](unsigned index)
 {
     assert(index < 3);
     return data[index];
 }
 
 template <typename T>
-T TVector<3, T>::operator[](unsigned index) const
+constexpr T TVector<3, T>::operator[](unsigned index) const
 {
     assert(index < 3);
     return data[index];
@@ -151,14 +154,14 @@ constexpr TVector<4, T>::TVector(const TVector<2, T>& other1, const TVector<2, T
 }
 
 template <typename T>
-T& TVector<4, T>::operator[](unsigned index)
+constexpr T& TVector<4, T>::operator[](unsigned index)
 {
     assert(index < 4);
     return data[index];
 }
 
 template <typename T>
-T TVector<4, T>::operator[](unsigned index) const
+constexpr T TVector<4, T>::operator[](unsigned index) const
 {
     assert(index < 4);
     return data[index];
@@ -268,7 +271,7 @@ constexpr bool operator==(const TVector<Size, T>& lhs, const TVector<Size, T>& r
 
 template <unsigned Size, typename T>
 requires std::is_floating_point_v<T>
-void CheckNaN(const TVector<Size, T>& v)
+constexpr void CheckNaN(const TVector<Size, T>& v)
 {
 #if VIT_NAN_CHECKS
     for (unsigned i = 0; i < Size; i++)

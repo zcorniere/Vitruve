@@ -1,3 +1,4 @@
+#pragma once
 #include "Quaternion.hxx"
 
 namespace Math
@@ -142,7 +143,7 @@ constexpr TQuaternion<T> operator*(const TQuaternion<T>& lhs, const TQuaternion<
 }
 
 template <typename T>
-void CheckNaN(const TQuaternion<T>& q)
+constexpr void CheckNaN(const TQuaternion<T>& q)
 {
 #if VIT_NAN_CHECKS
     ensureAlwaysMsg(!std::isnan(q.x) && !std::isnan(q.y) && !std::isnan(q.z) && !std::isnan(q.w),

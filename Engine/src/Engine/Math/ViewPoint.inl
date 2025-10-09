@@ -1,8 +1,11 @@
+#pragma once
+#include "ViewPoint.hxx"
+
 namespace Math
 {
 
 template <typename T>
-void TViewPoint<T>::ComputeProjectionMatrix()
+constexpr void TViewPoint<T>::ComputeProjectionMatrix()
 {
     ensureAlways(m_AspectRatio != 0.0f);
     const T tanHalfFOV = std::tan(m_FOV / T(2));
@@ -20,7 +23,7 @@ void TViewPoint<T>::ComputeProjectionMatrix()
 }
 
 template <typename T>
-void TViewPoint<T>::ComputeViewMatrix(const TTransform<T>& InTransform)
+constexpr void TViewPoint<T>::ComputeViewMatrix(const TTransform<T>& InTransform)
 {
     TMatrix4<T> RotationMatrix = InTransform.GetRotationMatrix();
 
@@ -44,7 +47,7 @@ void TViewPoint<T>::ComputeViewMatrix(const TTransform<T>& InTransform)
 }
 
 template <typename T>
-void CheckNan(const TViewPoint<T>& Value)
+constexpr void CheckNan(const TViewPoint<T>& Value)
 {
     ensureAlwaysMsg(!std::isnan(Value.m_FOV), "NaN detected in ViewPoint<{}> FOV", RTTI::TypeName<T>());
     ensureAlwaysMsg(!std::isnan(Value.m_AspectRatio), "NaN detected in ViewPoint<{}> AspectRatio", RTTI::TypeName<T>());

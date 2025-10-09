@@ -41,7 +41,7 @@ template <typename T>
 constexpr bool operator==(const TQuaternion<T>& lhs, const TQuaternion<T>& rhs);
 
 template <typename T>
-void CheckNaN(const TQuaternion<T>& q);
+constexpr void CheckNaN(const TQuaternion<T>& q);
 
 }    // namespace Math
 
