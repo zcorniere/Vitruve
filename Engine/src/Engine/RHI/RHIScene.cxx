@@ -363,12 +363,10 @@ void RRHIScene::Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch)
                 continue;
             }
 
+            // Update the transform resource array
+            TransformResourceArray.FindOrAdd(Mesh.Mesh->Asset->ID())[Mesh.TransformBufferIndex] = Batch.MatrixArray[i];
             Mesh.Transform.ModelMatrix = Batch.MatrixArray[i];
             Mesh.Transform.bModelMatrixDirty = false;
-
-            // Update the transform resource array
-            TransformResourceArray.FindOrAdd(Mesh.Mesh->Asset->ID())[Mesh.TransformBufferIndex] =
-                Mesh.Transform.GetModelMatrix();
 
             i++;
         }
