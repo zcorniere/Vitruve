@@ -24,7 +24,6 @@ RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandConte
 
     // Register to the world events
     OwnerWorld->OnActorAddedToWorld.Add(
-        this,
         [this](AActor* Actor) mutable
         {
             TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
@@ -51,7 +50,6 @@ RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandConte
         });
 
     OwnerWorld->OnActorRemovedFromWorld.Add(
-        this,
         [this](AActor* Actor) mutable
         {
             TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
