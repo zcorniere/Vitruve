@@ -31,7 +31,8 @@ generate_build_config_header(
     "${CMAKE_SOURCE_DIR}/cmake/BuildConfig.hxx.in"
 )
 add_library(
-    ${PROJECT_NAME} SHARED
+    ${PROJECT_NAME}
+    ${VIT_LIBRARY_TYPE}
     src/Engine/Main.cxx
     src/Engine/Core/Log.cxx
     src/Engine/Core/UUID.cxx
@@ -100,7 +101,7 @@ target_precompile_headers(
     PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/generated/BuildConfig.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
-	"${CMAKE_BINARY_DIR}/RHI/Vulkan/generated/VulkanRHI_Export.hxx"
+    "${CMAKE_BINARY_DIR}/RHI/Vulkan/generated/VulkanRHI_Export.hxx"
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
 )
@@ -130,27 +131,37 @@ else()
     message(STATUS "VIT - NaN checks disabled")
 endif(VIT_NAN_CHECKS)
 
-# ---------- Asset Registry Module ----------
+# Link to the RHI or at least mark it as a dependency
+if(VIT_COMPILE_MONOLITHIC)
+    target_sources(
+        ${PROJECT_NAME} PRIVATE src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
+                                src/AssetRegistry/MeshFactory.cxx
+    )
+else()
+    # ---------- Asset Registry Module ----------
 
-set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
-generate_export_header(ASSETREGISTRY_API ${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx)
-add_library(
-    ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
-                                         src/AssetRegistry/MeshFactory.cxx
-)
-target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-set_target_properties(${PROJECT_NAME}_AssetRegistry PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
-target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETREGISTRY_EXPORTS)
-target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
-target_precompile_headers(
-    ${PROJECT_NAME}_AssetRegistry
-    PRIVATE
-    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
-    "src/Engine/Vitruve.hxx"
-)
-target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
+    set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
+    generate_export_header(ASSETREGISTRY_API ${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx)
+    add_library(
+        ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
+                                             src/AssetRegistry/MeshFactory.cxx
+    )
+    target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+    set_target_properties(
+        ${PROJECT_NAME}_AssetRegistry PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1
+    )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETREGISTRY_EXPORTS)
+    target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
+    target_precompile_headers(
+        ${PROJECT_NAME}_AssetRegistry
+        PRIVATE
+        "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
+        "${CMAKE_CURRENT_BINARY_DIR}/generated/EngineExport.hxx"
+        "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+        "src/Engine/Vitruve.hxx"
+    )
+    target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
+endif()
 
 # ------------- Tests -------------
 
@@ -178,4 +189,7 @@ target_precompile_headers(
     "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
 )
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm ${PROJECT_NAME}_AssetRegistry)
+target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
+if(NOT VIT_COMPILE_MONOLITHIC)
+    target_link_libraries(${PROJECT_NAME}_Test PRIVATE ${PROJECT_NAME}_AssetRegistry)
+endif(NOT VIT_COMPILE_MONOLITHIC)

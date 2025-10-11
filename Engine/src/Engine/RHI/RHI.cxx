@@ -11,10 +11,18 @@
 
 ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
+#if VIT_COMPILE_MONOLITHIC
+extern FGenericRHI* CreateRHI();
+#endif    // VIT_COMPILE_MONOLITHIC
+
 void RHI::Create()
 {
     VIT_PROFILE_FUNC()
 
+#if VIT_COMPILE_MONOLITHIC
+
+    GDynamicRHI = CreateRHI();
+#else
     FModuleManager::Get().AddDLLSearchPath(std::filesystem::current_path() / "RHI/Vulkan");
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
     check(ModuleInterface);
@@ -22,6 +30,7 @@ void RHI::Create()
     IRHIModule* const RHIModuleInterface = ModuleInterface->Cast<IRHIModule>();
     check(RHIModuleInterface);
     GDynamicRHI = RHIModuleInterface->CreateRHI();
+#endif    // VIT_COMPILE_MONOLITHIC
 }
 
 void RHI::Destroy()
@@ -36,7 +45,9 @@ void RHI::Destroy()
     delete GDynamicRHI;
     GDynamicRHI = nullptr;
 
+#if !VIT_COMPILE_MONOLITHIC
     FModuleManager::Get().UnloadModule("VulkanRHI");
+#endif    // VIT_COMPILE_MONOLITHIC
 }
 
 void RHI::BeginFrame()

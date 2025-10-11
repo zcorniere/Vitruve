@@ -16,8 +16,8 @@ file(
 generate_export_header(VULKAN_RHI_API "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx")
 
 add_library(
-    ${PROJECT_NAME} SHARED EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES} # Compile the imgui vulkan backend #
-                                            ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
+    ${PROJECT_NAME} ${VIT_LIBRARY_TYPE} EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES} # Compile the imgui vulkan backend #
+                    ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_precompile_headers(

@@ -2,8 +2,15 @@ project(VitruveEditor)
 set(CMAKE_FOLDER "Vitruve")
 
 add_executable(${PROJECT_NAME} EditorApplication.cxx Actor/Oscillator.cxx)
-add_dependencies(${PROJECT_NAME} VitruveEngine_VulkanRHI)
-target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine VitruveEngine_AssetRegistry imgui)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine imgui)
+if(NOT VIT_COMPILE_MONOLITHIC)
+    target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine_VulkanRHI)
+    target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine_AssetRegistry)
+else()
+    add_dependencies(${PROJECT_NAME} VitruveEngine_VulkanRHI)
+endif(NOT VIT_COMPILE_MONOLITHIC)
+
 target_precompile_headers(
     ${PROJECT_NAME}
     PRIVATE
