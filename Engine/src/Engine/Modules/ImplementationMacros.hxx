@@ -131,7 +131,11 @@ static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ <= 16, "Expecting 16-byte default
         FMemory_Free(Ptr);                                                                                      \
     }
 
-#define MODULE_BOILERPLATE UE_DEFINE_FMEMORY_WRAPPERS REPLACEMENT_OPERATOR_NEW_AND_DELETE
+#if VIT_COMPILE_MONOLITHIC
+    #define MODULE_BOILERPLATE
+#else
+    #define MODULE_BOILERPLATE UE_DEFINE_FMEMORY_WRAPPERS REPLACEMENT_OPERATOR_NEW_AND_DELETE
+#endif    // VIT_COMPILE_MONOLITHIC
 
 #define IMPLEMENT_MODULE(ExportMacro, ModuleClass)          \
     extern "C" ExportMacro IModuleInterface* CreateModule() \
