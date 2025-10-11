@@ -92,6 +92,38 @@ else()
     message(STATUS "VIT - Compiling as modular")
 endif(VIT_COMPILE_MONOLITHIC)
 
+function(vit_set_standard_options target)
+    target_disable_rtti(${target})
+    target_compile_features(${target} PUBLIC cxx_std_23)
+    target_compile_definitions(${target} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
+    if(WIN32)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+    endif(WIN32)
+    target_compile_options(
+        ${target}
+        PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+                -Wall
+                -Wextra
+                -Wno-missing-field-initializers>
+                $<$<CXX_COMPILER_ID:MSVC>:
+                /Zc:preprocessor
+                /W4
+                /wd4267 # conversion from 'size_t' to 'T', possible loss of data
+                /wd4244 # conversion from 'T' to 'T', possible loss of data
+                /wd4201 # unamed union
+                /wd4324 # structure was padded due to alignment specifier
+                /wd4702 # unreachable code
+                /wd5030> # unknown attribute
+    )
+    set_target_properties(${target} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
+    if(OPTIMIZE_FOR_NATIVE)
+        target_compile_options(${target} PUBLIC -march=native)
+    endif(OPTIMIZE_FOR_NATIVE)
+    if(VIT_ENABLE_PROFILING)
+        target_link_libraries(${target} PUBLIC Tracy::TracyClient)
+    endif(VIT_ENABLE_PROFILING)
+endfunction(vit_set_standard_options)
+
 add_subdirectory(External/)
 add_subdirectory(Engine/)
 add_subdirectory(Editor/)
