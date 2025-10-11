@@ -3,6 +3,13 @@ set(CMAKE_FOLDER "Vitruve/Engine")
 
 add_subdirectory(External/)
 
+option(VIT_NAN_CHECKS "Enable NaN checks in the engine" ON)
+if(VIT_NAN_CHECKS)
+    message(STATUS "VIT - NaN checks enabled")
+else()
+    message(STATUS "VIT - NaN checks disabled")
+endif(VIT_NAN_CHECKS)
+
 if(WIN32)
     file(GLOB PLATFORM_SOURCE_FILES src/Engine/Platforms/Windows/*.cxx)
 elseif(UNIX)
@@ -67,8 +74,7 @@ add_library(
     ${PLATFORM_SOURCE_FILES}
     ${COMPILER_SOURCE_FILE}
 )
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
+vit_set_standard_options(${PROJECT_NAME})
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC cpplogger
@@ -78,24 +84,7 @@ target_link_libraries(
            ModernDialogs
 )
 
-target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-            -Wall
-            -Wextra
-            -Wno-missing-field-initializers>
-            $<$<CXX_COMPILER_ID:MSVC>:
-            /Zc:preprocessor
-            /W4
-            /wd4267 # conversion from 'size_t' to 'T', possible loss of data
-            /wd4244 # conversion from 'T' to 'T', possible loss of data
-            /wd4201 # unamed union
-            /wd4324 # structure was padded due to alignment specifier
-            /wd4702 # unreachable code
-            /wd5030> # unknown attribute
-)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_compile_definitions(${PROJECT_NAME} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
 target_precompile_headers(
     ${PROJECT_NAME}
     PRIVATE
@@ -106,30 +95,13 @@ target_precompile_headers(
     "src/Engine/Vitruve.hxx"
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
-target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
-target_disable_rtti(${PROJECT_NAME})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 
 if(UNIX)
     target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
 elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
 endif()
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
-if(VIT_ENABLE_PROFILING)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
-endif(VIT_ENABLE_PROFILING)
-
-if(OPTIMIZE_FOR_NATIVE)
-    target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
-endif()
-
-option(VIT_NAN_CHECKS "Enable NaN checks in the engine" ON)
-if(VIT_NAN_CHECKS)
-    message(STATUS "VIT - NaN checks enabled")
-else()
-    message(STATUS "VIT - NaN checks disabled")
-endif(VIT_NAN_CHECKS)
 
 # Link to the RHI or at least mark it as a dependency
 if(VIT_COMPILE_MONOLITHIC)
@@ -139,17 +111,14 @@ if(VIT_COMPILE_MONOLITHIC)
     )
 else()
     # ---------- Asset Registry Module ----------
-
     set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
     generate_export_header(ASSETREGISTRY_API ${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx)
     add_library(
         ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
                                              src/AssetRegistry/MeshFactory.cxx
     )
+    vit_set_standard_options(${PROJECT_NAME}_AssetRegistry)
     target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-    set_target_properties(
-        ${PROJECT_NAME}_AssetRegistry PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1
-    )
     target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETREGISTRY_EXPORTS)
     target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
     target_precompile_headers(
@@ -160,7 +129,6 @@ else()
         "${CMAKE_CURRENT_BINARY_DIR}/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
         "src/Engine/Vitruve.hxx"
     )
-    target_disable_rtti(${PROJECT_NAME}_AssetRegistry)
 endif()
 
 # ------------- Tests -------------
