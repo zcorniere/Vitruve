@@ -1,12 +1,15 @@
-function(generate_export_header macro_name output_path)
+function(generate_export_header macro_name)
     # Compose the define name from macro_name
+    string(APPEND macro_name "_API")
     string(REPLACE "_API" "_EXPORTS" macro_define "${macro_name}")
 
     # Use set_property to cache the values for configure_file
     set(EXPORT_MACRO "${macro_name}")
     set(EXPORT_DEFINE "${macro_define}")
 
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/EngineExport.hxx.in" "${output_path}" @ONLY)
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/cmake/LibraryExport.h.in" "${CMAKE_BINARY_DIR}/generated/${macro_name}_Export.h" @ONLY
+    )
 endfunction(generate_export_header)
 
 function(generate_build_config_header)

@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.31)
 project(Vitruve)
 
+# Require out-of-source builds
+file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
+if(EXISTS "${LOC_PATH}")
+    message(
+        FATAL_ERROR
+            "You cannot build in a source directory (or any directory with a CMakeLists.txt file). Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles."
+    )
+endif()
+
 option(BUILD_TESTING "Build the unit tests" ON)
 
 include(CheckIPOSupported)
@@ -92,9 +101,26 @@ else()
     message(STATUS "VIT - Compiling as modular")
 endif(VIT_COMPILE_MONOLITHIC)
 
-function(vit_set_standard_options target)
+# Purge the generated files and regenerate them
+file(REMOVE "${CMAKE_BINARY_DIR}/generated/*")
+generate_build_config_header(
+    OUTPUT_PATH
+    "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
+    VERSION
+    "0.0.1"
+    TEMPLATE
+    "${CMAKE_SOURCE_DIR}/cmake/BuildConfig.h.in"
+)
+
+function(vit_set_standard_options target precompile_header)
     target_disable_rtti(${target})
     target_compile_features(${target} PUBLIC cxx_std_23)
+    set_target_properties(
+        ${target}
+        PROPERTIES CXX_STANDARD 23
+                   CXX_STANDARD_REQUIRED YES
+                   CXX_EXTENSIONS NO
+    )
     target_compile_definitions(${target} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
     if(WIN32)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
@@ -122,6 +148,10 @@ function(vit_set_standard_options target)
     if(VIT_ENABLE_PROFILING)
         target_link_libraries(${target} PUBLIC Tracy::TracyClient)
     endif(VIT_ENABLE_PROFILING)
+
+    # #TOCHECK: does cmake actually grab the generated headers even if the line to generated them is later ?
+    file(GLOB GENERATED_HEADERS "${CMAKE_BINARY_DIR}/generated/*.h")
+    target_precompile_headers(${target} PRIVATE ${GENERATED_HEADERS} ${precompile_header})
 endfunction(vit_set_standard_options)
 
 add_subdirectory(External/)

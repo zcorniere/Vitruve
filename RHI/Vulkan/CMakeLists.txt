@@ -13,23 +13,14 @@ file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VulkanRHI/RenderPass/*.cxx
 )
 
-generate_export_header(VULKAN_RHI_API "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx")
+generate_export_header(VULKAN_RHI)
 
 add_library(
     ${PROJECT_NAME} ${VIT_LIBRARY_TYPE} EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES} # Compile the imgui vulkan backend #
                     ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
 )
-vit_set_standard_options(${PROJECT_NAME})
+vit_set_standard_options(${PROJECT_NAME} "VulkanRHI.pch.hxx")
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_precompile_headers(
-    ${PROJECT_NAME}
-    PRIVATE
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx"
-    "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
-    "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
-    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
-    "VulkanRHI.pch.hxx"
-)
 target_compile_definitions(${PROJECT_NAME} PRIVATE VULKAN_RHI_EXPORTS)
 target_link_libraries(
     ${PROJECT_NAME}
@@ -55,9 +46,9 @@ target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
 target_precompile_headers(
     ${PROJECT_NAME}_Test
     PRIVATE
-    "${CMAKE_BINARY_DIR}/Engine/generated/BuildConfig.hxx"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/VulkanRHI_Export.hxx"
-    "${CMAKE_BINARY_DIR}/Engine/generated/EngineExport.hxx"
-    "${CMAKE_BINARY_DIR}/Engine/generated/AssetRegistryExport.hxx" # TODO: try to make it automagically
+    "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
+    "${CMAKE_BINARY_DIR}/generated/VULKAN_RHI_API_Export.h"
+    "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
+    "${CMAKE_BINARY_DIR}/generated/ASSETREGISTRY_API_Export.h" # TODO: try to make it automagically
     "VulkanRHI.pch.hxx"
 )
