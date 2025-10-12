@@ -107,3 +107,11 @@ extern "C" IApplication* GetApplication()
 {
     return nullptr;
 }
+
+#if VIT_COMPILE_MONOLITHIC
+class FGenericRHI;
+FGenericRHI* CreateRHI()
+{
+    return nullptr;
+}
+#endif
