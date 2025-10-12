@@ -1,6 +1,6 @@
 #pragma once
 
-namespace  Memory
+namespace Memory
 {
 ENGINE_API void* Malloc(uint32 Size, uint32 Alignment = 0);
 ENGINE_API void* Realloc(void* Original, uint32 Size, uint32 Alignment = 0);
@@ -56,15 +56,14 @@ public:
         (void)hint;
         if (Size == 0)
             return nullptr;
-        if (Size > std::numeric_limits<std::size_t>::max() / sizeof(T))
-            throw std::bad_array_new_length();
+        assert(Size < std::numeric_limits<std::size_t>::max() / sizeof(T));
 
         if (T* p = static_cast<T*>(Memory::Malloc(Size * sizeof(T))))
         {
             return p;
         }
 
-        throw std::bad_alloc();
+        assert(false && "FAllocator: Failed to allocate memory");
     }
 
     /// @brief Deallocate the given memory pointer
