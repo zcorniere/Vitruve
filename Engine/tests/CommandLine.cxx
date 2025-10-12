@@ -44,22 +44,22 @@ TEST_CASE("Delegates")
 
     SECTION("Simple lambda")
     {
-        int bCalled = false;
+        int Called = false;
         Delegate.Add(
-            [&bCalled](int Value)
+            [&Called](int Value)
             {
-                bCalled += 1;
+                Called += 1;
                 REQUIRE(Value == 42);
             });
         Delegate.Add(
-            [&bCalled](int Value)
+            [&Called](int Value)
             {
-                bCalled += 1;
+                Called += 1;
                 REQUIRE(Value == 42);
             });
 
         Delegate.Broadcast(42);
-        REQUIRE(bCalled);
+        REQUIRE(Called == 2);
     }
 
     SECTION("Member function")
