@@ -18,3 +18,5 @@ public:
 private:
     Ref<RWorld> World;
 };
+
+IApplication* CreateApplication();
