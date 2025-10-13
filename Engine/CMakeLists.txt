@@ -29,6 +29,7 @@ else()
 endif()
 
 generate_export_header(ENGINE)
+
 add_library(
     ${PROJECT_NAME}
     ${VIT_LIBRARY_TYPE}
@@ -63,6 +64,9 @@ add_library(
     src/Engine/Math/SIMD/Transform_double.cxx
     src/Engine/Threading/Thread.cxx
     src/Engine/Threading/ThreadPool.cxx
+    src/AssetRegistry/AssetRegistry.cxx
+    src/AssetRegistry/Asset.cxx
+    src/AssetRegistry/MeshFactory.cxx
     ${PLATFORM_SOURCE_FILES}
     ${COMPILER_SOURCE_FILE}
 )
@@ -84,26 +88,6 @@ if(UNIX)
     target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
 elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
-endif()
-
-# Link to the RHI or at least mark it as a dependency
-if(VIT_COMPILE_MONOLITHIC)
-    target_sources(
-        ${PROJECT_NAME} PRIVATE src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
-                                src/AssetRegistry/MeshFactory.cxx
-    )
-else()
-    # ---------- Asset Registry Module ----------
-    set(CMAKE_FOLDER "Vitruve/Engine/AssetRegistry")
-    generate_export_header(ASSETREGISTRY)
-    add_library(
-        ${PROJECT_NAME}_AssetRegistry SHARED src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
-                                             src/AssetRegistry/MeshFactory.cxx
-    )
-    vit_set_standard_options(${PROJECT_NAME}_AssetRegistry "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
-    target_include_directories(${PROJECT_NAME}_AssetRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETREGISTRY_EXPORTS)
-    target_link_libraries(${PROJECT_NAME}_AssetRegistry PUBLIC ${PROJECT_NAME})
 endif()
 
 # ------------- Tests -------------
@@ -129,7 +113,6 @@ target_precompile_headers(
     PRIVATE
     "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
     "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
-    "${CMAKE_BINARY_DIR}/generated/ASSETREGISTRY_API_Export.h" # TODO: try to make it automagically
     "src/Engine/Vitruve.hxx"
 )
 target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)

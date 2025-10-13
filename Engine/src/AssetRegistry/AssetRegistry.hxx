@@ -2,13 +2,12 @@
 
 #include "AssetRegistry/Asset.hxx"
 
-class ASSETREGISTRY_API FAssetRegistry
+class  FAssetRegistry
 {
 public:
     FAssetRegistry();
 
     Ref<RAsset> LoadAsset(const std::filesystem::path& Path);
-
     Ref<RAsset> RegisterMemoryOnlyAsset(Ref<RAsset>& Asset);
     Ref<RRHIMaterial> RegisterMemoryOnlyMaterial(Ref<RRHIMaterial>& Material);
 
@@ -18,7 +17,6 @@ public:
     Ref<RRHIMaterial> GetMaterialByID(uint64 ID) const;
 
     void UnloadAsset(const std::string& Name);
-
     void Purge();
 
     Ref<RAsset> GetCubeAsset() const

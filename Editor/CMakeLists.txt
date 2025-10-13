@@ -6,7 +6,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine imgui)
 if(VIT_COMPILE_MONOLITHIC)
     target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine_VulkanRHI)
 else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine_AssetRegistry)
     add_dependencies(${PROJECT_NAME} VitruveEngine_VulkanRHI)
 endif()
 

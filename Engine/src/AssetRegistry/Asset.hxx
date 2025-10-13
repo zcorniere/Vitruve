@@ -3,6 +3,7 @@
 #include "Engine/Containers/ResourceArray.hxx"
 #include "Engine/RHI/Resources/RHIBuffer.hxx"
 
+
 BEGIN_UNALIGNED_PARAMETER_STRUCT(FVertex)
 PARAMETER(FVector3, Position)
 PARAMETER(FVector3, Normal)
@@ -11,7 +12,7 @@ PARAMETER(FVector3, Binormal)
 PARAMETER(UVector2, Texcoord)
 END_PARAMETER_STRUCT();
 
-class ASSETREGISTRY_API RAsset : public RObject
+class RAsset : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RAsset, RObject);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AssetRegistry/AssetRegistry_Forward.hxx"
+#include "AssetRegistry/AssetRegistry.hxx"
 #include "Engine/GameFramework/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
 

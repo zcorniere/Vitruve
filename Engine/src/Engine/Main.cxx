@@ -13,7 +13,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 
-extern "C" IApplication* GetApplication();
+extern "C"  IApplication* GetApplication();
 
 FORCEINLINE int EngineLoop()
 {
@@ -85,7 +85,7 @@ FORCEINLINE int EngineLoop()
 }
 
 #ifdef PLATFORM_WINDOWS
-int ENGINE_API WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     (void)hInstance;
     (void)hPrevInstance;

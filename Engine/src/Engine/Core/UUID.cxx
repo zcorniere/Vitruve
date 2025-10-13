@@ -2,9 +2,9 @@
 
 #include <random>
 
-static ENGINE_API std::random_device s_RandomDevice;
-static ENGINE_API std::mt19937_64 eng(s_RandomDevice());
-static ENGINE_API std::uniform_int_distribution<uint64> s_UniformDistribution;
+ENGINE_API std::random_device s_RandomDevice;
+ENGINE_API std::mt19937_64 eng(s_RandomDevice());
+ENGINE_API std::uniform_int_distribution<uint64> s_UniformDistribution;
 
 namespace Vitruve
 {

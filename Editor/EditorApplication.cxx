@@ -139,7 +139,7 @@ void EditorApplication::Tick(const double DeltaTime)
 }
 
 // Not really extern "C" but I use it to mark that this function will be called by an external unit
-extern "C" ENGINE_API IApplication* GetApplication()
+extern "C" IApplication* GetApplication()
 {
     return new EditorApplication();
 }

@@ -35,10 +35,7 @@ class ENGINE_API FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
 
 public:
     FNamedClass() = default;
-    FNamedClass(const std::string_view& InName): m_Name(InName)
-    {
-    }
-    virtual ~FNamedClass() = default;
+    explicit FNamedClass(const std::string_view& InName);
 
     /// Give the object a debug name
     template <typename... ArgsTypes>
@@ -47,22 +44,13 @@ public:
         std::string NewName = std::format(std::move(InFormat), std::forward<ArgsTypes>(InArgs)...);
         SetName(NewName);
     }
-    virtual void SetName(std::string_view InName)
-    {
-        m_Name = InName;
-    }
+    virtual void SetName(std::string_view InName);
 
     /// Return the debug name of the object
-    const std::string& GetName() const
-    {
-        return m_Name;
-    }
+    [[nodiscard]] const std::string& GetName() const;
 
     /// Return a string representing the Object
-    virtual std::string ToString() const
-    {
-        return std::format("(\"{:s}\" <{:s}> {:p})", GetName(), GetBaseTypeName(), (void*)this);
-    }
+    [[nodiscard]] virtual std::string ToString() const;
 
 private:
     std::string m_Name = "Unnamed";
@@ -119,7 +107,7 @@ template <typename T>
 class Ref
 {
 public:
-    /// @brief Create a new RObject and give it is name
+    /// @brief Create a new RObject and give it his name
     /// @return the new RObject
     template <typename... Args>
     FORCEINLINE static Ref<T> CreateNamed(std::string_view Name, Args&&... args)
@@ -158,7 +146,7 @@ public:
 
     Ref(T* Object): m_ObjPtr(Object)
     {
-        static_assert(std::is_base_of<RObject, T>::value, "Class is not RefCounted!");
+        static_assert(std::is_base_of_v<RObject, T>, "Class is not RefCounted!");
 
         IncrementRefCount();
     }
