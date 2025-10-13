@@ -15,10 +15,8 @@ file(
 
 generate_export_header(VULKAN_RHI)
 
-add_library(
-    ${PROJECT_NAME} ${VIT_LIBRARY_TYPE} EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES} # Compile the imgui vulkan backend #
-                    ${CMAKE_SOURCE_DIR}/External/imgui/backends/imgui_impl_vulkan.cpp
-)
+add_library(${PROJECT_NAME} ${VIT_LIBRARY_TYPE} EXCLUDE_FROM_ALL ${VULKAN_RENDERER_FILES})
+
 vit_set_standard_options(${PROJECT_NAME} "VulkanRHI.pch.hxx")
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(${PROJECT_NAME} PRIVATE VULKAN_RHI_EXPORTS)
@@ -49,6 +47,5 @@ target_precompile_headers(
     "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
     "${CMAKE_BINARY_DIR}/generated/VULKAN_RHI_API_Export.h"
     "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
-    "${CMAKE_BINARY_DIR}/generated/ASSETREGISTRY_API_Export.h" # TODO: try to make it automagically
     "VulkanRHI.pch.hxx"
 )
