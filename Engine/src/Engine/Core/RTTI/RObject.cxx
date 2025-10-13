@@ -43,3 +43,23 @@ bool RObjectUtils::AreThereAnyLiveObject(bool bPrintObjects)
     }
     return s_LiveReferences.size() > 0;
 }
+
+
+FNamedClass::FNamedClass(const std::string_view& InName): m_Name(InName)
+{
+}
+
+void FNamedClass::SetName(std::string_view InName)
+{
+    m_Name = InName;
+}
+
+const std::string& FNamedClass::GetName() const
+{
+    return m_Name;
+}
+
+std::string FNamedClass::ToString() const
+{
+    return std::format("(\"{:s}\" <{:s}> {:p})", GetName(), GetBaseTypeName(), (void*)this);
+}
