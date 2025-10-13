@@ -7,9 +7,8 @@
 
 #include "AssetRegistry/AssetRegistry.hxx"
 
-uint64 GFrameCounter = 0;
-
-FEngine* GEngine = nullptr;
+ENGINE_API uint64 GFrameCounter = 0;
+ENGINE_API FEngine* GEngine = nullptr;
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 

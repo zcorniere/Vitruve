@@ -9,11 +9,7 @@
 #include "Engine/Modules/ModuleInterface.hxx"
 #include "Engine/Modules/ModuleManager.hxx"
 
-FGenericRHI* GDynamicRHI = nullptr;
-
-#if VIT_COMPILE_MONOLITHIC
-extern FGenericRHI* CreateRHI();
-#endif    // VIT_COMPILE_MONOLITHIC
+ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
 void RHI::Create()
 {
