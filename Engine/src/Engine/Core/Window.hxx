@@ -54,7 +54,7 @@ class RWindow : public RObject
 
 public:
     /// Make sure GLFW is initialized or do it if it is not
-    static bool EnsureGLFWInit();
+    ENGINE_API static bool EnsureGLFWInit();
 
 public:
     /// Default ctor
@@ -98,7 +98,7 @@ public:
     ENGINE_API void SetText(const std::string_view Text);
     ENGINE_API void DrawAttention();
 
-    GLFWwindow* GetHandle() const;
+    ENGINE_API GLFWwindow* GetHandle() const;
 
     const FWindowDefinition& GetDefinition() const
     {
