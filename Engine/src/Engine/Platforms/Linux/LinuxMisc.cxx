@@ -151,16 +151,31 @@ const FCPUInformation& FLinuxMisc::GetCPUInformation()
 FLinuxExternalModule::FLinuxExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = dlopen(ModulePath.data(), RTLD_NOW | RTLD_LOCAL);
+    if (ModuleHandle == nullptr)
+    {
+        LOG(LogPlatform, Error, "Failed to load module {:s}: {:s}", ModulePath, dlerror());
+    }
 }
 
 FLinuxExternalModule::~FLinuxExternalModule()
 {
-    dlclose(ModuleHandle);
+    if (ModuleHandle)
+    {
+        dlclose(ModuleHandle);
+    }
 }
 
 void* FLinuxExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
-    return dlsym(ModuleHandle, SymbolName.data());
+    dlerror();    // Clear any existing error
+    void* FunctionPtr = dlsym(ModuleHandle, SymbolName.data());
+    char* ErrorMessage = dlerror();
+    if (ErrorMessage != nullptr)
+    {
+        LOG(LogPlatform, Error, "Failed to find symbol {:s}: {:s}", SymbolName, ErrorMessage);
+        return nullptr;
+    }
+    return FunctionPtr;
 }
 
 bool FLinuxMisc::BaseAllocator(void* TargetMemory)
