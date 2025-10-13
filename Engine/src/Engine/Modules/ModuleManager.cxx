@@ -48,18 +48,22 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
     }
     if (Holder.State == EModuleState::Error)
     {
-        if (Holder.ErrorStatus == EModuleErrorStatus::EntryPointNotFound)
+        switch (Holder.ErrorStatus)
         {
-            LOG(LogModuleManager, Warning, "Module {:s} does not have the required entry point", ModuleName);
-            Holder.State = EModuleState::Error;
-            return nullptr;
+            case EModuleErrorStatus::Malformed:
+                LOG(LogModuleManager, Warning, "Module {:s} is malformed", ModuleName);
+                break;
+            case EModuleErrorStatus::EntryPointNotFound:
+                LOG(LogModuleManager, Warning, "Module {:s} does not have the required entry point", ModuleName);
+                break;
+            case EModuleErrorStatus::NotFound:
+                LOG(LogModuleManager, Warning, "Module {:s} not found in any of the search paths", ModuleName);
+                break;
+            case EModuleErrorStatus::None:
+                checkNoEntry();
+                break;
         }
-        if (Holder.ErrorStatus == EModuleErrorStatus::NotFound)
-        {
-            LOG(LogModuleManager, Warning, "Module {:s} not found in any of the search paths", ModuleName);
-            Holder.State = EModuleState::Error;
-            return nullptr;
-        }
+        return nullptr;
     }
     Holder.Module->StartupModule();
     Holder.State = EModuleState::Started;
