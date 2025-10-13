@@ -4,6 +4,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+DECLARE_LOGGER_CATEGORY(Core, LogPlatform, Info);
+
 /// Structure that hold info about the CPU, things like instruction set, vendor named etc...
 struct FCPUInformation
 {
@@ -90,7 +92,7 @@ public:
 
     /// @brief Platform independent function to load shared library
     /// If the same library is loaded multiple times, the return will be cached
-    /// @param ModuleName The name of the module to load
+    /// @param ModuleName The name of the module to load. If empty, will open the current executable
     /// @return The loaded module
     static Ref<IExternalModule> LoadExternalModule(std::string_view ModuleName);
 
