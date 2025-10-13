@@ -2,6 +2,7 @@
 
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Core/Window.hxx"
+#include "Engine/Misc/Utils.hxx"
 #include "Engine/RHI/GenericRHI.hxx"
 #include "Engine/RHI/RHICommandList.hxx"
 
@@ -16,17 +17,20 @@ void RHI::Create()
     VIT_PROFILE_FUNC()
 
 #if VIT_COMPILE_MONOLITHIC
-
-    GDynamicRHI = CreateRHI();
+    IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("");
 #else
     FModuleManager::Get().AddDLLSearchPath(std::filesystem::current_path() / "RHI/Vulkan");
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
-    check(ModuleInterface);
+#endif    // VIT_COMPILE_MONOLITHIC
+    if (!ModuleInterface)
+    {
+        Utils::RequestExit(-2, true);
+        return;
+    }
 
     IRHIModule* const RHIModuleInterface = ModuleInterface->Cast<IRHIModule>();
     check(RHIModuleInterface);
     GDynamicRHI = RHIModuleInterface->CreateRHI();
-#endif    // VIT_COMPILE_MONOLITHIC
 }
 
 void RHI::Destroy()
