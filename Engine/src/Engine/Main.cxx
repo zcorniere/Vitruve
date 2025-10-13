@@ -13,9 +13,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 
-extern "C"  IApplication* GetApplication();
-
-FORCEINLINE int EngineLoop()
+FORCEINLINE int EngineLoop(IApplication* (*ApplicationEntryPoint)())
 {
     GEngine = new FEngine;
 
@@ -28,7 +26,7 @@ FORCEINLINE int EngineLoop()
     RHI::Create();
     GDynamicRHI->Init();
 
-    IApplication* const Application = GetApplication();
+    IApplication* const Application = ApplicationEntryPoint();
     check(Application);
     if (!Application->OnEngineInitialization())
     {
@@ -84,18 +82,9 @@ FORCEINLINE int EngineLoop()
     return ExitStatus;
 }
 
-#ifdef PLATFORM_WINDOWS
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-    (void)hInstance;
-    (void)hPrevInstance;
-    (void)nShowCmd;
-    FCommandLine::Set(lpCmdLine);
-#else
-int ENGINE_API main(int ac, char** av)
+ENGINE_API int EngineMain(const int ac, const char* const* av, IApplication* (*ApplicationEntryPoint)())
 {
     FCommandLine::Set(ac, av);
-#endif    // !PLATFORM_WINDOWS
 
     FPlatform::Initialize();
     if (FCommandLine::Param("-waitfordebugger"))
@@ -108,7 +97,7 @@ int ENGINE_API main(int ac, char** av)
     }
     Log::Init();
 
-    const int GuardedReturnValue = EngineLoop();
+    const int GuardedReturnValue = EngineLoop(ApplicationEntryPoint);
 
     // Make sure no RObjects are left undestroyed
     // Not strictly necessary, but this precaution don't hurt ¯\_(ツ)_/¯

@@ -138,8 +138,7 @@ void EditorApplication::Tick(const double DeltaTime)
     MainWindow->SetText(std::to_string(1.0f / DeltaTime));
 }
 
-// Not really extern "C" but I use it to mark that this function will be called by an external unit
-extern "C" IApplication* GetApplication()
+IApplication* CreateApplication()
 {
     return new EditorApplication();
 }

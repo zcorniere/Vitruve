@@ -116,6 +116,3 @@ target_precompile_headers(
     "src/Engine/Vitruve.hxx"
 )
 target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
-if(NOT VIT_COMPILE_MONOLITHIC)
-    target_link_libraries(${PROJECT_NAME}_Test PRIVATE ${PROJECT_NAME}_AssetRegistry)
-endif(NOT VIT_COMPILE_MONOLITHIC)

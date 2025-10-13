@@ -100,18 +100,3 @@ TEST_CASE("Delegates")
         REQUIRE(Value2 == 90);
     }
 }
-
-// #TOREMOVE: when application is properly decoupled from engine
-#include "Engine/Core/Application.hxx"
-extern "C" IApplication* GetApplication()
-{
-    return nullptr;
-}
-
-#if VIT_COMPILE_MONOLITHIC
-class FGenericRHI;
-FGenericRHI* CreateRHI()
-{
-    return nullptr;
-}
-#endif
