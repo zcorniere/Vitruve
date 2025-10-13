@@ -38,13 +38,6 @@ public:
     }
 };
 
-#if VIT_COMPILE_MONOLITHIC
-FGenericRHI* CreateRHI()
-{
-    return new VulkanRHI::FVulkanDynamicRHI;
-}
-#endif
-
 IMPLEMENT_MODULE(VULKAN_RHI_API, FRHIVulkanModule)
 
 static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platform,
