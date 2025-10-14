@@ -15,8 +15,7 @@ enum class ERHIInterfaceType
     Vulkan,
 };
 
-class FGenericRHI;
-extern FGenericRHI* GDynamicRHI;
+extern ENGINE_API class FGenericRHI* GDynamicRHI;
 
 /// Wrapper function around the RHI function
 namespace RHI
