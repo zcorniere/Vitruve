@@ -141,6 +141,9 @@ function(vit_set_standard_options target precompile_header)
                 /wd4702 # unreachable code
                 /wd5030> # unknown attribute
     )
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
     set_target_properties(${target} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
     if(OPTIMIZE_FOR_NATIVE)
         target_compile_options(${target} PUBLIC -march=native)
