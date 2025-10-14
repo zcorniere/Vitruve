@@ -137,16 +137,29 @@ const FCPUInformation& FWindowsMisc::GetCPUInformation()
 FWindowsExternalModule::FWindowsExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = ::LoadLibrary(ModulePath.data());
+    if (!ModuleHandle)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to open External module: {}", GetLastError());
+    }
 }
 
 FWindowsExternalModule::~FWindowsExternalModule()
 {
-    ::FreeLibrary(HMODULE(ModuleHandle));
+    bool bSuccess = ::FreeLibrary(HMODULE(ModuleHandle));
+    if (!bSuccess)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to unload external module: {}", GetLastError());
+    }
 }
 
 void* FWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
-    return ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
+    void* Symbol = ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
+    if (!ModuleHandle)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to find symbol \"{:s}\": {}", SymbolName, GetLastError());
+    }
+    return Symbol;
 }
 
 bool FWindowsMisc::BaseAllocator(void* TargetMemory)
