@@ -6,7 +6,7 @@
 
 extern class IApplication* GApplication;
 
-class IApplication : public RTTI::FEnable
+class ENGINE_API IApplication : public RTTI::FEnable
 {
     RTTI_DECLARE_TYPEINFO(IApplication)
 public:

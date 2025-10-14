@@ -39,7 +39,7 @@ public:
 
     /// Give the object a debug name
     template <typename... ArgsTypes>
-    inline void SetNamef(std::format_string<ArgsTypes...> InFormat, ArgsTypes&&... InArgs)
+    void SetNamef(std::format_string<ArgsTypes...> InFormat, ArgsTypes&&... InArgs)
     {
         std::string NewName = std::format(std::move(InFormat), std::forward<ArgsTypes>(InArgs)...);
         SetName(NewName);
@@ -71,7 +71,7 @@ public:
     }
 
     /// Get the current ref count
-    std::uint32_t GetRefCount() const
+     std::uint32_t GetRefCount() const
     {
         return m_RefCount.load(std::memory_order_relaxed);
     }
@@ -110,7 +110,7 @@ public:
     /// @brief Create a new RObject and give it his name
     /// @return the new RObject
     template <typename... Args>
-    FORCEINLINE static Ref<T> CreateNamed(std::string_view Name, Args&&... args)
+    static Ref<T> CreateNamed(std::string_view Name, Args&&... args)
     {
         Ref<T> NewRef = CreateInternal(std::forward<Args>(args)...);
         NewRef->SetName(Name);
@@ -120,14 +120,14 @@ public:
     /// @brief Create a new RObject
     /// @return the new RObject
     template <typename... Args>
-    FORCEINLINE static Ref<T> Create(Args&&... args)
+    static Ref<T> Create(Args&&... args)
     {
         return CreateInternal(std::forward<Args>(args)...);
     }
 
 private:
     template <typename... Args>
-    FORCEINLINE static Ref<T> CreateInternal(Args&&... args)
+    static Ref<T> CreateInternal(Args&&... args)
     {
         T* const NewRef = new T(std::forward<Args>(args)...);
         LOG(RObjectUtils::LogRObject, Trace, "Creating RObject {:s}", NewRef->ToString());

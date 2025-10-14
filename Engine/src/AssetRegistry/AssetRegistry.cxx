@@ -1,5 +1,6 @@
 #include "AssetRegistry/AssetRegistry.hxx"
 
+#include "AssetRegistry.hxx"
 #include "AssetRegistry/MeshFactory.hxx"
 
 DECLARE_LOGGER_CATEGORY(Core, LogAssetRegistry, Info)
@@ -11,6 +12,10 @@ FAssetRegistry::FAssetRegistry()
 
     Ref<RAsset> CapsuleAsset = MeshFactory::CreateCapsule(1.0f, 2.0f);
     RegisterMemoryOnlyAsset(CapsuleAsset);
+}
+
+FAssetRegistry::~FAssetRegistry()
+{
 }
 
 Ref<RAsset> FAssetRegistry::LoadAsset(const std::filesystem::path& Path)

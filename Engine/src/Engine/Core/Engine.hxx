@@ -6,13 +6,13 @@
 
 extern ENGINE_API class FEngine* GEngine;
 
-class ENGINE_API FEngine
+class FEngine
 {
 public:
     FEngine();
     ~FEngine();
 
-    FThreadPool& GetThreadPool()
+    ENGINE_API FThreadPool& GetThreadPool()
     {
         return m_ThreadPool;
     }
@@ -27,9 +27,9 @@ public:
     void PreTick();
     void PostTick();
 
-    Ref<RWorld> CreateWorld();
-    void SetWorld(Ref<RWorld> World);
-    Ref<RWorld> GetWorld() const;
+    ENGINE_API Ref<RWorld> CreateWorld();
+    ENGINE_API void SetWorld(Ref<RWorld> World);
+    ENGINE_API Ref<RWorld> GetWorld() const;
 
 public:
     std::unique_ptr<FAssetRegistry> AssetRegistry;

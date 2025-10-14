@@ -7,7 +7,7 @@ class AActor;
 class RSceneComponent;
 class RRHIScene;
 
-class ENGINE_API RWorld : public RObject
+class RWorld : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RWorld, RObject)
 public:
@@ -28,12 +28,12 @@ public:
         return Actor;
     }
 
-    void AddToWorld(Ref<AActor> Actor);
+    ENGINE_API void AddToWorld(Ref<AActor> Actor);
     void RemoveFromWorld(Ref<AActor> Actor);
 
     void Tick(double DeltaTime);
 
-    Ref<RRHIScene> GetScene() const;
+    ENGINE_API Ref<RRHIScene> GetScene() const;
 
 private:
     void UpdateActorLocation(uint64 ID, RSceneComponent* const Component);

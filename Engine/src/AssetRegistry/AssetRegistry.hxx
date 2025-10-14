@@ -2,28 +2,29 @@
 
 #include "AssetRegistry/Asset.hxx"
 
-class ENGINE_API FAssetRegistry
+class  FAssetRegistry
 {
 public:
     FAssetRegistry();
+    ENGINE_API ~FAssetRegistry();
 
-    Ref<RAsset> LoadAsset(const std::filesystem::path& Path);
-    Ref<RAsset> RegisterMemoryOnlyAsset(Ref<RAsset>& Asset);
-    Ref<RRHIMaterial> RegisterMemoryOnlyMaterial(Ref<RRHIMaterial>& Material);
+    ENGINE_API Ref<RAsset> LoadAsset(const std::filesystem::path& Path);
+    ENGINE_API Ref<RAsset> RegisterMemoryOnlyAsset(Ref<RAsset>& Asset);
+    ENGINE_API Ref<RRHIMaterial> RegisterMemoryOnlyMaterial(Ref<RRHIMaterial>& Material);
 
-    Ref<RAsset> GetAsset(const std::string& Name) const;
-    Ref<RRHIMaterial> GetMaterial(const std::string& Name) const;
-    Ref<RAsset> GetAssetByID(uint64 ID) const;
-    Ref<RRHIMaterial> GetMaterialByID(uint64 ID) const;
+    ENGINE_API Ref<RAsset> GetAsset(const std::string& Name) const;
+    ENGINE_API Ref<RRHIMaterial> GetMaterial(const std::string& Name) const;
+    ENGINE_API Ref<RAsset> GetAssetByID(uint64 ID) const;
+    ENGINE_API Ref<RRHIMaterial> GetMaterialByID(uint64 ID) const;
 
-    void UnloadAsset(const std::string& Name);
-    void Purge();
+    ENGINE_API void UnloadAsset(const std::string& Name);
+    ENGINE_API void Purge();
 
-    Ref<RAsset> GetCubeAsset() const
+    ENGINE_API Ref<RAsset> GetCubeAsset() const
     {
         return AssetRegistry["Box"];
     }
-    Ref<RAsset> GetCapsuleAsset() const
+    ENGINE_API Ref<RAsset> GetCapsuleAsset() const
     {
         return AssetRegistry["Capsule"];
     }

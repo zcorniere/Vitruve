@@ -2,7 +2,6 @@
 
 #include <cpplogger/Logger.hpp>
 
-extern uint64 GFrameCounter;
 
 /// Class to manage the Log startup and shutdown sequence
 class ENGINE_API Log
