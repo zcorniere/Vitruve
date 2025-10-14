@@ -122,9 +122,22 @@ function(vit_set_standard_options target precompile_header)
                    CXX_EXTENSIONS NO
     )
     target_compile_definitions(${target} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
+
     if(WIN32)
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+            set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+        endif()
         target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
-    endif(WIN32)
+    else()
+        set_target_properties(
+            ${PROJECT_NAME}
+            PROPERTIES BUILD_RPATH "$ORIGIN:$ORIGIN/lib"
+                       INSTALL_RPATH "$ORIGIN:$ORIGIN/lib"
+                       CXX_VISIBILITY_PRESET hidden
+                       VISIBILITY_INLINES_HIDDEN 1
+        )
+    endif()
+
     target_compile_options(
         ${target}
         PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
@@ -141,10 +154,6 @@ function(vit_set_standard_options target precompile_header)
                 /wd4702 # unreachable code
                 /wd5030> # unknown attribute
     )
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-    endif()
-    set_target_properties(${target} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
     if(OPTIMIZE_FOR_NATIVE)
         target_compile_options(${target} PUBLIC -march=native)
     endif(OPTIMIZE_FOR_NATIVE)
@@ -171,10 +180,10 @@ endfunction(vit_add_platforms_entrypoint)
 function(vit_copy_dlls_to_target_dir TARGET_NAME)
     # Copy all additional DLL/shared library targets passed after TARGET_NAME
     foreach(DLL_TARGET IN LISTS ARGN)
-        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:${DLL_TARGET}>
-                $<TARGET_FILE_DIR:${TARGET_NAME}>
+        add_custom_command(
+            TARGET ${TARGET_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${DLL_TARGET}> $<TARGET_FILE_DIR:${TARGET_NAME}>
             COMMENT "Copying $<TARGET_FILE:${DLL_TARGET}> to $<TARGET_FILE_DIR:${TARGET_NAME}>"
         )
     endforeach()
