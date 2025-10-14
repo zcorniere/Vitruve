@@ -16,4 +16,6 @@ if(MSVC)
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 endif(MSVC)
 
+vit_copy_dlls_to_target_dir(${PROJECT_NAME} VitruveEngine VitruveEngine_VulkanRHI glfw cpplogger)
+
 # target_generate_debug_file(${PROJECT_NAME})

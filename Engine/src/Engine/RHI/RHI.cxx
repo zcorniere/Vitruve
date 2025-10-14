@@ -19,7 +19,6 @@ void RHI::Create()
 #if VIT_COMPILE_MONOLITHIC
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("");
 #else
-    FModuleManager::Get().AddDLLSearchPath(std::filesystem::current_path() / "RHI/Vulkan");
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
 #endif    // VIT_COMPILE_MONOLITHIC
     if (!ModuleInterface)
