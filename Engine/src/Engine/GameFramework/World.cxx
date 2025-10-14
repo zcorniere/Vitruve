@@ -26,12 +26,14 @@ void RWorld::SetName(std::string_view InName)
 void RWorld::AddToWorld(Ref<AActor> Actor)
 {
     Actors.Add(Actor);
+    Actor->BeginPlay();
     OnActorAddedToWorld.Broadcast(Actor.Raw());
 }
 
 void RWorld::RemoveFromWorld(Ref<AActor> Actor)
 {
     OnActorRemovedFromWorld.Broadcast(Actor.Raw());
+    Actor->EndPlay();
     Actors.Remove(Actor);
 }
 
