@@ -101,13 +101,11 @@ void FModuleManager::LoadModuleWithPath(const std::string_view& ModuleName, cons
 {
     VIT_PROFILE_FUNC()
 
-    const std::string FullPath = std::format("libVitruveEngine_{:s}.{:s}", ModuleName,
 #if defined(PLATFORM_WINDOWS)
-                                             "dll"
+    const std::string FullPath = std::format("VitruveEngine_{:s}.dll", ModuleName);
 #elif defined(PLATFORM_LINUX)
-                                             "so"
+    const std::string FullPath = std::format("libVitruveEngine_{:s}.so", ModuleName);
 #endif
-    );
 
     for (const std::filesystem::directory_entry& Entry: std::filesystem::recursive_directory_iterator(Path))
     {
