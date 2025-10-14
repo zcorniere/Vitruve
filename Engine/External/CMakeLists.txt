@@ -5,10 +5,17 @@ set(CPPLOGGER_NO_EXCEPTIONS
     ON
     CACHE BOOL "" FORCE
 )
-set(CPPLOGGER_SHARED_LIB
-    ON
-    CACHE BOOL "" FORCE
-)
+if(${VIT_LIBRARY_TYPE} STREQUAL "SHARED")
+    set(CPPLOGGER_SHARED_LIB
+        ON
+        CACHE BOOL "" FORCE
+    )
+else()
+    set(CPPLOGGER_SHARED_LIB
+        OFF
+        CACHE BOOL "" FORCE
+    )
+endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/logger-cpp EXCLUDE_FROM_ALL)
 
 # magic_enum
@@ -51,7 +58,7 @@ set(GLFW_INSTALL
     CACHE INTERNAL "" FORCE
 )
 set(GLFW_LIBRARY_TYPE
-    "SHARED"
+    ${VIT_LIBRARY_TYPE}
     CACHE STRING "" FORCE
 )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glfw EXCLUDE_FROM_ALL)
@@ -62,7 +69,8 @@ endif()
 
 # Modern Dialogs
 add_library(
-    ModernDialogs EXCLUDE_FROM_ALL STATIC ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs/ModernDialogs.cpp
+    ModernDialogs EXCLUDE_FROM_ALL ${VIT_LIBRARY_TYPE}
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs/ModernDialogs.cpp
 )
 target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs)
 
