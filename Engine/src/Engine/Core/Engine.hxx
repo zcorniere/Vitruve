@@ -4,7 +4,7 @@
 #include "Engine/GameFramework/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
 
-extern class FEngine* GEngine;
+extern ENGINE_API class FEngine* GEngine;
 
 class ENGINE_API FEngine
 {
