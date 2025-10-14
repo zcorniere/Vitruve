@@ -7,7 +7,7 @@ class ENGINE_API AActor : public RObject
     RTTI_DECLARE_TYPEINFO(AActor, RObject)
 public:
     AActor();
-    virtual ~AActor();
+    ~AActor();
 
     virtual void BeginPlay();
     virtual void EndPlay();

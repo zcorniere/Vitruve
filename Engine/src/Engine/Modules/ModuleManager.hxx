@@ -2,7 +2,7 @@
 
 #include "Engine/Modules/ModuleInterface.hxx"
 
-class ENGINE_API FModuleManager
+class FModuleManager
 {
 public:
     enum class EModuleState

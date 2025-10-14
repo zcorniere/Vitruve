@@ -72,7 +72,7 @@ namespace details
     }    // namespace Hash
 }    // namespace details
 
-struct FEnable;
+struct ENGINE_API FEnable;
 
 /// Type identifier used to identify types in the RTTI system
 using FTypeId = uint32_t;

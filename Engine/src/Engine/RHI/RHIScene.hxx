@@ -77,7 +77,7 @@ private:
     WeakRef<RRHIScene> Scene = nullptr;
 };
 
-class ENGINE_API RRHIScene : public RObject
+class RRHIScene : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RRHIScene, RObject);
 
@@ -118,18 +118,18 @@ public:
     RRHIScene(RWorld* OuterWorld, const FRHIRenderPassTarget& InRenderPassTarget);
     virtual ~RRHIScene();
 
-    void SetViewport(Ref<RRHIViewport>& InViewport);
+    ENGINE_API void SetViewport(Ref<RRHIViewport>& InViewport);
     WeakRef<RRHIViewport> GetViewport() const
     {
         return RenderPassTarget.Viewport;
     }
-    void SetRenderPassTarget(const FRHIRenderPassTarget& InRenderPassTarget);
+    ENGINE_API void SetRenderPassTarget(const FRHIRenderPassTarget& InRenderPassTarget);
 
     void PreTick();
     void PostTick(double DeltaTime);
     void UpdateActorLocation(uint64 Id, const FTransform& NewTransform);
 
-    void TickRenderer(FFRHICommandList& CommandList);
+    ENGINE_API void TickRenderer(FFRHICommandList& CommandList);
 
 private:
     void UpdateCameraAspectRatio();
