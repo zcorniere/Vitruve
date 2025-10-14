@@ -45,8 +45,7 @@ set(MI_BUILD_SHARED
 )
 set(MI_TRACK_VALGRIND "$<IF:$<AND:$<CONFIG:Debug>,$<NOT:$<BOOL:${VIT_ENABLE_ASAN}>>>,ON,OFF>")
 set(MI_TRACK_ASAN ${VIT_ENABLE_ASAN})
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mimalloc)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mimalloc EXCLUDE_FROM_ALL)
 
 # glfw
 set(GLFW_BUILD_DOCS
@@ -69,9 +68,11 @@ endif()
 
 # Modern Dialogs
 add_library(
-    ModernDialogs EXCLUDE_FROM_ALL ${VIT_LIBRARY_TYPE}
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs/ModernDialogs.cpp
+    ModernDialogs STATIC EXCLUDE_FROM_ALL ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs/ModernDialogs.cpp
 )
+if(NOT VIT_COMPILE_MONOLITHIC)
+    set_property(TARGET ModernDialogs PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(VIT_COMPILE_MONOLITHIC)
 target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs)
 
 # glm
