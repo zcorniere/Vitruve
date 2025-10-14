@@ -72,7 +72,7 @@ add_library(
 )
 if(NOT VIT_COMPILE_MONOLITHIC)
     set_property(TARGET ModernDialogs PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif(VIT_COMPILE_MONOLITHIC)
+endif(NOT VIT_COMPILE_MONOLITHIC)
 target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ModernDialogs/ModernDialogs)
 
 # glm
