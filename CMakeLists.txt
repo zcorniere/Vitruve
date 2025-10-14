@@ -168,6 +168,18 @@ function(vit_add_platforms_entrypoint target)
     endif()
 endfunction(vit_add_platforms_entrypoint)
 
+function(vit_copy_dlls_to_target_dir TARGET_NAME)
+    # Copy all additional DLL/shared library targets passed after TARGET_NAME
+    foreach(DLL_TARGET IN LISTS ARGN)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:${DLL_TARGET}>
+                $<TARGET_FILE_DIR:${TARGET_NAME}>
+            COMMENT "Copying $<TARGET_FILE:${DLL_TARGET}> to $<TARGET_FILE_DIR:${TARGET_NAME}>"
+        )
+    endforeach()
+endfunction(vit_copy_dlls_to_target_dir)
+
 add_subdirectory(External/)
 add_subdirectory(Engine/)
 add_subdirectory(Editor/)
