@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcpplogger.a CMakeFiles/cpplogger.dir/source/Logger.cpp.o
+/usr/bin/ranlib libcpplogger.a

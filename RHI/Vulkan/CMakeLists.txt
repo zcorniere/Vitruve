@@ -59,11 +59,13 @@ if(OPTIMIZE_FOR_NATIVE)
 endif(OPTIMIZE_FOR_NATIVE)
 
 build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx)
-# Give the tests access to the RHI headers
-target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_precompile_headers(${PROJECT_NAME}_Test PRIVATE VulkanRHI.pch.hxx)
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
-target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
+if(BUILD_TESTING)
+    # Give the tests access to the RHI headers
+    target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_precompile_headers(${PROJECT_NAME}_Test PRIVATE VulkanRHI.pch.hxx)
+    target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
+    target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
+endif()
 
 if(VIT_ENABLE_PROFILING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)

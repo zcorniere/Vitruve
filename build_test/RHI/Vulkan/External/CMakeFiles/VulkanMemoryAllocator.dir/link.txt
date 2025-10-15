@@ -1,0 +1,2 @@
+/usr/bin/ar qc libVulkanMemoryAllocator.a CMakeFiles/VulkanMemoryAllocator.dir/VulkanMemoryAllocator/include/vk_mem_alloc.h.o
+/usr/bin/ranlib libVulkanMemoryAllocator.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libGenericCodeGen.a CMakeFiles/GenericCodeGen.dir/stub.cpp.o
+/usr/bin/ranlib libGenericCodeGen.a

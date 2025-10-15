@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSPIRV.a CMakeFiles/SPIRV.dir/__/glslang/stub.cpp.o
+/usr/bin/ranlib libSPIRV.a
