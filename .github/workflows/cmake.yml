@@ -41,23 +41,105 @@ jobs:
         ninja: true
         clangtidy: false
         cppcheck: false
+        ccache: true
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}
 
     - name: Install dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y valgrind libglm-dev libwayland-bin libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
+    
     - name: Configure CMake
       run: >
         cmake -S .
         -B ./build
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DBUILD_TESTING=OFF
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
         -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build ./build --config=${{ matrix.build_type }} --parallel ${{ steps.cpu-cores.outputs.count }} 
+      run: cmake --build ./build --config=${{ matrix.build_type }} --parallel ${{ steps.cpu-cores.outputs.count }}
+
+    - name: Cache build artifacts
+      uses: actions/cache/save@v3
+      if: matrix.build_type == 'Debug'
+      with:
+        path: ./build
+        key: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-${{ github.sha }}
+
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        compiler: [clang, msvc]
+        exclude:
+          - os: windows-latest
+            compiler: clang
+          - os: ubuntu-latest
+            compiler: msvc
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Get number of CPU cores
+      uses: SimenB/github-actions-cpu-cores@v1
+      id: cpu-cores
+
+    - uses: actions/checkout@v4.1.0
+      with:
+        submodules: true
+
+    - name: "Setup Cpp"
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: ${{ matrix.compiler }}
+        vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+        cmake: true
+        ninja: true
+        clangtidy: false
+        cppcheck: false
+        ccache: true
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ matrix.os }}-${{ matrix.compiler }}-Debug
+
+    - name: Install dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind libglm-dev libwayland-bin libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
+
+    - name: Restore build artifacts
+      uses: actions/cache/restore@v3
+      with:
+        path: ./build
+        key: build-${{ matrix.os }}-${{ matrix.compiler }}-Debug-${{ github.sha }}
+        fail-on-cache-miss: true
+
+    - name: Configure CMake for tests
+      run: >
+        cmake -S .
+        -B ./build
+        -DCMAKE_BUILD_TYPE=Debug
+        -DBUILD_TESTING=ON
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        -S ${{ github.workspace }}
+
+    - name: Build tests
+      run: cmake --build ./build --config=Debug --target tests --parallel ${{ steps.cpu-cores.outputs.count }}
 
     - name: Test
       working-directory: ./build
       run: >
-        ctest -j ${{ steps.cpu-cores.outputs.count }} -C ${{ matrix.build_type }} --rerun-failed --output-on-failure;
+        ctest -j ${{ steps.cpu-cores.outputs.count }} -C Debug --rerun-failed --output-on-failure
