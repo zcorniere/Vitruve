@@ -1,2 +1,0 @@
-/usr/bin/ar qc libSPIRV-Tools-diff.a "CMakeFiles/SPIRV-Tools-diff.dir/diff.cpp.o"
-/usr/bin/ranlib libSPIRV-Tools-diff.a

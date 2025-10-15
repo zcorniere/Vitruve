@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/Vitruve/Vitruve/build_test_on/RHI/Vulkan/VitruveRHIVulkan_Test-8f145c4_tests.cmake")
-  include("/home/runner/work/Vitruve/Vitruve/build_test_on/RHI/Vulkan/VitruveRHIVulkan_Test-8f145c4_tests.cmake")
-else()
-  add_test(VitruveRHIVulkan_Test_NOT_BUILT-8f145c4 VitruveRHIVulkan_Test_NOT_BUILT-8f145c4)
-endif()

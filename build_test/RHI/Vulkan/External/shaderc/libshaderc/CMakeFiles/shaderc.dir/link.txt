@@ -1,2 +1,0 @@
-/usr/bin/ar qc libshaderc.a CMakeFiles/shaderc.dir/src/shaderc.cc.o
-/usr/bin/ranlib libshaderc.a

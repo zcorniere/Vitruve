@@ -1,2 +1,0 @@
-/usr/bin/ar qc libVulkanSafeStruct.a CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_core.cpp.o CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_ext.cpp.o CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_khr.cpp.o CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_utils.cpp.o CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_vendor.cpp.o CMakeFiles/VulkanSafeStruct.dir/vk_safe_struct_manual.cpp.o
-/usr/bin/ranlib libVulkanSafeStruct.a

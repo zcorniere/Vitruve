@@ -1,2 +1,0 @@
-/usr/bin/ar qc libMachineIndependent.a CMakeFiles/MachineIndependent.dir/stub.cpp.o
-/usr/bin/ranlib libMachineIndependent.a

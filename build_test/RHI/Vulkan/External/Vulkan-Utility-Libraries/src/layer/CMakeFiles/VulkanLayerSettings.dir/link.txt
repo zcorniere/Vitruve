@@ -1,2 +1,0 @@
-/usr/bin/ar qc libVulkanLayerSettings.a CMakeFiles/VulkanLayerSettings.dir/vk_layer_settings.cpp.o CMakeFiles/VulkanLayerSettings.dir/vk_layer_settings_helper.cpp.o CMakeFiles/VulkanLayerSettings.dir/layer_settings_manager.cpp.o CMakeFiles/VulkanLayerSettings.dir/layer_settings_util.cpp.o
-/usr/bin/ranlib libVulkanLayerSettings.a
