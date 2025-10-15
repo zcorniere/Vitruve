@@ -1,6 +1,6 @@
 #pragma once
 
-namespace  FCommandLine
+namespace FCommandLine
 {
 
 ENGINE_API const char* Get();
@@ -14,4 +14,4 @@ ENGINE_API bool Param(const char* Key);
 ENGINE_API bool Parse(const char* Key, int& Value);
 ENGINE_API bool Parse(const char* Key, std::string& Value);
 
-};    // namespace ENGINE_API FCommandLine
+};    // namespace FCommandLine

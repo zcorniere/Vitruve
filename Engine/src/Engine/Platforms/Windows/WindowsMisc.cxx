@@ -155,7 +155,7 @@ FWindowsExternalModule::~FWindowsExternalModule()
 void* FWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
     void* Symbol = ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
-    if (!ModuleHandle)
+    if (!Symbol)
     {
        LOG(LogPlatformMisc, Error, "Failed to find symbol \"{:s}\": {}", SymbolName, GetLastError());
     }
