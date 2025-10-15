@@ -108,16 +108,16 @@ jobs:
         cppcheck: false
         ccache: true
 
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ matrix.os }}-${{ matrix.compiler }}-Debug
-
     - name: Install dependencies
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y valgrind libglm-dev libwayland-bin libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ matrix.os }}-${{ matrix.compiler }}-Debug
 
     - name: Restore build artifacts
       uses: actions/cache/restore@v3
