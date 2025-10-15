@@ -94,7 +94,7 @@ public:
     /// If the same library is loaded multiple times, the return will be cached
     /// @param ModuleName The name of the module to load. If empty, will open the current executable
     /// @return The loaded module
-    static Ref<IExternalModule> LoadExternalModule(std::string_view ModuleName);
+    static IExternalModule* LoadExternalModule(std::string_view ModuleName);
 
     /// @brief Platform agnostic way to look for a config file
     /// @return Return the platform standard path to look for the config

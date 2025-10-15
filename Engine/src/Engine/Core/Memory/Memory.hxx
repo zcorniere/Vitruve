@@ -56,7 +56,7 @@ public:
         (void)hint;
         if (Size == 0)
             return nullptr;
-        assert(Size < std::numeric_limits<std::size_t>::max() / sizeof(T));
+        assert(Size <= std::numeric_limits<std::size_t>::max() / sizeof(T));
 
         if (T* p = static_cast<T*>(Memory::Malloc(Size * sizeof(T))))
         {
