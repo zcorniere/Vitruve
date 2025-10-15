@@ -133,10 +133,10 @@ function(vit_set_standard_options target precompile_header)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
         endif()
-        target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+        target_compile_definitions(${target} PUBLIC _CRT_SECURE_NO_WARNINGS)
     else()
         set_target_properties(
-            ${PROJECT_NAME}
+            ${target}
             PROPERTIES BUILD_RPATH "$ORIGIN:$ORIGIN/lib"
                        INSTALL_RPATH "$ORIGIN:$ORIGIN/lib"
                        CXX_VISIBILITY_PRESET hidden
