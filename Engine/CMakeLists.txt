@@ -127,7 +127,9 @@ build_tests(
     tests/Core/RTTI/RTTIParameter.cxx
     tests/CommandLine.cxx
 )
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
+if(BUILD_TESTING)
+    target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)
+endif()
 
 if(VIT_ENABLE_PROFILING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
