@@ -34,7 +34,9 @@ endif()
 option(VIT_ENABLE_ASAN "Enable AddressSanitizer" OFF)
 if(VIT_ENABLE_ASAN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+            "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>"
+        )
         add_compile_options(/fsanitize=address)
         add_link_options(/fsanitize=address)
     else()
@@ -126,6 +128,7 @@ function(vit_set_standard_options target precompile_header)
         PROPERTIES CXX_STANDARD 23
                    CXX_STANDARD_REQUIRED YES
                    CXX_EXTENSIONS NO
+                   POSITION_INDEPENDENT_CODE ON
     )
     target_compile_definitions(${target} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
 
