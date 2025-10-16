@@ -45,12 +45,12 @@ protected:
     /// Executed from the thread when started
     virtual void PreRun();
     /// Run the Interface::ThreadRuntime
-    virtual std::uint32_t Run();
+    virtual std::uint32_t Run(std::stop_token stoken);
     /// Executed from the thread when quitting
     virtual void PostRun();
 
 private:
-    static void thread_runtime(FThread* pThis);
+    static void thread_runtime(std::stop_token stoken, FThread* pThis);
 
 private:
     std::string m_name;

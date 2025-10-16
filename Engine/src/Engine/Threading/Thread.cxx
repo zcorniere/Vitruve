@@ -48,12 +48,12 @@ void FThread::PreRun()
 {
 }
 
-std::uint32_t FThread::Run()
+std::uint32_t FThread::Run(std::stop_token stoken)
 {
     std::uint32_t exitCode = 1;
     check(m_internalRuntime);
 
-    if (m_internalRuntime->Init())
+    if (m_internalRuntime->Init(stoken))
     {
         PreRun();
         exitCode = m_internalRuntime->Run();
@@ -71,10 +71,10 @@ void FThread::PostRun()
 {
 }
 
-void FThread::thread_runtime(FThread* pThis)
+void FThread::thread_runtime(std::stop_token stoken, FThread* pThis)
 {
     check(pThis);
     pThis->Start();
-    pThis->Run();
+    pThis->Run(stoken);
     pThis->PostRun();
 }

@@ -16,7 +16,8 @@ public:
     }
 
     /// Initialize the runtime
-    virtual bool Init() = 0;
+    /// @param stoken The stop token that can be used to check if the thread should stop
+    virtual bool Init(std::stop_token stoken) = 0;
     /// Start the main loop of the thread
     virtual std::uint32_t Run() = 0;
     /// Tell the thread that it should gracefully stop

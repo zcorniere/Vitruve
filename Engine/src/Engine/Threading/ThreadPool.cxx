@@ -1,6 +1,7 @@
 #include "Engine/Threading/ThreadPool.hxx"
 
 DECLARE_LOGGER_CATEGORY(Core, LogWorkerThreadRuntime, Warning);
+DECLARE_LOGGER_CATEGORY(Core, LogThreadPool, Info);
 
 FThreadPool::FThreadPool(): state(std::make_shared<FThreadPool::State>())
 {
@@ -8,13 +9,30 @@ FThreadPool::FThreadPool(): state(std::make_shared<FThreadPool::State>())
 
 void FThreadPool::Start(unsigned i)
 {
+    LOG(LogThreadPool, Info, "Starting ThreadPool with {} threads", i);
     Resize(i);
 }
 
 void FThreadPool::Stop()
 {
+    LOG(LogThreadPool, Info, "Stopping ThreadPool", thread_p.Size());
+    for (auto& thread: thread_p)
+    {
+        thread.End();
+    }
+
     state->q_var.notify_all();
     thread_p.Clear();
+
+    // Make sure all work is cleared
+    {
+        std::unique_lock lock(state->q_mutex);
+        while (!state->qWork.empty())
+        {
+            LOG(LogThreadPool, Warning, "Stopping the ThreadPool while work is still pending !");
+            state->qWork.pop();
+        }
+    }
 }
 
 void FThreadPool::Resize(unsigned size)
@@ -32,13 +50,13 @@ std::atomic_int FThreadPool::WorkerPoolRuntime::s_threadIDCounter = 0;
 
 FThreadPool::WorkerPoolRuntime::WorkerPoolRuntime(std::shared_ptr<FThreadPool::State> context)
     : i_threadID(0)
-    , b_requestExit(false)
     , p_state(std::move(context))
 {
 }
 
-bool FThreadPool::WorkerPoolRuntime::Init()
+bool FThreadPool::WorkerPoolRuntime::Init(std::stop_token stoken)
 {
+    this->stoken = stoken;
     i_threadID = s_threadIDCounter++;
     return true;
 }
@@ -48,7 +66,7 @@ std::uint32_t FThreadPool::WorkerPoolRuntime::Run()
     using namespace std::chrono_literals;
     FThreadPool::WorkUnits work;
 
-    while (!b_requestExit)
+    while (!stoken.stop_requested())
     {
         {
             std::unique_lock lock(p_state->q_mutex);
@@ -70,12 +88,10 @@ std::uint32_t FThreadPool::WorkerPoolRuntime::Run()
 
 void FThreadPool::WorkerPoolRuntime::Stop()
 {
-    b_requestExit = true;
     LOG(LogWorkerThreadRuntime, Info, "Thread {}: exit requested", i_threadID);
 }
 
 void FThreadPool::WorkerPoolRuntime::Exit()
 {
-    b_requestExit = true;
     LOG(LogWorkerThreadRuntime, Info, "Thread {}: exit requested", i_threadID);
 }

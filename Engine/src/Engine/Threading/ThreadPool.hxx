@@ -31,7 +31,7 @@ private:
     public:
         explicit WorkerPoolRuntime(std::shared_ptr<FThreadPool::State> context);
 
-        bool Init() override;
+        bool Init(std::stop_token stoken) override;
         std::uint32_t Run() override;
         void Stop() override;
         void Exit() override;
@@ -41,7 +41,7 @@ private:
 
     private:
         int i_threadID;
-        std::atomic_bool b_requestExit;
+        std::stop_token stoken;
         std::shared_ptr<FThreadPool::State> p_state;
     };
 
