@@ -5,35 +5,24 @@
 #include <cpplogger/sinks/StdoutSink.hpp>
 #include <cstdio>
 
-static cpplogger::Logger* s_CoreLogger = nullptr;
-
-void Log::Init()
+FLog::FLog()
 {
-    if (!s_CoreLogger)
+    std::string LogFileLocation;
+    if (FCommandLine::Parse("-logfile=", LogFileLocation))
     {
-        s_CoreLogger = new cpplogger::Logger("Core");
+        printf("%s\n", LogFileLocation.c_str());
 
-        s_CoreLogger->addSink<cpplogger::StdoutSink, Log::ColorFormatter>(stdout);
+        Sinks.Emplace(std::make_unique<cpplogger::FileSink<FLog::BaseFormatter>>(LogFileLocation, false));
+    }
+    Sinks.Emplace(std::make_unique<cpplogger::StdoutSink<FLog::ColorFormatter>>(stdout));
 
-        std::string LogFileLocation;
-        if (FCommandLine::Parse("-logfile=", LogFileLocation))
-        {
-            printf("%s\n", LogFileLocation.c_str());
-
-            s_CoreLogger->addSink<cpplogger::FileSink, Log::BaseFormatter>(LogFileLocation, false);
-        }
+    CoreLogger = std::make_unique<cpplogger::Logger>("Core");
+    for (std::unique_ptr<cpplogger::ISink>& Sink: Sinks)
+    {
+        CoreLogger->addSink(Sink.get());
     }
 }
 
-void Log::Shutdown()
+FLog::~FLog()
 {
-    std::vector<cpplogger::ISink*> Sinks = s_CoreLogger->getSinks();
-
-    delete s_CoreLogger;
-    s_CoreLogger = nullptr;
-
-    for (cpplogger::ISink* Sink: Sinks)
-    {
-        delete Sink;
-    }
 }
