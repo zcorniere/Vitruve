@@ -16,22 +16,14 @@
 #include <cpplogger/sinks/FileSink.hpp>
 #include <cpplogger/sinks/StdoutSink.hpp>
 
-DECLARE_LOGGER_CATEGORY(Editor, LogApplication, Info)
-
-static cpplogger::Logger* s_EditorLogger = nullptr;
+DECLARE_LOGGER_CATEGORY(Core, LogApplication, Info)
 
 EditorApplication::EditorApplication()
 {
-    check(s_EditorLogger == nullptr);
-    s_EditorLogger = new cpplogger::Logger("Editor");
-
-    s_EditorLogger->addSink<cpplogger::StdoutSink, Log::ColorFormatter>(stdout);
 }
 
 EditorApplication::~EditorApplication()
 {
-    delete s_EditorLogger;
-    s_EditorLogger = nullptr;
 }
 
 bool EditorApplication::OnEngineInitialization()

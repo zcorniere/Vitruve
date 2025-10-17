@@ -95,15 +95,16 @@ ENGINE_API int EngineMain(const int ac, const char* const* av, IApplication* (*A
         }
         PLATFORM_BREAK();
     }
-    Log::Init();
 
-    const int GuardedReturnValue = EngineLoop(ApplicationEntryPoint);
+    int GuardedReturnValue = 0;
+    {
+        FLog Log;
+        GuardedReturnValue = EngineLoop(ApplicationEntryPoint);
 
-    // Make sure no RObjects are left undestroyed
-    // Not strictly necessary, but this precaution don't hurt ¯\_(ツ)_/¯
-    check(RObjectUtils::AreThereAnyLiveObject() == false);
-
-    Log::Shutdown();
+        // Make sure no RObjects are left undestroyed
+        // Not strictly necessary, but this precaution don't hurt ¯\_(ツ)_/¯
+        check(RObjectUtils::AreThereAnyLiveObject() == false);
+    }
     FPlatform::Deinitialize();
     return GuardedReturnValue;
 }

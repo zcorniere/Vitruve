@@ -2,9 +2,8 @@
 
 #include <cpplogger/Logger.hpp>
 
-
 /// Class to manage the Log startup and shutdown sequence
-class ENGINE_API Log
+class FLog
 {
 public:
     class ColorFormatter
@@ -34,11 +33,10 @@ public:
     };
 
 public:
-    /// @brief Start the Logger
-    ///
-    /// Must be called as soon a possible
-    static void Init();
+    ENGINE_API FLog();
+    ENGINE_API ~FLog();
 
-    /// @brief Shutdown the loggers
-    static void Shutdown();
+private:
+    TArray<std::unique_ptr<cpplogger::ISink>> Sinks;
+    std::unique_ptr<cpplogger::Logger> CoreLogger = nullptr;
 };

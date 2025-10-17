@@ -113,7 +113,7 @@ static void CheckReflection(const VulkanRHI::RVulkanShader::FReflectionData& Exp
 TEST_CASE("Vulkan Shader Compiler: Simple Compilation")
 {
     using namespace VulkanRHI;
-    ::Log::Init();
+    FLog log;
 
     std::filesystem::path SimpleShaderPath = GetCurrentFilePath() / "test_shaders/SimpleShader.vert";
     FVulkanShaderCompiler Compiler;
@@ -160,8 +160,6 @@ TEST_CASE("Vulkan Shader Compiler: Simple Compilation")
     const RVulkanShader::FReflectionData& GotReflection = ShaderResult->GetReflectionData();
 
     CheckReflection(ExpectedReflection, GotReflection);
-
-    ::Log::Shutdown();
 }
 
 BEGIN_PARAMETER_STRUCT(PointLightStruct)
@@ -212,7 +210,7 @@ END_PARAMETER_STRUCT();
 TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
 {
     using namespace VulkanRHI;
-    ::Log::Init();
+    FLog log;
 
     std::filesystem::path SimpleShaderPath = GetCurrentFilePath() / "test_shaders/TestComplex.frag";
     FVulkanShaderCompiler Compiler;
@@ -728,6 +726,4 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
     //     }
     //     CHECK(GotExpectedReflection == ExpectedReflection);
     // }
-
-    ::Log::Shutdown();
 }
