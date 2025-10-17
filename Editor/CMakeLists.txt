@@ -16,6 +16,11 @@ if(MSVC)
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 endif(MSVC)
 
-vit_copy_dlls_to_target_dir(${PROJECT_NAME} VitruveEngine VitruveEngine_VulkanRHI glfw cpplogger)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+    COMMAND_EXPAND_LISTS
+)
+
+vit_copy_dlls_to_target_dir(${PROJECT_NAME} VitruveEngine_VulkanRHI)
 
 # target_generate_debug_file(${PROJECT_NAME})

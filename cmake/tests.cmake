@@ -10,7 +10,11 @@ function(build_tests TARGET)
         target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/)
         target_link_libraries(${TEST_NAME} PRIVATE Catch2::Catch2WithMain ${TARGET}_obj)
         add_dependencies(tests ${TEST_NAME})
-        vit_copy_dlls_to_target_dir(${PROJECT_NAME}_Test glfw cpplogger)
+
+        add_custom_command(TARGET ${TEST_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${TEST_NAME}> $<TARGET_RUNTIME_DLLS:${TEST_NAME}>
+            COMMAND_EXPAND_LISTS
+        )
 
 
         if(DEFINED ENV{CI})
