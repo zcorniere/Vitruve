@@ -196,7 +196,7 @@ void FVulkanDynamicRHI::FlushDeletionQueue()
     DeletionQueue.Clear();
     if (Counter > 0)
     {
-        LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
+        LOG(LogVulkanRHI, Trace, "Deleted {} RHI ressources", Counter);
     }
 }
 
@@ -211,7 +211,7 @@ void FVulkanDynamicRHI::FlushDeletionQueueAsync()
         }
         if (Counter > 0)
         {
-            LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
+            LOG(LogVulkanRHI, Trace, "Deleted {} RHI ressources", Counter);
         }
 
         while (Counter > 0)
