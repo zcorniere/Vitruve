@@ -117,4 +117,4 @@ target_precompile_headers(
     "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
     "src/Engine/Vitruve.hxx"
 )
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm ${PROJECT_NAME}_obj)
+target_link_libraries(${PROJECT_NAME}_Test PRIVATE glm)

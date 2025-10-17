@@ -42,7 +42,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_obj)
 
 build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx)
 target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers ${PROJECT_NAME}_obj)
+target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
 target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
 target_precompile_headers(
     ${PROJECT_NAME}_Test
