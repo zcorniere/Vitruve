@@ -28,7 +28,7 @@ add_library(
 )
 if(NOT VIT_COMPILE_MONOLITHIC)
     set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif(VIT_COMPILE_MONOLITHIC)
+endif()
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends)
 target_compile_definitions(imgui PRIVATE GLFW_INCLUDE_NONE)
 target_link_libraries(imgui PUBLIC glfw)
