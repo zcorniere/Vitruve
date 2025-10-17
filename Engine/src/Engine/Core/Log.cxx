@@ -27,6 +27,13 @@ void Log::Init()
 
 void Log::Shutdown()
 {
+    std::vector<cpplogger::ISink*> Sinks = s_CoreLogger->getSinks();
+
     delete s_CoreLogger;
     s_CoreLogger = nullptr;
+
+    for (cpplogger::ISink* Sink: Sinks)
+    {
+        delete Sink;
+    }
 }
