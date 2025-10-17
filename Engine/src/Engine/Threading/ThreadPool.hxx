@@ -52,9 +52,9 @@ public:
     ~FThreadPool() = default;
 
     /// Create the pool with a given number of thread (default 2 / 3 of the max number of thread)
-    void Start(unsigned size = std::max(((std::thread::hardware_concurrency() * 2) / 3), 1u));
+    ENGINE_API void Start(unsigned size = std::max(((std::thread::hardware_concurrency() * 2) / 3), 1u));
     /// Stop and join all of the thread
-    void Stop();
+    ENGINE_API void Stop();
     /// Return the amount of thread in the pool
     unsigned Size()
     {

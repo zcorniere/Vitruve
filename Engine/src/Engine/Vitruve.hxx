@@ -48,4 +48,4 @@ DECLARE_LOGGER_CATEGORY(Core, LogCore, Trace);
 
 extern IMallocInterface* GMalloc;
 
-extern uint64 GFrameCounter;
+ENGINE_API extern uint64 GFrameCounter;

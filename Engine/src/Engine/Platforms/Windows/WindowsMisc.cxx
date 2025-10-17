@@ -134,21 +134,32 @@ const FCPUInformation& FWindowsMisc::GetCPUInformation()
 }
 // ------------------ Windows External Module --------------------------
 
-static TMap<std::string, WeakRef<RWindowsExternalModule>> s_ModuleStorage;
-
-RWindowsExternalModule::RWindowsExternalModule(std::string_view ModulePath): IExternalModule(ModulePath)
+FWindowsExternalModule::FWindowsExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = ::LoadLibrary(ModulePath.data());
+    if (!ModuleHandle)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to open External module: {}", GetLastError());
+    }
 }
 
-RWindowsExternalModule::~RWindowsExternalModule()
+FWindowsExternalModule::~FWindowsExternalModule()
 {
-    ::FreeLibrary(HMODULE(ModuleHandle));
+    bool bSuccess = ::FreeLibrary(HMODULE(ModuleHandle));
+    if (!bSuccess)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to unload external module: {}", GetLastError());
+    }
 }
 
-void* RWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
+void* FWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
-    return ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
+    void* Symbol = ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
+    if (!Symbol)
+    {
+       LOG(LogPlatformMisc, Error, "Failed to find symbol \"{:s}\": {}", SymbolName, GetLastError());
+    }
+    return Symbol;
 }
 
 bool FWindowsMisc::BaseAllocator(void* TargetMemory)
@@ -159,17 +170,13 @@ bool FWindowsMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-Ref<IExternalModule> FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
 {
-    WeakRef<RWindowsExternalModule>* Iter = s_ModuleStorage.Find(ModuleName);
+    VIT_PROFILE_FUNC()
 
-    if (Iter == nullptr || !Iter->IsValid())
-    {
-        Ref<RWindowsExternalModule> Module = Ref<RWindowsExternalModule>::Create(ModuleName);
-        s_ModuleStorage.FindOrAdd(ModuleName) = Module;
-        return Module;
-    }
-    return Iter->Pin();
+    IExternalModule* Module = new FWindowsExternalModule(ModuleName);
+    Module->SetName(ModuleName);
+    return Module;
 }
 
 std::filesystem::path FWindowsMisc::GetConfigPath()

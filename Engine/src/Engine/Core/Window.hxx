@@ -39,7 +39,7 @@ struct FWindowDefinition
 };
 
 /// @brief A holder for GLFW to make sure it stays initialized
-struct GLFWHolder
+struct ENGINE_API GLFWHolder
 {
     GLFWHolder();
     ~GLFWHolder();
@@ -54,7 +54,7 @@ class RWindow : public RObject
 
 public:
     /// Make sure GLFW is initialized or do it if it is not
-    static bool EnsureGLFWInit();
+    ENGINE_API static bool EnsureGLFWInit();
 
 public:
     /// Default ctor
@@ -64,42 +64,41 @@ public:
 
     /// @brief Open the window
     /// @param InDefinition The definition of the window
-    /// @param InParent (optional) The parent window of this window
-    void Initialize(const FWindowDefinition& InDefinition);
+    ENGINE_API void Initialize(const FWindowDefinition& InDefinition);
 
     /// Reshape the window
-    void ReshapeWindow(int32 X, int32 Y, int32 Width, int32 Height);
+    ENGINE_API void ReshapeWindow(int32 X, int32 Y, int32 Width, int32 Height);
     /// Move the window
-    void MoveWindow(int32 X, int32 Y);
+    ENGINE_API void MoveWindow(int32 X, int32 Y);
     /// Bring the window to the front
-    void BringToFront(bool bForce = false);
+    ENGINE_API void BringToFront(bool bForce = false);
 
     /// Destroy the window
-    void Destroy();
+    ENGINE_API void Destroy();
     /// Minimize the window
-    void Minimize();
+    ENGINE_API void Minimize();
     /// Maximize the window
-    void Maximize();
+    ENGINE_API void Maximize();
     /// Restore the window
-    void Restore();
+    ENGINE_API void Restore();
 
     /// @brief Show the window
-    void Show();
+    ENGINE_API void Show();
     /// @brief Hide the window
-    void Hide();
+    ENGINE_API void Hide();
 
-    bool IsMaximized() const;
-    bool IsMinimized() const;
-    bool IsVisible() const;
+    ENGINE_API bool IsMaximized() const;
+    ENGINE_API bool IsMinimized() const;
+    ENGINE_API bool IsVisible() const;
 
-    void AcceptInput(bool bEnable);
-    int32 GetWindowBorderSize() const;
-    int32 GetWindowTitleBarSize() const;
+    ENGINE_API void AcceptInput(bool bEnable);
+    ENGINE_API int32 GetWindowBorderSize() const;
+    ENGINE_API int32 GetWindowTitleBarSize() const;
 
-    void SetText(const std::string_view Text);
-    void DrawAttention();
+    ENGINE_API void SetText(const std::string_view Text);
+    ENGINE_API void DrawAttention();
 
-    GLFWwindow* GetHandle() const;
+    ENGINE_API GLFWwindow* GetHandle() const;
 
     const FWindowDefinition& GetDefinition() const
     {
@@ -109,9 +108,9 @@ public:
     void ProcessEvents();
 
 private:
-    static bool InitializeGLFW();
-    static std::atomic_bool bGLFWInitialized;
-    static std::atomic_short GLFWInUseCount;
+    static ENGINE_API bool InitializeGLFW();
+    static ENGINE_API std::atomic_bool bGLFWInitialized;
+    static ENGINE_API std::atomic_short GLFWInUseCount;
 
     void SetupGLFWCallbacks();
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/RHI/Resources/RHIGraphicsPipeline.hxx"
+#include "Engine/RHI/Resources/RHIGraphicsPipeline.hxx"
 
 #include "VulkanRHI/DescriptorPoolManager.hxx"
 #include "VulkanRHI/Resources/VulkanShader.hxx"

@@ -1,8 +1,10 @@
 #include "Engine/Core/Window.hxx"
-#include "GLFW/glfw3.h"
 
 #include "VulkanRHI/VulkanExtension.hxx"
 #include "VulkanRHI/VulkanPlatform.hxx"
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 template <typename ExistingChainType, typename NewStructType>
 static void AddToPNext(ExistingChainType& Existing, NewStructType& Added)

@@ -2,31 +2,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogAssert, Trace)
 
-bool Vitruve::Debug::HandleCheckFailure(const std::string& Message, bool bShouldAbort)
-{
-    if constexpr (ShouldCheckPrintStackTrace())
-    {
-        CollectAndPrintStackTrace(Compiler::ReturnAddress());
-    }
-
-    fprintf(stderr, "%s\n", Message.c_str());
-    fflush(stderr);
-
-    if (bShouldAbort)
-    {
-        if (FPlatform::isDebuggerPresent())
-        {
-            PLATFORM_BREAK();
-        }
-        else
-        {
-            std::abort();
-        }
-    }
-    return FPlatform::isDebuggerPresent();
-}
-
-void Vitruve::Debug::CollectAndPrintStackTrace(void* ReturnAddress)
+void CollectAndPrintStackTrace(void* ReturnAddress)
 {
     static bool bIsAlreadyHandlerAssertions = false;
 
@@ -51,4 +27,28 @@ void Vitruve::Debug::CollectAndPrintStackTrace(void* ReturnAddress)
             detailed_info.Filename, detailed_info.LineNumber);
     }
     bIsAlreadyHandlerAssertions = false;
+}
+
+bool Vitruve::Debug::HandleCheckFailure(const std::string& Message, bool bShouldAbort)
+{
+    if constexpr (ShouldCheckPrintStackTrace())
+    {
+        CollectAndPrintStackTrace(Compiler::ReturnAddress());
+    }
+
+    fprintf(stderr, "%s\n", Message.c_str());
+    fflush(stderr);
+
+    if (bShouldAbort)
+    {
+        if (FPlatform::isDebuggerPresent())
+        {
+            PLATFORM_BREAK();
+        }
+        else
+        {
+            std::abort();
+        }
+    }
+    return FPlatform::isDebuggerPresent();
 }

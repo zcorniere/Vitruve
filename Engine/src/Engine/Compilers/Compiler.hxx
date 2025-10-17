@@ -13,7 +13,7 @@
 ///
 /// @brief Wrapper around generic intrinsics function
 ///
-class GenericCompiler
+class ENGINE_API GenericCompiler
 {
 public:
     /// Return the address of the current function,

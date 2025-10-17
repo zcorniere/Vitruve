@@ -4,6 +4,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+DECLARE_LOGGER_CATEGORY(Core, LogPlatform, Info);
+
 /// Structure that hold info about the CPU, things like instruction set, vendor named etc...
 struct FCPUInformation
 {
@@ -34,21 +36,13 @@ enum class EBoxReturnType
 };
 
 /// @brief Interface that represent a manually loaded shared library
-class IExternalModule : public RObject
+class ENGINE_API IExternalModule : public FNamedClass
 {
-    RTTI_DECLARE_TYPEINFO(IExternalModule, RObject);
+    RTTI_DECLARE_TYPEINFO(IExternalModule, FNamedClass);
 
 public:
-    IExternalModule() = delete;
-    /// @brief  Construct a new module, and load the library
-    /// @param  Name The name of the shared library
-    IExternalModule(std::string_view Name)
-    {
-        SetName(Name);
-    }
-    virtual ~IExternalModule()
-    {
-    }
+    IExternalModule() = default;
+    virtual ~IExternalModule() = default;
 
     /// @brief Find the requested function pointer
     /// @tparam T The Function pointer type to return
@@ -60,6 +54,8 @@ public:
         return (T)GetSymbol_Internal(SymbolName);
     }
 
+    virtual bool IsValid() const = 0;
+
 private:
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const = 0;
 };
@@ -67,7 +63,7 @@ private:
 DECLARE_LOGGER_CATEGORY(Core, LogPlatformMisc, Info);
 
 /// @brief Miscellaneous platform agnostic function
-class FGenericMisc
+class ENGINE_API FGenericMisc
 {
 public:
     /// @brief Display a simple message box
@@ -96,9 +92,9 @@ public:
 
     /// @brief Platform independent function to load shared library
     /// If the same library is loaded multiple times, the return will be cached
-    /// @param ModuleName The name of the module to load
+    /// @param ModuleName The name of the module to load. If empty, will open the current executable
     /// @return The loaded module
-    static Ref<IExternalModule> LoadExternalModule(std::string_view ModuleName);
+    static IExternalModule* LoadExternalModule(std::string_view ModuleName);
 
     /// @brief Platform agnostic way to look for a config file
     /// @return Return the platform standard path to look for the config

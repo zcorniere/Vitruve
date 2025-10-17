@@ -1,11 +1,11 @@
 #include "Engine/Core/Application.hxx"
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Core/Log.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/Timer.hxx"
 #include "Engine/Misc/Utils.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
 #ifdef PLATFORM_WINDOWS
     #include <windows.h>
@@ -13,9 +13,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 
-extern "C" IApplication* GetApplication();
-
-FORCEINLINE int EngineLoop()
+FORCEINLINE int EngineLoop(IApplication* (*ApplicationEntryPoint)())
 {
     GEngine = new FEngine;
 
@@ -28,7 +26,7 @@ FORCEINLINE int EngineLoop()
     RHI::Create();
     GDynamicRHI->Init();
 
-    IApplication* const Application = GetApplication();
+    IApplication* const Application = ApplicationEntryPoint();
     check(Application);
     if (!Application->OnEngineInitialization())
     {
@@ -72,6 +70,7 @@ FORCEINLINE int EngineLoop()
     if (ExitStatus == 0)
     {
         RHI::RHIWaitUntilIdle();
+        GEngine->OnApplicationDestruction();
         Application->OnEngineDestruction();
         RHI::Destroy();
         GEngine->Destroy();
@@ -83,18 +82,9 @@ FORCEINLINE int EngineLoop()
     return ExitStatus;
 }
 
-#ifdef PLATFORM_WINDOWS
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-    (void)hInstance;
-    (void)hPrevInstance;
-    (void)nShowCmd;
-    FCommandLine::Set(lpCmdLine);
-#else
-int main(int ac, char** av)
+ENGINE_API int EngineMain(const int ac, const char* const* av, IApplication* (*ApplicationEntryPoint)())
 {
     FCommandLine::Set(ac, av);
-#endif    // !PLATFORM_WINDOWS
 
     FPlatform::Initialize();
     if (FCommandLine::Param("-waitfordebugger"))
@@ -105,15 +95,16 @@ int main(int ac, char** av)
         }
         PLATFORM_BREAK();
     }
-    Log::Init();
 
-    const int GuardedReturnValue = EngineLoop();
+    int GuardedReturnValue = 0;
+    {
+        FLog Log;
+        GuardedReturnValue = EngineLoop(ApplicationEntryPoint);
 
-    // Make sure no RObjects are left undestroyed
-    // Not strictly necessary, but this precaution don't hurt ¯\_(ツ)_/¯
-    check(RObjectUtils::AreThereAnyLiveObject() == false);
-
-    Log::Shutdown();
+        // Make sure no RObjects are left undestroyed
+        // Not strictly necessary, but this precaution don't hurt ¯\_(ツ)_/¯
+        check(RObjectUtils::AreThereAnyLiveObject() == false);
+    }
     FPlatform::Deinitialize();
     return GuardedReturnValue;
 }

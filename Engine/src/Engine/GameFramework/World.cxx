@@ -1,8 +1,8 @@
 #include "Engine/GameFramework/World.hxx"
 
 #include "Engine/Core/Engine.hxx"
-#include "Engine/Core/RHI/GenericRHI.hxx"
-#include "Engine/Core/RHI/RHIScene.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHIScene.hxx"
 
 #include "Engine/GameFramework/Actor.hxx"
 
@@ -26,12 +26,14 @@ void RWorld::SetName(std::string_view InName)
 void RWorld::AddToWorld(Ref<AActor> Actor)
 {
     Actors.Add(Actor);
+    Actor->BeginPlay();
     OnActorAddedToWorld.Broadcast(Actor.Raw());
 }
 
 void RWorld::RemoveFromWorld(Ref<AActor> Actor)
 {
     OnActorRemovedFromWorld.Broadcast(Actor.Raw());
+    Actor->EndPlay();
     Actors.Remove(Actor);
 }
 

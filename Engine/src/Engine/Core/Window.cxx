@@ -3,11 +3,13 @@
 #include "Engine/Core/Events/ApplicationEvent.hxx"
 #include "Engine/Core/Events/KeyEvent.hxx"
 #include "Engine/Core/Events/MouseEvent.hxx"
-#include "Engine/Core/RHI/RHI.hxx"
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/MiscDefines.hxx"
 #include "Engine/Misc/Utils.hxx"
+#include "Engine/RHI/GenericRHI.hxx"
+#include "Engine/RHI/RHI.hxx"
 
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 DECLARE_LOGGER_CATEGORY(Core, LogWindow, Info);
@@ -70,6 +72,7 @@ void RWindow::Initialize(const FWindowDefinition& InDefinition)
         Utils::RequestExit(1);
     }
     SetupGLFWCallbacks();
+    RHI::Get()->OnWindowCreated(this);
 
     MoveWindow(X, Y);
 }
@@ -100,7 +103,7 @@ void RWindow::BringToFront(bool bForce)
 void RWindow::Destroy()
 {
     RHI::FlushDeletionQueue(false);
-
+    RHI::Get()->OnWindowDeleted(this);
     LOG(LogWindow, Info, "Destroying GLFW Window '{:p}'", (void*)p_Handle);
     glfwDestroyWindow(p_Handle);
     p_Handle = nullptr;

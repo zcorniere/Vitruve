@@ -32,7 +32,7 @@ public:
 
 private:
 private:
-    Ref<IExternalModule> VulkanModuleHandle = nullptr;
+    IExternalModule* VulkanModuleHandle = nullptr;
 };
 
 }    // namespace VulkanRHI

@@ -1,57 +1,54 @@
 #pragma once
 
-template <typename TFunctionSignature>
+#include "Engine/Core/RTTI/FunctionTraits.hxx"
+
+template <typename Fn>
+concept IsDelegateFunction =
+    requires { requires std::is_same_v<typename ::RTTI::FunctionTraits<Fn>::result_type, void>; };
+
+namespace details
+{
+
+template <typename T>
+struct wrapper : public wrapper<typename RTTI::FunctionTraits<T>::args_type>
+{
+};
+
+template <typename... ArgsType>
+struct wrapper<std::tuple<ArgsType...>>
+{
+    static constexpr auto wrap_function(auto system)
+    {
+        return [system = std::move(system)](ArgsType&&... Args) { std::apply(system, Args...); };
+    }
+
+    template <typename TClass>
+    static constexpr auto wrap_function(TClass* InContext, auto system)
+    {
+        return [system = std::move(system), InContext](ArgsType&&... Args)
+        { std::invoke(system, InContext, std::forward<ArgsType>(Args)...); };
+    }
+
+    template <typename TClass>
+    static constexpr auto wrap_function(WeakRef<TClass> InContext, auto system)
+    {
+        return [system = std::move(system), InContext = InContext.Pin()](ArgsType&&... Args)
+        {
+            if (InContext) [[likely]]
+            {
+                std::invoke(system, InContext, std::forward<ArgsType>(Args)...);
+            }
+        };
+    }
+};
+
+}    // namespace details
+
+template <IsDelegateFunction TFunctionSignature>
 class TDelegate
 {
 private:
-    class ILamdaInterface
-    {
-    public:
-        virtual ~ILamdaInterface() = default;
-        virtual std::function<TFunctionSignature> GetFunction() const = 0;
-    };
-
-    template <typename T>
-    class TWeakLambda : public ILamdaInterface
-    {
-    public:
-        TWeakLambda(WeakRef<T> InWeakPtr, std::function<TFunctionSignature>&& InFunction)
-            : WeakPtr(InWeakPtr)
-            , Function(std::move(InFunction))
-        {
-        }
-        virtual ~TWeakLambda() = default;
-
-        virtual std::function<TFunctionSignature> GetFunction() const override
-        {
-            if (!WeakPtr.IsValid())
-            {
-                return {};
-            }
-            return Function;
-        }
-
-    private:
-        WeakRef<T> WeakPtr = nullptr;
-        std::function<TFunctionSignature> Function;
-    };
-
-    class TLambda : public ILamdaInterface
-    {
-    public:
-        TLambda(std::function<TFunctionSignature>&& InFunction): Function(std::move(InFunction))
-        {
-        }
-        virtual ~TLambda() = default;
-
-        virtual std::function<TFunctionSignature> GetFunction() const override
-        {
-            return Function;
-        }
-
-    private:
-        std::function<TFunctionSignature> Function;
-    };
+    using Traits = RTTI::FunctionTraits<TFunctionSignature>;
 
 public:
     TDelegate() = default;
@@ -59,42 +56,55 @@ public:
 
     void Add(std::function<TFunctionSignature>&& Function)
     {
-        Functions.Add(std::make_unique<TLambda>(std::move(Function)));
-    }
-
-    template <typename T>
-    void Add(WeakRef<T> OwnerPtr, std::function<TFunctionSignature>&& Function)
-    {
-        Functions.Add(std::make_unique<TWeakLambda<T>>(OwnerPtr, std::move(Function)));
-    }
-    template <typename T>
-    void Add(T* OwnerPtr, std::function<TFunctionSignature>&& Function)
-    {
-        Functions.Add(std::make_unique<TWeakLambda<T>>(OwnerPtr, std::move(Function)));
-    }
-
-    void AddUnique(std::function<TFunctionSignature>&& Function)
-    {
-        if (std::find(Function->begin(), Function->end(), Function) == Function->end())
+        if (bIsBroadcasting)
         {
-            Functions.Add(std::make_unique<TLambda>(std::move(Function)));
+            LOG(LogCore, Error, "Adding a function to a delegate while broadcasting is not allowed");
+            return;
         }
+        BindedFunctions.Emplace(std::move(Function));
+    }
+
+    template <typename T, typename Fn>
+    void Add(WeakRef<T> OwnerPtr, Fn Function)
+    requires(std::is_same_v<typename Traits::args_type, typename RTTI::FunctionTraits<Fn>::args_type>) &&
+            (std::is_base_of_v<RObject, T>)    // Use the WeakRef version for RObject, please
+    {
+        if (bIsBroadcasting)
+        {
+            LOG(LogCore, Error, "Adding a function to a delegate while broadcasting is not allowed");
+            return;
+        }
+        BindedFunctions.Emplace(
+            details::wrapper<decltype(Function)>::template wrap_function<WeakRef<T>>(OwnerPtr, std::move(Function)));
+    }
+    template <typename T, typename Fn>
+    void Add(T* OwnerPtr, Fn Function)
+    requires std::is_member_function_pointer_v<std::decay_t<Fn>> &&
+             (std::is_same_v<typename Traits::args_type, typename RTTI::FunctionTraits<Fn>::args_type>)
+    // not the best requires expression, but it gets the job done. A bit.
+    {
+        if (bIsBroadcasting)
+        {
+            LOG(LogCore, Error, "Adding a function to a delegate while broadcasting is not allowed");
+            return;
+        }
+        BindedFunctions.Emplace(
+            details::wrapper<decltype(Function)>::template wrap_function<T>(OwnerPtr, std::move(Function)));
     }
 
     template <typename... TFunctionArgs>
-    requires std::is_invocable_v<TFunctionSignature, TFunctionArgs&...>
+    requires std::is_invocable_v<TFunctionSignature, TFunctionArgs...>
     void Broadcast(TFunctionArgs&&... Args)
     {
-        for (std::unique_ptr<ILamdaInterface>& Function: Functions)
+        bIsBroadcasting = true;
+        for (std::function<TFunctionSignature>& Function: BindedFunctions)
         {
-            std::function<TFunctionSignature> LambdaFunction = Function->GetFunction();
-            if (LambdaFunction)
-            {
-                LambdaFunction(Args...);
-            }
+            Function(std::forward<TFunctionArgs>(Args)...);
         }
+        bIsBroadcasting = false;
     }
 
 private:
-    TArray<std::unique_ptr<ILamdaInterface>> Functions;
+    bool bIsBroadcasting = false;
+    TArray<std::function<TFunctionSignature>> BindedFunctions;
 };

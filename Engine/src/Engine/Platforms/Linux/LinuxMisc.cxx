@@ -148,19 +148,34 @@ const FCPUInformation& FLinuxMisc::GetCPUInformation()
 
 // ------------------ Linux External Module --------------------------
 
-RLinuxExternalModule::RLinuxExternalModule(std::string_view ModulePath): IExternalModule(ModulePath)
+FLinuxExternalModule::FLinuxExternalModule(std::string_view ModulePath)
 {
     ModuleHandle = dlopen(ModulePath.data(), RTLD_NOW | RTLD_LOCAL);
+    if (ModuleHandle == nullptr)
+    {
+        LOG(LogPlatform, Error, "Failed to load module {:s}: {:s}", ModulePath, dlerror());
+    }
 }
 
-RLinuxExternalModule::~RLinuxExternalModule()
+FLinuxExternalModule::~FLinuxExternalModule()
 {
-    dlclose(ModuleHandle);
+    if (ModuleHandle)
+    {
+        dlclose(ModuleHandle);
+    }
 }
 
-void* RLinuxExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
+void* FLinuxExternalModule::GetSymbol_Internal(std::string_view SymbolName) const
 {
-    return dlsym(ModuleHandle, SymbolName.data());
+    dlerror();    // Clear any existing error
+    void* FunctionPtr = dlsym(ModuleHandle, SymbolName.data());
+    char* ErrorMessage = dlerror();
+    if (ErrorMessage != nullptr)
+    {
+        LOG(LogPlatform, Error, "Failed to find symbol {:s}: {:s}", SymbolName, ErrorMessage);
+        return nullptr;
+    }
+    return FunctionPtr;
 }
 
 bool FLinuxMisc::BaseAllocator(void* TargetMemory)
@@ -178,9 +193,13 @@ bool FLinuxMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-Ref<IExternalModule> FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
 {
-    return Ref<RLinuxExternalModule>::CreateNamed(ModuleName, ModuleName);
+    VIT_PROFILE_FUNC()
+
+    IExternalModule* Module = new FLinuxExternalModule(ModuleName);
+    Module->SetName(ModuleName);
+    return Module;
 }
 
 std::filesystem::path FLinuxMisc::GetConfigPath()

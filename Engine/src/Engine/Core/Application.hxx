@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Engine/Core/Events/ApplicationEvent.hxx"
-#include "Engine/Core/RHI/Resources/RHIViewport.hxx"
 #include "Engine/Core/Window.hxx"
+#include "Engine/RHI/Resources/RHIViewport.hxx"
 
 extern class IApplication* GApplication;
 
-class IApplication : public RTTI::FEnable
+class ENGINE_API IApplication : public RTTI::FEnable
 {
     RTTI_DECLARE_TYPEINFO(IApplication)
 public:
@@ -26,7 +26,7 @@ public:
     virtual void Tick(const double DeltaTime) = 0;
 };
 
-class FBaseApplication : public IApplication
+class ENGINE_API FBaseApplication : public IApplication
 {
     RTTI_DECLARE_TYPEINFO(FBaseApplication, IApplication)
 public:

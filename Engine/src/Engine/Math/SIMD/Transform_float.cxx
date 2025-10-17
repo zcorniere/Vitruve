@@ -7,7 +7,7 @@ namespace Math
 
 template <>
 [[gnu::target("avx2")]]
-size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT PositionX, const float* RESTRICT PositionY,
+ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT PositionX, const float* RESTRICT PositionY,
                                     const float* RESTRICT PositionZ, const float* RESTRICT QuaternionX,
                                     const float* RESTRICT QuaternionY, const float* RESTRICT QuaternionZ,
                                     const float* RESTRICT QuaternionW, const float* RESTRICT ScaleX,
@@ -92,7 +92,8 @@ size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT Position
 
 template <>
 [[gnu::target("avx512f")]]
-size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* RESTRICT PositionX, const float* RESTRICT PositionY,
+ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* RESTRICT PositionX,
+                                                const float* RESTRICT PositionY,
                                       const float* RESTRICT PositionZ, const float* RESTRICT QuaternionX,
                                       const float* RESTRICT QuaternionY, const float* RESTRICT QuaternionZ,
                                       const float* RESTRICT QuaternionW, const float* RESTRICT ScaleX,

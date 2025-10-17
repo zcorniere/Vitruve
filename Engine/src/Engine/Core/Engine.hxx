@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Engine/AssetRegistry/AssetRegistry.hxx"
+#include "AssetRegistry/AssetRegistry.hxx"
 #include "Engine/GameFramework/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
 
-extern class FEngine* GEngine;
+extern ENGINE_API class FEngine* GEngine;
 
 class FEngine
 {
@@ -12,7 +12,7 @@ public:
     FEngine();
     ~FEngine();
 
-    FThreadPool& GetThreadPool()
+    ENGINE_API FThreadPool& GetThreadPool()
     {
         return m_ThreadPool;
     }
@@ -21,17 +21,18 @@ public:
     bool ShouldExit() const;
 
     bool Initialisation();
+    void OnApplicationDestruction();
     void Destroy();
 
     void PreTick();
     void PostTick();
 
-    Ref<RWorld> CreateWorld();
-    void SetWorld(Ref<RWorld> World);
-    Ref<RWorld> GetWorld() const;
+    ENGINE_API Ref<RWorld> CreateWorld();
+    ENGINE_API void SetWorld(Ref<RWorld> World);
+    ENGINE_API Ref<RWorld> GetWorld() const;
 
 public:
-    FAssetRegistry AssetRegistry;
+    std::unique_ptr<FAssetRegistry> AssetRegistry;
     FThreadPool m_ThreadPool;
 
 private:

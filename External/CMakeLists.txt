@@ -9,6 +9,10 @@ set(TRACY_ON_DEMAND
     ON
     CACHE BOOL ""
 )
+set(TRACY_STATIC
+    OFF
+    CACHE BOOL ""
+)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy EXCLUDE_FROM_ALL)
 
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
@@ -22,7 +26,11 @@ add_library(
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui_demo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends/imgui_impl_glfw.cpp
 )
+if(NOT VIT_COMPILE_MONOLITHIC)
+    set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends)
+target_compile_definitions(imgui PRIVATE GLFW_INCLUDE_NONE)
 target_link_libraries(imgui PUBLIC glfw)
 
 if(BUILD_TESTING)

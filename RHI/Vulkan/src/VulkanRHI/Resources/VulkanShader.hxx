@@ -3,7 +3,7 @@
 #include "Engine/Serialization/StreamReader.hxx"
 #include "Engine/Serialization/StreamWriter.hxx"
 
-#include "Engine/Core/RHI/Resources/RHIShader.hxx"
+#include "Engine/RHI/Resources/RHIShader.hxx"
 
 namespace VulkanRHI
 {

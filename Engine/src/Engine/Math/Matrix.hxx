@@ -94,7 +94,7 @@ constexpr bool operator==(const TMatrix<TRows, TColumns, T>& lhs, const TMatrix<
 
 template <unsigned TRows, unsigned TColumns, typename T>
 requires(TRows > 0 && TColumns > 0 && std::is_floating_point_v<T>)
-void CheckNaN(const TMatrix<TRows, TColumns, T>& m);
+constexpr void CheckNaN(const TMatrix<TRows, TColumns, T>& m);
 
 }    // namespace Math
 

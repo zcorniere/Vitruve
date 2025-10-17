@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/RHI/RHIContext.hxx"
+#include "Engine/RHI/RHIContext.hxx"
 
 #include "VulkanRHI/VulkanPendingState.hxx"
 

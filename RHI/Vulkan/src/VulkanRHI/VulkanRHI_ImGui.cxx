@@ -32,8 +32,6 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
     // We can honor ImGuiPlatformIO::Textures[] requests during render.
     io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
-    ImGui_ImplGlfw_InitForVulkan(GApplication->GetMainWindow()->GetHandle(), true);
-
     ImGuiPipeline = RHI::CreateGraphicsPipeline(FRHIGraphicsPipelineSpecification{
         .VertexShader = "ImGui/ImGui.vert",
         .FragmentShader = "ImGui/ImGui.frag",
@@ -72,8 +70,6 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
 
 void VulkanRHI_ImGui::Shutdown()
 {
-    ImGui_ImplGlfw_Shutdown();
-
     ImGuiVertexBufferData.Clear();
     ImGuiVertexBuffer = nullptr;
     ImGuiIndexBufferData.Clear();

@@ -11,10 +11,7 @@
 namespace Vitruve::Debug
 {
 
-bool HandleCheckFailure(const std::string& Message, bool bShouldAbort);
-
-/// Collect and print the callstack
-void CollectAndPrintStackTrace(void* ReturnAddress);
+ENGINE_API bool HandleCheckFailure(const std::string& Message, bool bShouldAbort);
 
 /// Whether or not the check should print the stacktrace
 consteval bool ShouldCheckPrintStackTrace()

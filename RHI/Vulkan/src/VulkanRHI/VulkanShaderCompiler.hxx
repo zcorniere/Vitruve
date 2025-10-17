@@ -7,7 +7,7 @@ namespace VulkanRHI
 
 class RVulkanShader;
 
-class FVulkanShaderCompiler
+class VULKAN_RHI_API FVulkanShaderCompiler
 {
 public:
     /// Which optimization level to use when compiling

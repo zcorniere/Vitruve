@@ -372,7 +372,6 @@ public:
     TValue& FindOrAdd(const TKey& Key)
     requires(std::is_default_constructible<TValue>::value)
     {
-        VIT_PROFILE_FUNC();
         TValue* Value = Find(Key);
         if (Value == nullptr)
         {

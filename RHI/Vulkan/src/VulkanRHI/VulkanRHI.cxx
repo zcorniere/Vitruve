@@ -18,14 +18,27 @@
 #include "VulkanRHI/VulkanShaderCompiler.hxx"
 #include "VulkanRHI/VulkanUtils.hxx"
 
-// RHI Creation Implementation
-extern "C" FGenericRHI* RHI_CreateRHI()
-{
-    VIT_PROFILE_FUNC()
+#include "Engine/Core/Memory/Memory.hxx"
+#include "Engine/Modules/ImplementationMacros.hxx"
+#include "Engine/Modules/ModuleInterface.hxx"
 
-    return new VulkanRHI::FVulkanDynamicRHI;
-}
-//
+class FRHIVulkanModule final : public IRHIModule
+{
+public:
+    virtual void StartupModule() override
+    {
+    }
+
+    virtual void ShutdownModule() override
+    {
+    }
+    virtual FGenericRHI* CreateRHI() override
+    {
+        return new VulkanRHI::FVulkanDynamicRHI;
+    }
+};
+
+IMPLEMENT_MODULE(VULKAN_RHI_API, FRHIVulkanModule)
 
 static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platform,
                                         TArray<const char*> VulkanExtensions);
@@ -115,6 +128,15 @@ void FVulkanDynamicRHI::PostFrame()
 {
 }
 
+void FVulkanDynamicRHI::OnWindowCreated(RWindow* Window)
+{
+    ImGui_ImplGlfw_InitForVulkan(Window->GetHandle(), true);
+}
+void FVulkanDynamicRHI::OnWindowDeleted(RWindow*)
+{
+    ImGui_ImplGlfw_Shutdown();
+}
+
 VkDevice FVulkanDynamicRHI::RHIGetVkDevice() const
 {
     return Device->GetHandle();
@@ -148,11 +170,11 @@ void FVulkanDynamicRHI::Init()
 
     ShaderCompiler = std::make_unique<FVulkanShaderCompiler>();
     ShaderCompiler->SetOptimizationLevel(FVulkanShaderCompiler::EOptimizationLevel::PerfWithDebug);
+    ImGuiStuff.Initialize(Device.get());
 }
 
 void FVulkanDynamicRHI::PostInit()
 {
-    ImGuiStuff.Initialize(Device.get());
 }
 
 void FVulkanDynamicRHI::FlushDeletionQueue()
@@ -174,7 +196,7 @@ void FVulkanDynamicRHI::FlushDeletionQueue()
     DeletionQueue.Clear();
     if (Counter > 0)
     {
-        LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
+        LOG(LogVulkanRHI, Trace, "Deleted {} RHI ressources", Counter);
     }
 }
 
@@ -189,7 +211,7 @@ void FVulkanDynamicRHI::FlushDeletionQueueAsync()
         }
         if (Counter > 0)
         {
-            LOG(LogVulkanRHI, Info, "Deleted {} RHI ressources", Counter);
+            LOG(LogVulkanRHI, Trace, "Deleted {} RHI ressources", Counter);
         }
 
         while (Counter > 0)

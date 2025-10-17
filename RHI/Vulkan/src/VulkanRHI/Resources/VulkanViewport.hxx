@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Core/RHI/Resources/RHIViewport.hxx"
+#include "Engine/RHI/Resources/RHIViewport.hxx"
 
 #include "VulkanRHI/Resources/VulkanTexture.hxx"
 

@@ -16,8 +16,9 @@ set(VMA_DYNAMIC_VULKAN_FUNCTIONS
     CACHE BOOL "" FORCE
 )
 set(VMA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VulkanMemoryAllocator)
-add_library(VulkanMemoryAllocator EXCLUDE_FROM_ALL STATIC ${VMA_PATH}/include/vk_mem_alloc.h)
+add_library(VulkanMemoryAllocator STATIC EXCLUDE_FROM_ALL ${VMA_PATH}/include/vk_mem_alloc.h)
 set_source_files_properties(${VMA_PATH}/include/vk_mem_alloc.h PROPERTIES LANGUAGE CXX)
+set_property(TARGET VulkanMemoryAllocator PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(
     VulkanMemoryAllocator
     PRIVATE VMA_IMPLEMENTATION
@@ -167,6 +168,10 @@ set(SPIRV_CROSS_ENABLE_C_API
 )
 set(SPIRV_CROSS_ENABLE_UTIL
     OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_FORCE_PIC
+    ON
     CACHE BOOL "" FORCE
 )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/SPIRV-Cross EXCLUDE_FROM_ALL)

@@ -22,7 +22,7 @@ bool ReadBinaryFile(const std::filesystem::path& filename, TArray<T>& FileConten
 }
 
 /// Read a whole file into a string
-std::string ReadFile(const std::filesystem::path& filename);
+ENGINE_API std::string ReadFile(const std::filesystem::path& filename);
 
 template <typename T = std::byte>
 std::size_t WriteBinaryFile(const std::filesystem::path& filename, const std::span<const T>& code)
@@ -33,9 +33,9 @@ std::size_t WriteBinaryFile(const std::filesystem::path& filename, const std::sp
     return code.size();
 }
 
-std::string BytesToString(uint64 Bytes);
+ENGINE_API std::string BytesToString(uint64 Bytes);
 
-void RequestExit(int InStatus, bool bForce = false);
-bool HasRequestedExit(int& OutStatus);
+ENGINE_API void RequestExit(int InStatus, bool bForce = false);
+ENGINE_API bool HasRequestedExit(int& OutStatus);
 
 }    // namespace Utils

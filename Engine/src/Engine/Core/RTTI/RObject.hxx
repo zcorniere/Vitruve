@@ -17,11 +17,11 @@ namespace RObjectUtils
 DECLARE_LOGGER_CATEGORY(Core, LogRObject, Warning)
 
 /// Mark the RObject as a live ref
-void AddToLiveReferences(RObject* instance);
+ENGINE_API void AddToLiveReferences(RObject* instance);
 /// Mark the RObject as dead
-void RemoveFromLiveReferences(RObject* instance);
+ENGINE_API void RemoveFromLiveReferences(RObject* instance);
 /// Is the RObject live ?
-bool IsLive(RObject* instance);
+ENGINE_API bool IsLive(RObject* instance);
 
 /// @brief check is there is any live RObject
 /// @return true is a RObject was not deleted
@@ -29,47 +29,35 @@ bool AreThereAnyLiveObject(bool bPrintObjects = true);
 
 }    // namespace RObjectUtils
 
-class FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
+class ENGINE_API FNamedClass : public RTTI::FEnable, public Vitruve::FUUID
 {
     RTTI_DECLARE_TYPEINFO(FNamedClass);
 
 public:
     FNamedClass() = default;
-    FNamedClass(const std::string_view& InName): m_Name(InName)
-    {
-    }
-    virtual ~FNamedClass() = default;
+    explicit FNamedClass(const std::string_view& InName);
 
     /// Give the object a debug name
     template <typename... ArgsTypes>
-    inline void SetNamef(std::format_string<ArgsTypes...> InFormat, ArgsTypes&&... InArgs)
+    void SetNamef(std::format_string<ArgsTypes...> InFormat, ArgsTypes&&... InArgs)
     {
         std::string NewName = std::format(std::move(InFormat), std::forward<ArgsTypes>(InArgs)...);
         SetName(NewName);
     }
-    virtual void SetName(std::string_view InName)
-    {
-        m_Name = InName;
-    }
+    virtual void SetName(std::string_view InName);
 
     /// Return the debug name of the object
-    const std::string& GetName() const
-    {
-        return m_Name;
-    }
+    [[nodiscard]] const std::string& GetName() const;
 
     /// Return a string representing the Object
-    virtual std::string ToString() const
-    {
-        return std::format("(\"{:s}\" <{:s}> {:p})", GetName(), GetBaseTypeName(), (void*)this);
-    }
+    [[nodiscard]] virtual std::string ToString() const;
 
 private:
     std::string m_Name = "Unnamed";
 };
 
 /// Custom Ref Counting class
-class RObject : public FNamedClass
+class ENGINE_API RObject : public FNamedClass
 {
     RTTI_DECLARE_TYPEINFO(RObject, FNamedClass);
 
@@ -83,7 +71,7 @@ public:
     }
 
     /// Get the current ref count
-    std::uint32_t GetRefCount() const
+     std::uint32_t GetRefCount() const
     {
         return m_RefCount.load(std::memory_order_relaxed);
     }
@@ -119,10 +107,10 @@ template <typename T>
 class Ref
 {
 public:
-    /// @brief Create a new RObject and give it is name
+    /// @brief Create a new RObject and give it his name
     /// @return the new RObject
     template <typename... Args>
-    FORCEINLINE static Ref<T> CreateNamed(std::string_view Name, Args&&... args)
+    static Ref<T> CreateNamed(std::string_view Name, Args&&... args)
     {
         Ref<T> NewRef = CreateInternal(std::forward<Args>(args)...);
         NewRef->SetName(Name);
@@ -132,14 +120,14 @@ public:
     /// @brief Create a new RObject
     /// @return the new RObject
     template <typename... Args>
-    FORCEINLINE static Ref<T> Create(Args&&... args)
+    static Ref<T> Create(Args&&... args)
     {
         return CreateInternal(std::forward<Args>(args)...);
     }
 
 private:
     template <typename... Args>
-    FORCEINLINE static Ref<T> CreateInternal(Args&&... args)
+    static Ref<T> CreateInternal(Args&&... args)
     {
         T* const NewRef = new T(std::forward<Args>(args)...);
         LOG(RObjectUtils::LogRObject, Trace, "Creating RObject {:s}", NewRef->ToString());
@@ -158,7 +146,7 @@ public:
 
     Ref(T* Object): m_ObjPtr(Object)
     {
-        static_assert(std::is_base_of<RObject, T>::value, "Class is not RefCounted!");
+        static_assert(std::is_base_of_v<RObject, T>, "Class is not RefCounted!");
 
         IncrementRefCount();
     }

@@ -3,7 +3,7 @@
 namespace Vitruve
 {
 
-class FUUID
+class ENGINE_API FUUID
 {
 public:
     FUUID();

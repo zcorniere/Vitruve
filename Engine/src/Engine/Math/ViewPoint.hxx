@@ -17,7 +17,7 @@ public:
     /// @param Near The near plane
     /// @param Far The far plane
     /// @param AspectRatio The aspect ratio of the screen
-    TViewPoint(T FOV, T Near, T Far, T AspectRatio = T(0))
+    constexpr TViewPoint(T FOV, T Near, T Far, T AspectRatio = T(0))
         : m_FOV(DegreeToRadian(FOV))
         , m_AspectRatio(AspectRatio)
         , m_Near(Near)
@@ -26,7 +26,7 @@ public:
     {
     }
 
-    void SetFOV(T FOV)
+    constexpr void SetFOV(T FOV)
     {
         const T NewFOV = DegreeToRadian(FOV);
         if (m_FOV == NewFOV)
@@ -36,11 +36,11 @@ public:
         m_FOV = NewFOV;
         bProjectionMatrixDirty = true;
     }
-    T GetFOV() const
+    constexpr T GetFOV() const
     {
         return m_FOV;
     }
-    void SetAspectRatio(T AspectRatio)
+    constexpr void SetAspectRatio(T AspectRatio)
     {
         if (m_AspectRatio == AspectRatio)
         {
@@ -49,11 +49,11 @@ public:
         m_AspectRatio = AspectRatio;
         bProjectionMatrixDirty = true;
     }
-    T GetAspectRatio() const
+    constexpr T GetAspectRatio() const
     {
         return m_AspectRatio;
     }
-    void SetNear(T Near)
+    constexpr void SetNear(T Near)
     {
         if (m_Near == Near)
         {
@@ -62,11 +62,11 @@ public:
         m_Near = Near;
         bProjectionMatrixDirty = true;
     }
-    T GetNear() const
+    constexpr T GetNear() const
     {
         return m_Near;
     }
-    void SetFar(T Far)
+    constexpr void SetFar(T Far)
     {
         if (m_Far == Far)
         {
@@ -75,12 +75,12 @@ public:
         m_Far = Far;
         bProjectionMatrixDirty = true;
     }
-    T GetFar() const
+    constexpr T GetFar() const
     {
         return m_Far;
     }
 
-    TMatrix4<T> GetProjectionMatrix()
+    constexpr TMatrix4<T> GetProjectionMatrix()
     {
         if (bProjectionMatrixDirty)
         {
@@ -90,7 +90,7 @@ public:
         return m_ProjectionMatrix;
     }
 
-    TMatrix4<T> GetViewMatrix(const TTransform<T>& InTransform)
+    constexpr TMatrix4<T> GetViewMatrix(const TTransform<T>& InTransform)
     {
         if (bViewMatrixDirty)
         {
@@ -101,8 +101,8 @@ public:
     }
 
 private:
-    void ComputeProjectionMatrix();
-    void ComputeViewMatrix(const TTransform<T>& InTransform);
+    constexpr void ComputeProjectionMatrix();
+    constexpr void ComputeViewMatrix(const TTransform<T>& InTransform);
 
 private:
     /// @brief The field of view in radians

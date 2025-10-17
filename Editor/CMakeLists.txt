@@ -1,41 +1,26 @@
 project(VitruveEditor)
-set(CMAKE_FOLDER "Vitruve/Editor")
+set(CMAKE_FOLDER "Vitruve")
 
-add_executable(${PROJECT_NAME} EditorApplication.cxx Actor/Oscillator.cxx)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine imgui)
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx)
-target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-            -Wall
-            -Wextra
-            -Wno-missing-field-initializers>
-            $<$<CXX_COMPILER_ID:MSVC>:
-            /Zc:preprocessor
-            /W4
-            /wd4267 # conversion from 'size_t' to 'T', possible loss of data
-            /wd4244 # conversion from 'T' to 'T', possible loss of data
-            /wd4201 # unamed union
-            /wd4324 # structure was padded due to alignment specifier
-            /wd4702 # unreachable code
-            /wd5030> # unknown attribute
-)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
-set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 1)
-target_disable_rtti(${PROJECT_NAME})
-
-if(MSVC)
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+add_executable(${PROJECT_NAME} src/EditorApplication.cxx src/Actor/Oscillator.cxx)
+target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine imgui)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+if(VIT_COMPILE_MONOLITHIC)
+    target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine_VulkanRHI)
+else()
+    add_dependencies(${PROJECT_NAME} VitruveEngine_VulkanRHI)
 endif()
 
-if(VIT_ENABLE_PROFILING)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_PROFILING=1)
-    if(VIT_ENABLE_MEMORY_PROFILING)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC VIT_ENABLE_MEMORY_PROFILING=1)
-    endif(VIT_ENABLE_MEMORY_PROFILING)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
-endif(VIT_ENABLE_PROFILING)
+vit_add_platforms_entrypoint(${PROJECT_NAME})
+vit_set_standard_options(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
+if(MSVC)
+    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+endif(MSVC)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+    COMMAND_EXPAND_LISTS
+)
+
+vit_copy_dlls_to_target_dir(${PROJECT_NAME} VitruveEngine_VulkanRHI)
 
 # target_generate_debug_file(${PROJECT_NAME})

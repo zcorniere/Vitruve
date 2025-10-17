@@ -1,8 +1,12 @@
+#pragma once
+#include "Transform.hxx"
+
 namespace Math
 {
 
 template <typename T>
-TTransform<T>::TTransform(const TVector3<T>& InLocation, const TQuaternion<T>& InRotation, const TVector3<T>& InScale)
+constexpr TTransform<T>::TTransform(const TVector3<T>& InLocation, const TQuaternion<T>& InRotation,
+                                    const TVector3<T>& InScale)
     : Location(InLocation)
     , Rotation(InRotation)
     , Scale(InScale)
@@ -10,7 +14,7 @@ TTransform<T>::TTransform(const TVector3<T>& InLocation, const TQuaternion<T>& I
 }
 
 template <typename T>
-void TTransform<T>::SetLocation(const TVector3<T>& InLocation)
+constexpr void TTransform<T>::SetLocation(const TVector3<T>& InLocation)
 {
     Math::CheckNaN(InLocation);
     Location = InLocation;
@@ -18,7 +22,7 @@ void TTransform<T>::SetLocation(const TVector3<T>& InLocation)
 }
 
 template <typename T>
-void TTransform<T>::SetRotation(const TQuaternion<T>& InRotation)
+constexpr void TTransform<T>::SetRotation(const TQuaternion<T>& InRotation)
 {
     Math::CheckNaN(InRotation);
     Rotation = InRotation;
@@ -26,7 +30,7 @@ void TTransform<T>::SetRotation(const TQuaternion<T>& InRotation)
 }
 
 template <typename T>
-void TTransform<T>::SetScale(const TVector3<T>& InScale)
+constexpr void TTransform<T>::SetScale(const TVector3<T>& InScale)
 {
     Math::CheckNaN(InScale);
     Scale = InScale;
@@ -34,43 +38,43 @@ void TTransform<T>::SetScale(const TVector3<T>& InScale)
 }
 
 template <typename T>
-const TVector3<T>& TTransform<T>::GetLocation() const
+constexpr const TVector3<T>& TTransform<T>::GetLocation() const
 {
     return Location;
 }
 
 template <typename T>
-const TQuaternion<T>& TTransform<T>::GetRotation() const
+constexpr const TQuaternion<T>& TTransform<T>::GetRotation() const
 {
     return Rotation;
 }
 
 template <typename T>
-const TVector3<T>& TTransform<T>::GetScale() const
+constexpr const TVector3<T>& TTransform<T>::GetScale() const
 {
     return Scale;
 }
 
 template <typename T>
-TVector3<T>& TTransform<T>::GetLocation()
+constexpr TVector3<T>& TTransform<T>::GetLocation()
 {
     return Location;
 }
 
 template <typename T>
-TQuaternion<T>& TTransform<T>::GetRotation()
+constexpr TQuaternion<T>& TTransform<T>::GetRotation()
 {
     return Rotation;
 }
 
 template <typename T>
-TVector3<T>& TTransform<T>::GetScale()
+constexpr TVector3<T>& TTransform<T>::GetScale()
 {
     return Scale;
 }
 
 template <typename T>
-TMatrix4<T> TTransform<T>::GetTranslationMatrix() const
+constexpr TMatrix4<T> TTransform<T>::GetTranslationMatrix() const
 {
     TMatrix4<T> TranslationMatrix = TMatrix4<T>::Identity();
 
@@ -81,13 +85,13 @@ TMatrix4<T> TTransform<T>::GetTranslationMatrix() const
 }
 
 template <typename T>
-TMatrix4<T> TTransform<T>::GetRotationMatrix() const
+constexpr TMatrix4<T> TTransform<T>::GetRotationMatrix() const
 {
     return Rotation.GetRotationMatrix();
 }
 
 template <typename T>
-TMatrix4<T> TTransform<T>::GetScaleMatrix() const
+constexpr TMatrix4<T> TTransform<T>::GetScaleMatrix() const
 {
     TMatrix4<T> ScaleMatrix = TMatrix4<T>::Identity();
     ScaleMatrix[0, 0] = Scale.x;
@@ -97,18 +101,20 @@ TMatrix4<T> TTransform<T>::GetScaleMatrix() const
 }
 
 template <typename T>
-TMatrix4<T> TTransform<T>::GetModelMatrix()
+constexpr TMatrix4<T> TTransform<T>::GetModelMatrix()
 {
     if (!bModelMatrixDirty)
     {
         return ModelMatrix;
     }
+    else
+    {
+        VIT_PROFILE_FUNC()
+        ModelMatrix = GetTranslationMatrix() * Rotation.GetRotationMatrix() * GetScaleMatrix();
 
-    VIT_PROFILE_FUNC()
-    ModelMatrix = GetTranslationMatrix() * Rotation.GetRotationMatrix() * GetScaleMatrix();
-
-    Math::CheckNaN(ModelMatrix);
-    bModelMatrixDirty = false;
+        Math::CheckNaN(ModelMatrix);
+        bModelMatrixDirty = false;
+    }
     return ModelMatrix;
 }
 
