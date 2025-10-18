@@ -152,6 +152,7 @@ function(vit_set_standard_options target precompile_header)
                 $<$<CXX_COMPILER_ID:MSVC>:
                 /Zc:preprocessor
                 /W4
+                /wd4251 # needs to have dll-interface to be used by clients
                 /wd4267 # conversion from 'size_t' to 'T', possible loss of data
                 /wd4244 # conversion from 'T' to 'T', possible loss of data
                 /wd4201 # unamed union
