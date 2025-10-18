@@ -31,7 +31,7 @@ endif()
 generate_export_header(ENGINE)
 
 add_library(
-    ${PROJECT_NAME}_obj OBJECT
+    ${PROJECT_NAME} ${VIT_LIBRARY_TYPE}
     src/Engine/Main.cxx
     src/Engine/Core/Log.cxx
     src/Engine/Core/UUID.cxx
@@ -69,9 +69,9 @@ add_library(
     ${PLATFORM_SOURCE_FILES}
     ${COMPILER_SOURCE_FILE}
 )
-vit_set_standard_options(${PROJECT_NAME}_obj "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
+vit_set_standard_options(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
 target_link_libraries(
-    ${PROJECT_NAME}_obj
+    ${PROJECT_NAME}
     PUBLIC cpplogger
            magic_enum
            glfw
@@ -79,18 +79,16 @@ target_link_libraries(
            ModernDialogs
 )
 
-target_include_directories(${PROJECT_NAME}_obj PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_compile_definitions(${PROJECT_NAME}_obj PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
-target_compile_definitions(${PROJECT_NAME}_obj PRIVATE ENGINE_EXPORTS)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
+target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 
 if(UNIX)
-    target_link_libraries(${PROJECT_NAME}_obj PUBLIC xdgpp)
+    target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
 elseif(WIN32)
-    target_link_libraries(${PROJECT_NAME}_obj PUBLIC dbghelp)
+    target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
 endif()
 
-add_library(${PROJECT_NAME} ${VIT_LIBRARY_TYPE})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}_obj)
 
 # ------------- Tests -------------
 
