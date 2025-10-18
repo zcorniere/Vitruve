@@ -727,3 +727,10 @@ TEST_CASE("Vulkan Shader Compiler: Complex Compilation")
     //     CHECK(GotExpectedReflection == ExpectedReflection);
     // }
 }
+
+
+
+
+#include "Engine/Modules/ImplementationMacros.hxx"
+
+MODULE_BOILERPLATE
