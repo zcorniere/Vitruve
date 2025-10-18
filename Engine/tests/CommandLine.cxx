@@ -100,3 +100,8 @@ TEST_CASE("Delegates")
         REQUIRE(Value2 == 90);
     }
 }
+
+
+#include "Engine/Modules/ImplementationMacros.hxx"
+
+MODULE_BOILERPLATE
