@@ -54,9 +54,9 @@ FThreadPool::WorkerPoolRuntime::WorkerPoolRuntime(std::shared_ptr<FThreadPool::S
 {
 }
 
-bool FThreadPool::WorkerPoolRuntime::Init(std::stop_token stoken)
+bool FThreadPool::WorkerPoolRuntime::Init(std::stop_token InStoken)
 {
-    this->stoken = stoken;
+    stoken = InStoken;
     i_threadID = s_threadIDCounter++;
     return true;
 }
