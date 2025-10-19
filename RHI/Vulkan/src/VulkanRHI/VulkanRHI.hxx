@@ -6,7 +6,7 @@
 #include "VulkanRHI/VulkanRHI_ImGui.hxx"
 #include "VulkanRHI/VulkanShaderCompiler.hxx"
 
-DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Trace);
+DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Info);
 
 // Vitruve classes
 class RRHIResource;
