@@ -48,7 +48,7 @@ private:
 
 #ifndef NDEBUG
 
-    #define Vitruve_ENSURE_IMPL(Always, Expression, Format, ...) \
+    #define VITRUVE_ENSURE_IMPL(Always, Expression, Format, ...) \
         (((Expression)) || (([__VA_OPT__(&)] {                                                             \
                                 static std::atomic_bool bExecuted = false;                                 \
                                 if (!bExecuted || Always) {                                                \
@@ -66,10 +66,10 @@ private:
                                 return false;                                                              \
                             }())))
 
-    #define ensure(Expression) Vitruve_ENSURE_IMPL(false, Expression, )
-    #define ensureMsg(Expression, Format, ...) Vitruve_ENSURE_IMPL(false, Expression, " :: " Format, ##__VA_ARGS__)
-    #define ensureAlways(Expression) Vitruve_ENSURE_IMPL(true, Expression, )
-    #define ensureAlwaysMsg(Expression, Format, ...) Vitruve_ENSURE_IMPL(true, Expression, " :: " Format, ##__VA_ARGS__)
+    #define ensure(Expression) VITRUVE_ENSURE_IMPL(false, Expression, )
+    #define ensureMsg(Expression, Format, ...) VITRUVE_ENSURE_IMPL(false, Expression, " :: " Format, ##__VA_ARGS__)
+    #define ensureAlways(Expression) VITRUVE_ENSURE_IMPL(true, Expression, )
+    #define ensureAlwaysMsg(Expression, Format, ...) VITRUVE_ENSURE_IMPL(true, Expression, " :: " Format, ##__VA_ARGS__)
 
     #define Vitruve_CHECK_IMPL(Expression, Format, ...)                                                        \
         {                                                                                                      \
@@ -103,11 +103,11 @@ private:
                                                              __LINE__)(MACRO_EXPENDER(RecursionCounter, __LINE__))
 
 #else
-    #define Vitruve_ENSURE_IMPL(Expression) (bool)(Expression)
-    #define ensure(Expression) Vitruve_ENSURE_IMPL(Expression)
-    #define ensureMsg(Expression, ...) Vitruve_ENSURE_IMPL(Expression)
-    #define ensureAlways(Expression) Vitruve_ENSURE_IMPL(Expression)
-    #define ensureAlwaysMsg(Expression, ...) Vitruve_ENSURE_IMPL(Expression)
+    #define VITRUVE_ENSURE_IMPL(Expression) (bool)(Expression)
+    #define ensure(Expression) VITRUVE_ENSURE_IMPL(Expression)
+    #define ensureMsg(Expression, ...) VITRUVE_ENSURE_IMPL(Expression)
+    #define ensureAlways(Expression) VITRUVE_ENSURE_IMPL(Expression)
+    #define ensureAlwaysMsg(Expression, ...) VITRUVE_ENSURE_IMPL(Expression)
 
     #define Vitruve_CHECK_IMPL(Expression) (void)(Expression);
     #define check(Expression) Vitruve_CHECK_IMPL(Expression)
