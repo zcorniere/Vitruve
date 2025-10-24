@@ -1,9 +1,10 @@
 #include "Engine/Core/RTTI/RObject.hxx"
 
+#include <shared_mutex>
 #include <unordered_set>
 
 static std::unordered_set<RObject*> s_LiveReferences;
-static std::recursive_mutex s_LiveReferenceMutex;
+static std::shared_mutex s_LiveReferenceMutex;
 
 void RObjectUtils::AddToLiveReferences(RObject* instance)
 {
@@ -25,7 +26,7 @@ void RObjectUtils::RemoveFromLiveReferences(RObject* instance)
 bool RObjectUtils::IsLive(RObject* instance)
 {
     check(instance);
-    std::scoped_lock lock(s_LiveReferenceMutex);
+    std::shared_lock lock(s_LiveReferenceMutex);
     return s_LiveReferences.find(instance) != s_LiveReferences.end();
 }
 
@@ -43,7 +44,6 @@ bool RObjectUtils::AreThereAnyLiveObject(bool bPrintObjects)
     }
     return s_LiveReferences.size() > 0;
 }
-
 
 FNamedClass::FNamedClass(const std::string_view& InName): m_Name(InName)
 {
