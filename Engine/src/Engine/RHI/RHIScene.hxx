@@ -13,6 +13,7 @@ class RMeshComponent;
 class RWorld;
 class RRHIScene;
 class RAsset;
+class AActor;
 class RRHIMaterial;
 
 enum class ERenderSceneLockType
@@ -132,6 +133,8 @@ public:
     ENGINE_API void TickRenderer(FFRHICommandList& CommandList);
 
 private:
+    void OnActorAddedToWorld(AActor* Actor);
+    void OnActorRemovedFromWorld(AActor* Actor);
     void UpdateCameraAspectRatio();
 
     void Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch);

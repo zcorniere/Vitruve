@@ -23,55 +23,8 @@ RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandConte
     CameraData.ViewProjection = FMatrix4::Identity();
 
     // Register to the world events
-    OwnerWorld->OnActorAddedToWorld.Add(
-        [this](AActor* Actor) mutable
-        {
-            TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
-            TArray<FMeshRepresentation>& Representation = WorldActorRepresentation.Emplace(Actor->ID());
-
-            RMeshComponent* const MeshComponent = Actor->GetMesh();
-            if (MeshComponent)
-            {
-                FMeshRepresentation& Mesh = Representation.Emplace();
-                Mesh.Transform = Actor->GetRootComponent()->GetRelativeTransform();
-                Mesh.Mesh = MeshComponent;
-
-                ActorThatNeedAttention.Insert(Actor->ID(), FActorRepresentationUpdateRequest{
-                                                               .ActorId = Actor->ID(),
-                                                               .NewTransform = Mesh.Transform,
-                                                           });
-            }
-
-            RCameraComponent<float>* CameraComponent = Actor->GetComponent<RCameraComponent<float>>();
-            if (CameraComponent)
-            {
-                CameraComponents.Add(CameraComponent);
-            }
-        });
-
-    OwnerWorld->OnActorRemovedFromWorld.Add(
-        [this](AActor* Actor) mutable
-        {
-            TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
-            TPair<uint64, TArray<FMeshRepresentation>> DeletedMesh;
-            WorldActorRepresentation.Remove(Actor->ID(), &DeletedMesh);
-
-            for (FMeshRepresentation& Mesh: DeletedMesh.Get<1>())
-            {
-                TResourceArray<FMatrix4>* TransformArrays = TransformResourceArray.Find(Mesh.Mesh->Asset->ID());
-                if (TransformArrays)
-                {
-                    TransformArrays->RemoveAt(Mesh.TransformBufferIndex);
-                }
-
-                FRenderRequestKey Key{Mesh.Mesh->Material.Raw(), Mesh.Mesh->Asset.Raw()};
-                TArray<FMeshRepresentation*>* RenderRequests = RenderCalls.Find(Key);
-                if (RenderRequests)
-                {
-                    RenderRequests->RemoveAt(Mesh.RenderBufferIndex);
-                }
-            }
-        });
+    OwnerWorld->OnActorAddedToWorld.Add(this, &RRHIScene::OnActorAddedToWorld);
+    OwnerWorld->OnActorRemovedFromWorld.Add(this, &RRHIScene::OnActorRemovedFromWorld);
 }
 
 RRHIScene::RRHIScene(RWorld* OwnerWorld, const FRHIRenderPassTarget& InRenderPassTarget): RRHIScene(OwnerWorld)
@@ -367,6 +320,54 @@ void RRHIScene::Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch)
             Mesh.Transform.bModelMatrixDirty = false;
 
             i++;
+        }
+    }
+}
+
+void RRHIScene::OnActorAddedToWorld(AActor* Actor)
+{
+    TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
+    TArray<FMeshRepresentation>& Representation = WorldActorRepresentation.Emplace(Actor->ID());
+
+    RMeshComponent* const MeshComponent = Actor->GetMesh();
+    if (MeshComponent)
+    {
+        FMeshRepresentation& Mesh = Representation.Emplace();
+        Mesh.Transform = Actor->GetRootComponent()->GetRelativeTransform();
+        Mesh.Mesh = MeshComponent;
+
+        ActorThatNeedAttention.Insert(Actor->ID(), FActorRepresentationUpdateRequest{
+                                                       .ActorId = Actor->ID(),
+                                                       .NewTransform = Mesh.Transform,
+                                                   });
+    }
+
+    RCameraComponent<float>* CameraComponent = Actor->GetComponent<RCameraComponent<float>>();
+    if (CameraComponent)
+    {
+        CameraComponents.Add(CameraComponent);
+    }
+}
+
+void RRHIScene::OnActorRemovedFromWorld(AActor* Actor)
+{
+    TRenderSceneLock<ERenderSceneLockType::Write> Lock(this);
+    TPair<uint64, TArray<FMeshRepresentation>> DeletedMesh;
+    WorldActorRepresentation.Remove(Actor->ID(), &DeletedMesh);
+
+    for (FMeshRepresentation& Mesh: DeletedMesh.Get<1>())
+    {
+        TResourceArray<FMatrix4>* TransformArrays = TransformResourceArray.Find(Mesh.Mesh->Asset->ID());
+        if (TransformArrays)
+        {
+            TransformArrays->RemoveAt(Mesh.TransformBufferIndex);
+        }
+
+        FRenderRequestKey Key{Mesh.Mesh->Material.Raw(), Mesh.Mesh->Asset.Raw()};
+        TArray<FMeshRepresentation*>* RenderRequests = RenderCalls.Find(Key);
+        if (RenderRequests)
+        {
+            RenderRequests->RemoveAt(Mesh.RenderBufferIndex);
         }
     }
 }
