@@ -2,8 +2,11 @@
 
 #include "Application.hxx"
 #include "Engine/Core/Window.hxx"
+#include "Engine/Misc/ConsoleVariable.hxx"
 #include "Engine/RHI/RHI.hxx"
 #include "Engine/RHI/Resources/RHIViewport.hxx"
+
+#include <imgui.h>
 
 #include "Engine/Misc/Utils.hxx"
 
@@ -69,6 +72,31 @@ void FBaseApplication::Tick(const double DeltaTime)
     VIT_PROFILE_FUNC()
 
     (void)DeltaTime;
+
+    ImGui::Begin("Base Application");
+    ImGui::Text("Hello from the Base Application!");
+    ImGui::BeginTable("ConsoleVariables", 2);
+    for (const IConsoleVariable* CVar: FConsoleVariableRegistry::Get().GetAllConsoleVariables())
+    {
+        ImGui::PushID(CVar->GetName());
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(CVar->GetName());
+        ImGui::TableNextColumn();
+        std::string valueStr = CVar->GetValueAsString();
+        char valueBuffer[256] = {0};
+        if (ImGui::InputTextWithHint(valueStr.c_str(), valueStr.c_str(), valueBuffer, sizeof(valueBuffer),
+                                     ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            FConsoleVariableRegistry::Get().SetVariableValue(CVar->GetName(), valueBuffer);
+        }
+
+        ImGui::TextWrapped("%s", CVar->GetHelpText());
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+    ImGui::End();
+
     MainWindow->ProcessEvents();
 }
 

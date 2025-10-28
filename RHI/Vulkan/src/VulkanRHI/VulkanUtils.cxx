@@ -4,7 +4,13 @@
 #include "VulkanRHI/VulkanMemoryManager.hxx"
 #include "VulkanRHI/VulkanRHI.hxx"
 
+#include "Engine/Misc/ConsoleVariable.hxx"
+
 #include <magic_enum/magic_enum.hpp>
+
+static TConsoleVariable<bool> CVar_Vulkan_DumpVmaOnOutOfMemory(
+    "vulkan.DumpVmaOnOutOfMemory", false,
+    "If true, dump the VMA memory state when an out of memory error occurs in Vulkan.");
 
 namespace VulkanRHI
 {
@@ -24,7 +30,7 @@ void VulkanCheckResult(VkResult Result, const char* VulkanFunction, const std::s
             break;
     }
 
-    if (bDumpMemory)
+    if (bDumpMemory && CVar_Vulkan_DumpVmaOnOutOfMemory.GetValue())
     {
         LOG(LogVulkanRHI, Fatal, "VMA DUMP : \n{}",
             GetVulkanDynamicRHI()->GetDevice()->GetMemoryManager()->GetVMADumpString());
