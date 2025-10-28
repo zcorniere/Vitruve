@@ -76,6 +76,7 @@ target_link_libraries(
            magic_enum
            glfw
            mimalloc-static
+           imgui
            ModernDialogs
 )
 

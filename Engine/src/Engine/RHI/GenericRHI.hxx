@@ -22,7 +22,10 @@ public:
     /// Called every frame from the main loop
     virtual void Tick(double fDeltaTime) = 0;
 
-    /// Called before the RHI is destroyed
+    /// Called every frame before the application tick
+    virtual void PreFrame() = 0;
+
+    /// Called every frame after the application tick
     virtual void PostFrame() = 0;
 
     /// Shutdown the RHI

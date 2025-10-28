@@ -87,7 +87,7 @@ void VulkanRHI_ImGui::Shutdown()
     ImGui::DestroyContext();
 }
 
-void VulkanRHI_ImGui::BeginFrame(FFRHICommandList&)
+void VulkanRHI_ImGui::BeginImGuiFrame()
 {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -95,7 +95,7 @@ void VulkanRHI_ImGui::BeginFrame(FFRHICommandList&)
     ImGui::ShowMetricsWindow();
 }
 
-void VulkanRHI_ImGui::EndFrame(FFRHICommandList&)
+void VulkanRHI_ImGui::EndImGuiFrame()
 {
     ImGui::EndFrame();
 }

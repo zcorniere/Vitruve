@@ -23,8 +23,8 @@ public:
     void Initialize(FVulkanDevice* Device);
     void Shutdown();
 
-    void BeginFrame(FFRHICommandList& CommandList);
-    void EndFrame(FFRHICommandList& CommandList);
+    void BeginImGuiFrame();
+    void EndImGuiFrame();
     void Render(FFRHICommandList& CommandList, RRHIViewport* Viewport);
 
 private:

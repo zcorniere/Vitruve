@@ -74,12 +74,7 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
 {
     (void)fDeltaTime;
 
-    ENQUEUE_RENDER_COMMAND(BeginFrame)(
-        [this](FFRHICommandList& CommandList)
-        {
-            CommandList.BeginFrame();
-            ImGuiStuff.BeginFrame(CommandList);
-        });
+    ENQUEUE_RENDER_COMMAND(BeginFrame)([](FFRHICommandList& CommandList) { CommandList.BeginFrame(); });
 
     for (WeakRef<RRHIScene>& Scene: ScenesContainers)
     {
@@ -99,8 +94,6 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
     (
         [this](FFRHICommandList& CommandList)
         {
-            ImGuiStuff.EndFrame(CommandList);
-
             RRHIViewport* Viewport = ScenesContainers[0]->GetViewport();
             ImGuiStuff.Render(CommandList, Viewport);
         });
@@ -124,8 +117,14 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
     ENQUEUE_RENDER_COMMAND(EndFrame)([](FFRHICommandList& CommandList) { CommandList.EndFrame(); });
 }
 
+void FVulkanDynamicRHI::PreFrame()
+{
+    ImGuiStuff.BeginImGuiFrame();
+}
+
 void FVulkanDynamicRHI::PostFrame()
 {
+    ImGuiStuff.EndImGuiFrame();
 }
 
 void FVulkanDynamicRHI::OnWindowCreated(RWindow* Window)

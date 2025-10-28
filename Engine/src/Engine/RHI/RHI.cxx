@@ -51,6 +51,7 @@ void RHI::Destroy()
 
 void RHI::BeginFrame()
 {
+    RHI::Get()->PreFrame();
 }
 
 void RHI::Tick(float fDeltaTime)
