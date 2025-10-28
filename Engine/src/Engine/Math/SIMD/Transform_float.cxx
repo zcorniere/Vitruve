@@ -7,12 +7,12 @@ namespace Math
 
 template <>
 [[gnu::target("avx2")]]
-ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT PositionX, const float* RESTRICT PositionY,
-                                    const float* RESTRICT PositionZ, const float* RESTRICT QuaternionX,
-                                    const float* RESTRICT QuaternionY, const float* RESTRICT QuaternionZ,
-                                    const float* RESTRICT QuaternionW, const float* RESTRICT ScaleX,
-                                    const float* RESTRICT ScaleY, const float* RESTRICT ScaleZ,
-                                    float* RESTRICT OutModelMatrix)
+ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRICT PositionX,
+                                               const float* RESTRICT PositionY, const float* RESTRICT PositionZ,
+                                               const float* RESTRICT QuaternionX, const float* RESTRICT QuaternionY,
+                                               const float* RESTRICT QuaternionZ, const float* RESTRICT QuaternionW,
+                                               const float* RESTRICT ScaleX, const float* RESTRICT ScaleY,
+                                               const float* RESTRICT ScaleZ, float* RESTRICT OutModelMatrix)
 {
     VIT_PROFILE_FUNC()
     size_t i = 0;
@@ -93,12 +93,11 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const float* RESTRI
 template <>
 [[gnu::target("avx512f")]]
 ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* RESTRICT PositionX,
-                                                const float* RESTRICT PositionY,
-                                      const float* RESTRICT PositionZ, const float* RESTRICT QuaternionX,
-                                      const float* RESTRICT QuaternionY, const float* RESTRICT QuaternionZ,
-                                      const float* RESTRICT QuaternionW, const float* RESTRICT ScaleX,
-                                      const float* RESTRICT ScaleY, const float* RESTRICT ScaleZ,
-                                      float* RESTRICT OutModelMatrix)
+                                                 const float* RESTRICT PositionY, const float* RESTRICT PositionZ,
+                                                 const float* RESTRICT QuaternionX, const float* RESTRICT QuaternionY,
+                                                 const float* RESTRICT QuaternionZ, const float* RESTRICT QuaternionW,
+                                                 const float* RESTRICT ScaleX, const float* RESTRICT ScaleY,
+                                                 const float* RESTRICT ScaleZ, float* RESTRICT OutModelMatrix)
 {
     VIT_PROFILE_FUNC()
     size_t i = 0;
@@ -175,57 +174,4 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const float* REST
     }
     return i;
 }
-
-template <>
-void ComputeModelMatrixBatch(const size_t Count, const float* PositionX, const float* PositionY, const float* PositionZ,
-                             const float* QuaternionX, const float* QuaternionY, const float* QuaternionZ,
-                             const float* QuaternionW, const float* ScaleX, const float* ScaleY, const float* ScaleZ,
-                             TMatrix4<float>* OutModelMatrix)
-{
-    VIT_PROFILE_FUNC()
-    check(Count > 0);
-    ensure(PositionX && PositionY && PositionZ && QuaternionX && QuaternionY && QuaternionZ && QuaternionW && ScaleX &&
-           ScaleY && ScaleZ && OutModelMatrix);
-
-    size_t WorkedCount = 0;
-    const FCPUInformation& CPUInfo = FPlatformMisc::GetCPUInformation();
-    if (CPUInfo.AVX512 && Count >= 16)
-    {
-        const size_t BatchCount = (Count / 16) * 16;    // largest multiple of 16 <= Count
-        if (BatchCount > 0)
-        {
-            WorkedCount += ComputeModelMatrixBatch_AVX512(
-                BatchCount, PositionX + WorkedCount, PositionY + WorkedCount, PositionZ + WorkedCount,
-                QuaternionX + WorkedCount, QuaternionY + WorkedCount, QuaternionZ + WorkedCount,
-                QuaternionW + WorkedCount, ScaleX + WorkedCount, ScaleY + WorkedCount, ScaleZ + WorkedCount,
-                reinterpret_cast<float*>(OutModelMatrix + WorkedCount));
-        }
-    }
-    if (CPUInfo.AVX2 && Count >= 8)
-    {
-        const size_t Remaining = Count - WorkedCount;
-        const size_t BatchCount = (Remaining / 8) * 8;
-        if (BatchCount > 0)
-        {
-            WorkedCount += ComputeModelMatrixBatch_AVX2(
-                Remaining, PositionX + WorkedCount, PositionY + WorkedCount, PositionZ + WorkedCount,
-                QuaternionX + WorkedCount, QuaternionY + WorkedCount, QuaternionZ + WorkedCount,
-                QuaternionW + WorkedCount, ScaleX + WorkedCount, ScaleY + WorkedCount, ScaleZ + WorkedCount,
-                reinterpret_cast<float*>(OutModelMatrix + WorkedCount));
-        }
-    }
-
-    // Fallback to scalar implementation
-    for (; WorkedCount < Count; WorkedCount++)
-    {
-        const TVector3<float> Location(PositionX[WorkedCount], PositionY[WorkedCount], PositionZ[WorkedCount]);
-        const TQuaternion<float> Rotation(QuaternionW[WorkedCount], QuaternionX[WorkedCount], QuaternionY[WorkedCount],
-                                          QuaternionZ[WorkedCount]);
-        const TVector3<float> Scale(ScaleX[WorkedCount], ScaleY[WorkedCount], ScaleZ[WorkedCount]);
-        TTransform<float> Transform(Location, Rotation, Scale);
-
-        OutModelMatrix[WorkedCount] = Transform.GetModelMatrix();
-    }
-}
-
 }    // namespace Math

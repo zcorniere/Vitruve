@@ -1,5 +1,8 @@
 #pragma once
+#include "Engine/Misc/ConsoleVariable.hxx"
 #include "Transform.hxx"
+
+#include <immintrin.h>
 
 namespace Math
 {
@@ -116,6 +119,63 @@ constexpr TMatrix4<T> TTransform<T>::GetModelMatrix()
         bModelMatrixDirty = false;
     }
     return ModelMatrix;
+}
+
+extern TConsoleVariable<bool> CVar_EnableSIMD;
+
+template <typename T>
+void ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
+                             const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX, const T* RESTRICT QuaternionY,
+                             const T* RESTRICT QuaternionZ, const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
+                             const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ, TMatrix4<T>* RESTRICT OutModelMatrix)
+{
+    VIT_PROFILE_FUNC()
+    check(Count > 0);
+    ensure(PositionX && PositionY && PositionZ && QuaternionX && QuaternionY && QuaternionZ && QuaternionW && ScaleX &&
+           ScaleY && ScaleZ && OutModelMatrix);
+
+    size_t WorkedCount = 0;
+    constexpr size_t AVX512BlockSize = sizeof(__m512) / sizeof(T);
+    constexpr size_t AVX2BlockSize = sizeof(__m256) / sizeof(T);
+
+    const FCPUInformation& CPUInfo = FPlatformMisc::GetCPUInformation();
+    if (CPUInfo.AVX512 && CVar_EnableSIMD.GetValue() && Count >= AVX512BlockSize)
+    {
+        const size_t BatchCount = (Count / AVX512BlockSize) * AVX512BlockSize;    // largest multiple of 16 <= Count
+        if (BatchCount > 0)
+        {
+            WorkedCount += ComputeModelMatrixBatch_AVX512(
+                BatchCount, PositionX + WorkedCount, PositionY + WorkedCount, PositionZ + WorkedCount,
+                QuaternionX + WorkedCount, QuaternionY + WorkedCount, QuaternionZ + WorkedCount,
+                QuaternionW + WorkedCount, ScaleX + WorkedCount, ScaleY + WorkedCount, ScaleZ + WorkedCount,
+                reinterpret_cast<T*>(OutModelMatrix + WorkedCount));
+        }
+    }
+    if (CPUInfo.AVX2 && CVar_EnableSIMD.GetValue() && Count >= AVX2BlockSize)
+    {
+        const size_t Remaining = Count - WorkedCount;
+        const size_t BatchCount = (Remaining / AVX2BlockSize) * AVX2BlockSize;
+        if (BatchCount > 0)
+        {
+            WorkedCount += ComputeModelMatrixBatch_AVX2(
+                BatchCount, PositionX + WorkedCount, PositionY + WorkedCount, PositionZ + WorkedCount,
+                QuaternionX + WorkedCount, QuaternionY + WorkedCount, QuaternionZ + WorkedCount,
+                QuaternionW + WorkedCount, ScaleX + WorkedCount, ScaleY + WorkedCount, ScaleZ + WorkedCount,
+                reinterpret_cast<T*>(OutModelMatrix + WorkedCount));
+        }
+    }
+
+    // Fallback to scalar implementation
+    for (; WorkedCount < Count; WorkedCount++)
+    {
+        const TVector3<T> Location(PositionX[WorkedCount], PositionY[WorkedCount], PositionZ[WorkedCount]);
+        const TQuaternion<T> Rotation(QuaternionW[WorkedCount], QuaternionX[WorkedCount], QuaternionY[WorkedCount],
+                                      QuaternionZ[WorkedCount]);
+        const TVector3<T> Scale(ScaleX[WorkedCount], ScaleY[WorkedCount], ScaleZ[WorkedCount]);
+        TTransform<T> Transform(Location, Rotation, Scale);
+
+        OutModelMatrix[WorkedCount] = Transform.GetModelMatrix();
+    }
 }
 
 }    // namespace Math

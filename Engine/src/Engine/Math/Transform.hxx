@@ -43,10 +43,12 @@ public:
 };
 
 template <typename T>
-void ENGINE_API ComputeModelMatrixBatch(const size_t Count, const T* LocationX, const T* LocationY, const T* LocationZ,
-                                        const T* QuaternionX, const T* QuaternionY, const T* QuaternionZ,
-                                        const T* QuaternionW, const T* ScaleX, const T* ScaleY, const T* ScaleZ,
-                                        TMatrix4<T>* OutModelMatrix);
+void ENGINE_API ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT LocationX, const T* RESTRICT LocationY,
+                                        const T* RESTRICT LocationZ, const T* RESTRICT QuaternionX,
+                                        const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
+                                        const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
+                                        const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ,
+                                        TMatrix4<T>* RESTRICT OutModelMatrix);
 
 // Do not call these directly, they are only exposed for unit testing
 template <typename T>
