@@ -124,10 +124,12 @@ constexpr TMatrix4<T> TTransform<T>::GetModelMatrix()
 extern TConsoleVariable<bool> CVar_EnableSIMD;
 
 template <typename T>
-void ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
-                             const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX, const T* RESTRICT QuaternionY,
-                             const T* RESTRICT QuaternionZ, const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
-                             const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ, TMatrix4<T>* RESTRICT OutModelMatrix)
+void ENGINE_API ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT PositionX, const T* RESTRICT PositionY,
+                                        const T* RESTRICT PositionZ, const T* RESTRICT QuaternionX,
+                                        const T* RESTRICT QuaternionY, const T* RESTRICT QuaternionZ,
+                                        const T* RESTRICT QuaternionW, const T* RESTRICT ScaleX,
+                                        const T* RESTRICT ScaleY, const T* RESTRICT ScaleZ,
+                                        TMatrix4<T>* RESTRICT OutModelMatrix)
 {
     VIT_PROFILE_FUNC()
     check(Count > 0);
@@ -135,10 +137,10 @@ void ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT PositionX, co
            ScaleY && ScaleZ && OutModelMatrix);
 
     size_t WorkedCount = 0;
-    constexpr size_t AVX512BlockSize = sizeof(__m512) / sizeof(T);
-    constexpr size_t AVX2BlockSize = sizeof(__m256) / sizeof(T);
-
+    const size_t AVX512BlockSize = sizeof(__m512) / sizeof(T);
+    const size_t AVX2BlockSize = sizeof(__m256) / sizeof(T);
     const FCPUInformation& CPUInfo = FPlatformMisc::GetCPUInformation();
+
     if (CPUInfo.AVX512 && CVar_EnableSIMD.GetValue() && Count >= AVX512BlockSize)
     {
         const size_t BatchCount = (Count / AVX512BlockSize) * AVX512BlockSize;    // largest multiple of 16 <= Count
@@ -151,6 +153,7 @@ void ComputeModelMatrixBatch(const size_t Count, const T* RESTRICT PositionX, co
                 reinterpret_cast<T*>(OutModelMatrix + WorkedCount));
         }
     }
+
     if (CPUInfo.AVX2 && CVar_EnableSIMD.GetValue() && Count >= AVX2BlockSize)
     {
         const size_t Remaining = Count - WorkedCount;
