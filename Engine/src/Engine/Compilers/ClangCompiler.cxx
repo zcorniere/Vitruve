@@ -9,7 +9,7 @@ std::string ClangCompiler::Demangle(const std::string_view& name)
 
     int status = 0;
     std::size_t xsize = 0;
-    char* const demangled = abi::__cxa_demangle(name.data(), NULL, &xsize, &status);
+    char* demangled = abi::__cxa_demangle(name.data(), NULL, &xsize, &status);
 
     if (status != 0)
     {
@@ -18,6 +18,6 @@ std::string ClangCompiler::Demangle(const std::string_view& name)
         return std::string(name);
     }
     std::string DemangledString(demangled);
-    free(const_cast<char*>(demangled));
+    free(demangled);
     return DemangledString;
 }
