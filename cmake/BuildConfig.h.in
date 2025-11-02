@@ -5,11 +5,11 @@
 
 #if !defined(VITRUVE_BUILD_TYPE)
     #define VITRUVE_BUILD_TYPE "Unknown"
-#endif // !defined(VITRUVE_BUILD_TYPE)
+#endif    // !defined(VITRUVE_BUILD_TYPE)
 
 #cmakedefine01 VIT_COMPILE_MONOLITHIC
 #cmakedefine01 VIT_NAN_CHECKS
-
+#cmakedefine01 VIT_ENABLE_STACKTRACE
 
 // Profiling
 #cmakedefine01 VIT_ENABLE_PROFILING

@@ -1,8 +1,48 @@
 #include "Engine/Platforms/Linux/LinuxStacktrace.hxx"
 
 #include <dlfcn.h>
+#include <elfutils/libdwfl.h>
 #include <execinfo.h>
 #include <fcntl.h>
+
+static Dwfl* dwfl = nullptr;
+
+void FLinuxStacktrace::InitDWARF()
+{
+    VIT_PROFILE_FUNC()
+    static const Dwfl_Callbacks callbacks = {
+        .find_elf = dwfl_linux_proc_find_elf,
+        .find_debuginfo = dwfl_standard_find_debuginfo,
+        .section_address = nullptr,
+        .debuginfo_path = nullptr,
+    };
+    dwfl = dwfl_begin(&callbacks);
+
+    RefreshDWARF();
+}
+
+void FLinuxStacktrace::RefreshDWARF()
+{
+    if (dwfl_linux_proc_report(dwfl, getpid()) == -1)
+    {
+        dwfl_end(dwfl);
+        dwfl = nullptr;
+        LOG(LogUnixPlateform, Warning, "Failed to init DWARF for stacktrace");
+        return;
+    }
+    else
+    {
+        dwfl_report_end(dwfl, nullptr, nullptr);
+    }
+}
+
+void FLinuxStacktrace::ShutdownDWARF()
+{
+    if (dwfl != nullptr)
+    {
+        dwfl_end(dwfl);
+    }
+}
 
 StacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
 {
@@ -28,28 +68,48 @@ StacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnA
 
 bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedSymbolInfo& detailed_info)
 {
-    Dl_info info;
-    bool ret = dladdr(reinterpret_cast<void*>(ProgramCounter), &info);
-
-    if (ret)
+    detailed_info.ProgramCounter = ProgramCounter;
+    if (dwfl == nullptr)
     {
-        detailed_info.ProgramCounter = ProgramCounter;
+        return false;
+    }
 
-        const char* ModulePath = info.dli_fname;
-        const char* ModuleName = std::strrchr(ModulePath, '/');
-        if (ModuleName)
+    Dwfl_Module* const mod = dwfl_addrmodule(dwfl, ProgramCounter);
+    if (mod == nullptr)
+    {
+        return false;
+    }
+
+    std::string_view moduleName = dwfl_module_info(mod, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+    if (!moduleName.empty())
+    {
+        auto Position = moduleName.find_last_of('/');
+        if (Position != std::string_view::npos)
         {
-            ModuleName += 1;
+            moduleName = moduleName.substr(Position + 1);
         }
-        else
+        std::strncpy(detailed_info.ModuleName, moduleName.data(), DetailedSymbolInfo::MaxNameLength);
+    }
+
+    Dwfl_Line* line = dwfl_module_getsrc(mod, ProgramCounter);
+    if (line != nullptr)
+    {
+        std::string_view filename = dwfl_lineinfo(line, nullptr, &detailed_info.LineNumber, nullptr, nullptr, nullptr);
+        if (!filename.empty())
         {
-            ModuleName = ModulePath;
-        }
-        std::strncpy(detailed_info.ModuleName, ModuleName, DetailedSymbolInfo::MaxNameLength);
-        if (info.dli_sname != nullptr)
-        {
-            std::strncpy(detailed_info.FunctionName, info.dli_sname, DetailedSymbolInfo::MaxNameLength);
+            auto Position = filename.find_first_of("Vitruve/");
+            if (Position != std::string_view::npos)
+            {
+                filename = filename.substr(Position);
+            }
+            std::strncpy(detailed_info.Filename, filename.data(), DetailedSymbolInfo::MaxNameLength);
         }
     }
-    return ret;
+
+    const char* const symbolName = dwfl_module_addrname(mod, ProgramCounter);
+    if (symbolName != nullptr)
+    {
+        std::strncpy(detailed_info.FunctionName, symbolName, DetailedSymbolInfo::MaxNameLength);
+    }
+    return true;
 }

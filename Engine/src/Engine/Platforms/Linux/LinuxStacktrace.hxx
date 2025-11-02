@@ -6,6 +6,10 @@
 class ENGINE_API FLinuxStacktrace : public FGenericStacktrace
 {
 public:
+    static void InitDWARF();
+    static void RefreshDWARF();
+    static void ShutdownDWARF();
+
     /// @brief Return a stacktrace of the current running process
     static StacktraceContent GetStackTraceFromReturnAddress(void* returnAddress);
 

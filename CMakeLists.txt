@@ -105,6 +105,13 @@ else()
     message(STATUS "VIT - Compiling as modular")
 endif(VIT_COMPILE_MONOLITHIC)
 
+option(VIT_ENABLE_STACKTRACE "Enable stacktrace checking on crashes" ON)
+if(VIT_ENABLE_STACKTRACE)
+    message(STATUS "VIT - Stacktrace enabled")
+else()
+    message(STATUS "VIT - Stacktrace disabled")
+endif(VIT_ENABLE_STACKTRACE)
+
 # Purge the generated files and regenerate them
 file(REMOVE "${CMAKE_BINARY_DIR}/generated/*")
 generate_build_config_header(

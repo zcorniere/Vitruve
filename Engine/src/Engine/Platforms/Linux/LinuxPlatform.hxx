@@ -14,6 +14,8 @@ static_assert(false, "Unix Platform header included on a non Unix platform");
 
 #define PLATFORM_BREAK() raise(SIGTRAP)
 
+DECLARE_LOGGER_CATEGORY(Core, LogUnixPlateform, Info)
+
 /// @brief Unix-specific functions
 class ENGINE_API FLinuxPlateform : public FGenericPlatform
 {
@@ -24,6 +26,9 @@ private:
 public:
     /// @copydoc GenericPlatform::Initialize
     static void Initialize();
+
+    /// @copydoc GenericPlatform::Deinitialize
+    static void Deinitialize();
 
     /// @copydoc GenericPlatform::isDebuggerPresent
     static bool isDebuggerPresent();

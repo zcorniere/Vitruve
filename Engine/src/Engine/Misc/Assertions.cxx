@@ -31,10 +31,9 @@ void CollectAndPrintStackTrace(void* ReturnAddress)
 
 bool Vitruve::Debug::HandleCheckFailure(const std::string& Message, bool bShouldAbort)
 {
-    if constexpr (ShouldCheckPrintStackTrace())
-    {
-        CollectAndPrintStackTrace(Compiler::ReturnAddress());
-    }
+#if VIT_ENABLE_STACKTRACE
+    CollectAndPrintStackTrace(Compiler::ReturnAddress());
+#endif
 
     fprintf(stderr, "%s\n", Message.c_str());
     fflush(stderr);

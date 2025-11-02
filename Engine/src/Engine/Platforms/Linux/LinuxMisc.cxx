@@ -6,6 +6,7 @@
 #include "Engine/Core/Memory/StdMalloc.hxx"
 #include "Engine/Misc/Assertions.hxx"
 #include "Engine/Misc/CommandLine.hxx"
+#include "Engine/Platforms/Linux/LinuxStacktrace.hxx"
 
 #include <ModernDialogs.h>
 #include <cpuid.h>
@@ -155,6 +156,7 @@ FLinuxExternalModule::FLinuxExternalModule(std::string_view ModulePath)
     {
         LOG(LogPlatform, Error, "Failed to load module {:s}: {:s}", ModulePath, dlerror());
     }
+    FPlatformStacktrace::RefreshDWARF();
 }
 
 FLinuxExternalModule::~FLinuxExternalModule()

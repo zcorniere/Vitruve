@@ -2,6 +2,8 @@
 #include "Engine/Misc/Assertions.hxx"
 #include "Engine/Misc/Utils.hxx"
 
+#include "Engine/Platforms/Linux/LinuxStacktrace.hxx"
+
 #include <cstring>
 #include <dlfcn.h>
 #include <execinfo.h>
@@ -11,8 +13,6 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 
-DECLARE_LOGGER_CATEGORY(Core, LogUnixPlateform, Info)
-
 void FLinuxPlateform::Initialize()
 {
     if (geteuid() == 0)
@@ -20,6 +20,13 @@ void FLinuxPlateform::Initialize()
         fprintf(stderr, "Refusing to run with the root privileges.\n");
         Utils::RequestExit(1, true);
     }
+
+    FLinuxStacktrace::InitDWARF();
+}
+
+void FLinuxPlateform::Deinitialize()
+{
+    FLinuxStacktrace::ShutdownDWARF();
 }
 
 bool FLinuxPlateform::isDebuggerPresent()

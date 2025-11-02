@@ -6,22 +6,12 @@
 
 #include <atomic>    // IWYU pragma: keep
 
-#define VIT_CHECK_STACKTRACE
+#define VIT_ENABLE_STACKTRACE 1
 
 namespace Vitruve::Debug
 {
 
 ENGINE_API bool HandleCheckFailure(const std::string& Message, bool bShouldAbort);
-
-/// Whether or not the check should print the stacktrace
-consteval bool ShouldCheckPrintStackTrace()
-{
-#if defined(VIT_CHECK_STACKTRACE)
-    return true;
-#else
-    return false;
-#endif
-}
 
 #ifndef NDEBUG
 class FRecursionScopeMarker
@@ -68,7 +58,7 @@ private:
     #define ensureAlways(Expression) VITRUVE_ENSURE_IMPL(true, Expression, )
     #define ensureAlwaysMsg(Expression, Format, ...) VITRUVE_ENSURE_IMPL(true, Expression, " :: " Format, ##__VA_ARGS__)
 
-    #define Vitruve_CHECK_IMPL(Expression, Format, ...)                                                        \
+    #define VITRUVE_CHECK_IMPL(Expression, Format, ...)                                                        \
         {                                                                                                      \
             if (!(Expression)) [[unlikely]]                                                                    \
             {                                                                                                  \
@@ -78,9 +68,9 @@ private:
             }                                                                                                  \
         }
 
-    #define check(Expression) Vitruve_CHECK_IMPL(Expression, )
+    #define check(Expression) VITRUVE_CHECK_IMPL(Expression, )
     #define checkSlow(Expression) check(Expression)
-    #define checkMsg(Expression, Format, ...) Vitruve_CHECK_IMPL(Expression, " :: " Format, ##__VA_ARGS__)
+    #define checkMsg(Expression, Format, ...) VITRUVE_CHECK_IMPL(Expression, " :: " Format, ##__VA_ARGS__)
     #define checkNoEntry()                                             \
         {                                                              \
             checkMsg(false, "Enclosing block should never be called"); \
@@ -106,10 +96,10 @@ private:
     #define ensureAlways(Expression) VITRUVE_ENSURE_IMPL(Expression)
     #define ensureAlwaysMsg(Expression, ...) VITRUVE_ENSURE_IMPL(Expression)
 
-    #define Vitruve_CHECK_IMPL(Expression) (void)(Expression);
-    #define check(Expression) Vitruve_CHECK_IMPL(Expression)
+    #define VITRUVE_CHECK_IMPL(Expression) (void)(Expression);
+    #define check(Expression) VITRUVE_CHECK_IMPL(Expression)
     #define checkSlow(Expression)
-    #define checkMsg(Expression, ...) Vitruve_CHECK_IMPL(Expression)
+    #define checkMsg(Expression, ...) VITRUVE_CHECK_IMPL(Expression)
     #define checkNoEntry()             \
         {                              \
             ::Compiler::Unreachable(); \
