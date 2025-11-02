@@ -78,7 +78,7 @@ public:
 
 private:
     template <std::size_t... Is>
-    void DoTaskImpl(FFRHICommandList& CommandList, std::index_sequence<Is...>)
+    FORCEINLINE void DoTaskImpl(FFRHICommandList& CommandList, std::index_sequence<Is...>)
     {
         Lambda(CommandList, std::get<Is>(Args)...);
     }
