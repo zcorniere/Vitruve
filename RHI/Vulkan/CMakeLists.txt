@@ -30,9 +30,10 @@ target_link_libraries(
             Vulkan::Headers
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine)
-target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_VULKAN_NO_PROTOTYPES=1)
 if(VIT_ENABLE_VULKAN_DEBUGGING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_DEBUGGING_ENABLED=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_DEBUGGING_ENABLED=0)
 endif()
 
 

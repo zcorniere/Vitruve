@@ -189,7 +189,7 @@ void FVulkanCommandContext::SetScissor(IVector2 Offset, UVector2 Size)
 void FVulkanCommandContext::BeginGPURegion([[maybe_unused]] const std::string& Name,
                                            [[maybe_unused]] const FColor& Color)
 {
-#if defined(VULKAN_DEBUGGING_ENABLED)
+#if VULKAN_DEBUGGING_ENABLED
     FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();
     VkDebugUtilsLabelEXT Label{
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
@@ -203,7 +203,7 @@ void FVulkanCommandContext::BeginGPURegion([[maybe_unused]] const std::string& N
 
 void FVulkanCommandContext::EndGPURegion()
 {
-#if defined(VULKAN_DEBUGGING_ENABLED)
+#if VULKAN_DEBUGGING_ENABLED
     FVulkanCmdBuffer* CmdBuffer = CommandManager->GetActiveCmdBuffer();
     VulkanAPI::vkCmdEndDebugUtilsLabelEXT(CmdBuffer->GetHandle());
 #endif
