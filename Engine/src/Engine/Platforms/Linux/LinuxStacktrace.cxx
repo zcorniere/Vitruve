@@ -23,12 +23,12 @@ void FLinuxStacktrace::InitDWARF()
 
 void FLinuxStacktrace::RefreshDWARF()
 {
+    VIT_PROFILE_FUNC()
     if (dwfl_linux_proc_report(dwfl, getpid()) == -1)
     {
         dwfl_end(dwfl);
         dwfl = nullptr;
         LOG(LogUnixPlateform, Warning, "Failed to init DWARF for stacktrace");
-        return;
     }
     else
     {

@@ -42,6 +42,7 @@ RWindow::~RWindow()
 
 void RWindow::Initialize(const FWindowDefinition& InDefinition)
 {
+    VIT_PROFILE_FUNC()
     GLFWInUseCount += 1;
 
     Definition = InDefinition;

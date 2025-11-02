@@ -95,6 +95,8 @@ std::string_view FVulkanDevice::GetDeviceName() const
 
 void FVulkanDevice::InitPhysicalDevice()
 {
+    VIT_PROFILE_FUNC()
+
     std::uint32_t QueueCount = 0;
     VulkanAPI::vkGetPhysicalDeviceQueueFamilyProperties(Gpu, &QueueCount, nullptr);
     check(QueueCount >= 1);

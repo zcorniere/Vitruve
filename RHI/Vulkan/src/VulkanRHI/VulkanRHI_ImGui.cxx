@@ -16,10 +16,10 @@ namespace VulkanRHI
 
 void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
 {
-    this->Device = InDevice;
-
+    VIT_PROFILE_FUNC()
     IMGUI_CHECKVERSION();
 
+    this->Device = InDevice;
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    // Enable Keyboard Controls
@@ -70,6 +70,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
 
 void VulkanRHI_ImGui::Shutdown()
 {
+    check(false);
     ImGuiVertexBufferData.Clear();
     ImGuiVertexBuffer = nullptr;
     ImGuiIndexBufferData.Clear();

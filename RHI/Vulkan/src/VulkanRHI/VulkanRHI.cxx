@@ -277,6 +277,7 @@ void FVulkanDynamicRHI::Shutdown()
 
 VkInstance FVulkanDynamicRHI::CreateInstance(const TArray<const char*>& ValidationLayers)
 {
+    VIT_PROFILE_FUNC()
     VkApplicationInfo AppInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pEngineName = "VitruveEngine",
@@ -363,6 +364,7 @@ VkInstance FVulkanDynamicRHI::CreateInstance(const TArray<const char*>& Validati
 
 FVulkanDevice* FVulkanDynamicRHI::SelectDevice(VkInstance Instance)
 {
+    VIT_PROFILE_FUNC()
     std::uint32_t GpuCount = 0;
     VkResult Result = VulkanAPI::vkEnumeratePhysicalDevices(Instance, &GpuCount, nullptr);
     if (Result == VK_ERROR_INITIALIZATION_FAILED)

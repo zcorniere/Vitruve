@@ -86,8 +86,6 @@ void RHI::FlushDeletionQueue(bool bAsync)
     }
     else
     {
-        VIT_PROFILE_FUNC()
-
         RHI::Get()->FlushDeletionQueue();
     }
 }
