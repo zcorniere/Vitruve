@@ -4,6 +4,6 @@
 namespace Math
 {
 
-TConsoleVariable<bool> CVar_EnableSIMD("math.EnableSIMD", true, "If true, enable SIMD code path for math coputations.");
+TConsoleVariable<bool> CVar_EnableSIMD("math.EnableSIMD", true, "If true, use SIMD code path for math computations");
 
 }    // namespace Math
