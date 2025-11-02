@@ -3,13 +3,12 @@ name: Build & test
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     strategy:
       fail-fast: false
       matrix:
@@ -24,40 +23,40 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Get number of CPU cores
-      uses: SimenB/github-actions-cpu-cores@v1
-      id: cpu-cores
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v1
+        id: cpu-cores
 
-    - uses: actions/checkout@v4.1.0
-      with:
-        submodules: true
+      - uses: actions/checkout@v4.1.0
+        with:
+          submodules: true
 
-    - name: "Setup Cpp"
-      uses: aminya/setup-cpp@v1
-      with:
-        compiler: ${{ matrix.compiler }}
-        vcvarsall: ${{ contains(matrix.os, 'windows' )}}
-        cmake: true
-        ninja: true
-        clangtidy: false
-        cppcheck: false
+      - name: "Setup Cpp"
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+          cmake: true
+          ninja: true
+          clangtidy: false
+          cppcheck: false
 
-    - name: Install dependencies
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y valgrind libglm-dev libwayland-bin libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
-    - name: Configure CMake
-      run: >
-        cmake -S .
-        -B ./build
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind libdw-dev libglm-dev libwayland-bin libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
+      - name: Configure CMake
+        run: >
+          cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
 
-    - name: Build
-      run: cmake --build ./build --config=${{ matrix.build_type }} --parallel ${{ steps.cpu-cores.outputs.count }} 
+      - name: Build
+        run: cmake --build ./build --config=${{ matrix.build_type }} --parallel ${{ steps.cpu-cores.outputs.count }}
 
-    - name: Test
-      working-directory: ./build
-      run: >
-        ctest -j ${{ steps.cpu-cores.outputs.count }} -C ${{ matrix.build_type }} --rerun-failed --output-on-failure;
+      - name: Test
+        working-directory: ./build
+        run: >
+          ctest -j ${{ steps.cpu-cores.outputs.count }} -C ${{ matrix.build_type }} --rerun-failed --output-on-failure;
