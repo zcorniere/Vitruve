@@ -70,7 +70,6 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
 
 void VulkanRHI_ImGui::Shutdown()
 {
-    check(false);
     ImGuiVertexBufferData.Clear();
     ImGuiVertexBuffer = nullptr;
     ImGuiIndexBufferData.Clear();
