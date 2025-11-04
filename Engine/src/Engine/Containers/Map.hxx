@@ -240,6 +240,11 @@ public:
         }
     }
 
+    ~TMap()
+    {
+        Clear();
+    }
+
     FORCEINLINE Iterator begin()
     {
         return Iterator(*this, 0);
