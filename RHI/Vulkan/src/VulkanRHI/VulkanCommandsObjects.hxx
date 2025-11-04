@@ -9,7 +9,7 @@ class FVulkanDevice;
 class FVulkanQueue;
 class FVulkanCommandContext;
 class VulkanCommandBufferPool;
-class VulkanCommandBufferManager;
+class FVulkanCommandBufferManager;
 class RVulkanGraphicsPipeline;
 
 class FVulkanCmdBuffer : public FNamedClass, public IDeviceChild
@@ -153,15 +153,15 @@ private:
 /// It manage two command buffers:
 /// - The active command buffer, used for rendering
 /// - The upload command buffer, used for uploading resources to the GPU
-class VulkanCommandBufferManager : public IDeviceChild, public FNamedClass
+class FVulkanCommandBufferManager : public IDeviceChild, public FNamedClass
 {
-    VIT_NONCOPYABLE(VulkanCommandBufferManager)
+    VIT_NONCOPYABLE(FVulkanCommandBufferManager)
 public:
-    VulkanCommandBufferManager() = delete;
+    FVulkanCommandBufferManager() = delete;
     /// Construct a command buffer manager for the given queue
-    VulkanCommandBufferManager(FVulkanDevice* InDevice, FVulkanQueue* InQueue);
+    FVulkanCommandBufferManager(FVulkanDevice* InDevice, FVulkanQueue* InQueue);
     /// Destruct the command buffer manager, and all its command buffers as well
-    virtual ~VulkanCommandBufferManager();
+    virtual ~FVulkanCommandBufferManager();
 
     void SetName(std::string_view InName) override;
 

@@ -95,7 +95,7 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
         [this](FFRHICommandList& CommandList)
         {
             RRHIViewport* Viewport = ScenesContainers[0]->GetViewport();
-            ImGuiStuff.Render(CommandList, Viewport);
+            VulkanRHI_ImGui::Render(CommandList, Viewport);
         });
 
     for (WeakRef<RRHIScene>& Scene: ScenesContainers)
@@ -119,12 +119,12 @@ void FVulkanDynamicRHI::Tick(double fDeltaTime)
 
 void FVulkanDynamicRHI::PreFrame()
 {
-    ImGuiStuff.BeginImGuiFrame();
+    VulkanRHI_ImGui::BeginImGuiFrame();
 }
 
 void FVulkanDynamicRHI::PostFrame()
 {
-    ImGuiStuff.EndImGuiFrame();
+    VulkanRHI_ImGui::EndImGuiFrame();
 }
 
 void FVulkanDynamicRHI::OnWindowCreated(RWindow* Window)
@@ -152,24 +152,24 @@ void FVulkanDynamicRHI::Init()
 
     TArray<const char*> ValidationLayers;
 #if VULKAN_DEBUGGING_ENABLED
-    ValidationLayers = DebugLayer.GetSupportedInstanceLayers();
+    ValidationLayers = VulkanRHI_Debug::GetSupportedInstanceLayers();
 #endif    // VULKAN_DEBUGGING_ENABLED
     m_Instance = CreateInstance(ValidationLayers);
 
 #if VULKAN_DEBUGGING_ENABLED
     LOG(LogVulkanRHI, Warning, "Vulkan Debugging is enabled {}!",
-        (DebugLayer.IsValidationLayersMissing()) ? ("but some instance layers are missing ") : (""));
-    DebugLayer.SetupDebugLayer(m_Instance);
+        (VulkanRHI_Debug::IsValidationLayersMissing()) ? ("but some instance layers are missing ") : (""));
+    VulkanRHI_Debug::SetupDebugLayer(m_Instance);
 #endif
 
-    Device.reset(SelectDevice(m_Instance));
+    Device = SelectDevice(m_Instance);
 
     Device->InitPhysicalDevice();
     Device->SetName("Main Vulkan Device");
 
-    ShaderCompiler = std::make_unique<FVulkanShaderCompiler>();
+    ShaderCompiler = new FVulkanShaderCompiler();
     ShaderCompiler->SetOptimizationLevel(FVulkanShaderCompiler::EOptimizationLevel::PerfWithDebug);
-    ImGuiStuff.Initialize(Device.get());
+    VulkanRHI_ImGui::Initialize(Device);
 }
 
 void FVulkanDynamicRHI::PostInit()
@@ -254,9 +254,10 @@ void FVulkanDynamicRHI::Shutdown()
 {
     WaitUntilIdle();
 
-    ImGuiStuff.Shutdown();
+    VulkanRHI_ImGui::Shutdown();
 
-    ShaderCompiler.reset();
+    delete ShaderCompiler;
+    ShaderCompiler = nullptr;
 
     /// Release the command contexts
     RHIReleaseCommandContext(Device->GetImmediateContext());
@@ -265,10 +266,11 @@ void FVulkanDynamicRHI::Shutdown()
 
     FlushDeletionQueue();    // Flush the deletion queue, synchronously
 
-    Device.reset();
+    delete Device;
+    Device = nullptr;
 
 #if VULKAN_DEBUGGING_ENABLED
-    DebugLayer.RemoveDebugLayer(m_Instance);
+    VulkanRHI_Debug::RemoveDebugLayer(m_Instance);
 #endif
 
     VulkanAPI::vkDestroyInstance(m_Instance, VULKAN_CPU_ALLOCATOR);

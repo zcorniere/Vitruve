@@ -212,7 +212,7 @@ void VulkanCommandBufferPool::RefreshFenceStatus(const FVulkanCmdBuffer* SkipCmd
 
 /// ------------------- VulkanCommandBufferManager -------------------
 
-VulkanCommandBufferManager::VulkanCommandBufferManager(FVulkanDevice* InDevice, FVulkanQueue* InQueue)
+FVulkanCommandBufferManager::FVulkanCommandBufferManager(FVulkanDevice* InDevice, FVulkanQueue* InQueue)
     : IDeviceChild(InDevice)
     , Queue(InQueue)
 {
@@ -225,19 +225,19 @@ VulkanCommandBufferManager::VulkanCommandBufferManager(FVulkanDevice* InDevice, 
     UploadCmdBufferRef = nullptr;
 }
 
-VulkanCommandBufferManager::~VulkanCommandBufferManager()
+FVulkanCommandBufferManager::~FVulkanCommandBufferManager()
 {
     RefreshFenceStatus();
     delete Pool;
 }
 
-void VulkanCommandBufferManager::SetName(std::string_view InName)
+void FVulkanCommandBufferManager::SetName(std::string_view InName)
 {
     FNamedClass::SetName(InName);
     Pool->SetNamef("{:s}.CommandPool", InName);
 }
 
-void VulkanCommandBufferManager::WaitForCmdBuffer(FVulkanCmdBuffer* CmdBuffer, float TimeInSecondsToWait)
+void FVulkanCommandBufferManager::WaitForCmdBuffer(FVulkanCmdBuffer* CmdBuffer, float TimeInSecondsToWait)
 {
     check(CmdBuffer->IsSubmitted());
     bool bSuccess = CmdBuffer->GetFence()->Wait((uint64)(TimeInSecondsToWait * 1e9));
@@ -245,7 +245,7 @@ void VulkanCommandBufferManager::WaitForCmdBuffer(FVulkanCmdBuffer* CmdBuffer, f
     CmdBuffer->RefreshFenceStatus();
 }
 
-FVulkanCmdBuffer* VulkanCommandBufferManager::GetActiveCmdBuffer()
+FVulkanCmdBuffer* FVulkanCommandBufferManager::GetActiveCmdBuffer()
 {
     if (UploadCmdBufferRef)
     {
@@ -253,7 +253,7 @@ FVulkanCmdBuffer* VulkanCommandBufferManager::GetActiveCmdBuffer()
     }
     return ActiveCmdBufferRef;
 }
-FVulkanCmdBuffer* VulkanCommandBufferManager::GetUploadCmdBuffer()
+FVulkanCmdBuffer* FVulkanCommandBufferManager::GetUploadCmdBuffer()
 {
     if (!UploadCmdBufferRef)
     {
@@ -263,13 +263,13 @@ FVulkanCmdBuffer* VulkanCommandBufferManager::GetUploadCmdBuffer()
     return UploadCmdBufferRef;
 }
 
-void VulkanCommandBufferManager::PrepareForNewActiveCommandBuffer()
+void FVulkanCommandBufferManager::PrepareForNewActiveCommandBuffer()
 {
     ActiveCmdBufferRef = FindAvailableCmdBuffer();
     ActiveCmdBufferRef->SetNamef("{:s}.Active{:d}.CommandBuffer", GetName(), GFrameCounter);
 }
 
-void VulkanCommandBufferManager::SubmitUploadCmdBuffer(const Ref<RSemaphore>& SignalSemaphore)
+void FVulkanCommandBufferManager::SubmitUploadCmdBuffer(const Ref<RSemaphore>& SignalSemaphore)
 {
     check(UploadCmdBufferRef);
 
@@ -291,7 +291,7 @@ void VulkanCommandBufferManager::SubmitUploadCmdBuffer(const Ref<RSemaphore>& Si
     UploadCmdBufferRef = nullptr;
 }
 
-void VulkanCommandBufferManager::SubmitActiveCmdBuffer(const Ref<RSemaphore>& SignalSemaphore)
+void FVulkanCommandBufferManager::SubmitActiveCmdBuffer(const Ref<RSemaphore>& SignalSemaphore)
 {
     check(ActiveCmdBufferRef);
 
@@ -317,7 +317,7 @@ void VulkanCommandBufferManager::SubmitActiveCmdBuffer(const Ref<RSemaphore>& Si
     ActiveCmdBufferRef = nullptr;
 }
 
-void VulkanCommandBufferManager::SubmitActiveCmdBufferFromPresent(const Ref<RSemaphore>& SignalSemaphore)
+void FVulkanCommandBufferManager::SubmitActiveCmdBufferFromPresent(const Ref<RSemaphore>& SignalSemaphore)
 {
     if (SignalSemaphore)
     {
@@ -329,7 +329,7 @@ void VulkanCommandBufferManager::SubmitActiveCmdBufferFromPresent(const Ref<RSem
     }
 }
 
-FVulkanCmdBuffer* VulkanCommandBufferManager::FindAvailableCmdBuffer()
+FVulkanCmdBuffer* FVulkanCommandBufferManager::FindAvailableCmdBuffer()
 {
     FVulkanCmdBuffer* const NewBuffer = Pool->GetCommandBuffer();
     NewBuffer->Begin();

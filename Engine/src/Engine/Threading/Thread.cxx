@@ -21,15 +21,19 @@ void FThread::End(bool bShouldWait)
     {
         m_internalRuntime->Stop();
     }
+
     m_managedThread.request_stop();
 
     if (bShouldWait && m_managedThread.joinable())
     {
         m_managedThread.join();
     }
+
+    delete m_internalRuntime;
+    m_internalRuntime = nullptr;
 }
 
-void FThread::Create(const std::string& name, std::unique_ptr<IThreadRuntime> threadCode)
+void FThread::Create(const std::string& name, IThreadRuntime* threadCode)
 {
     if (m_managedThread.joinable())
     {
@@ -37,7 +41,7 @@ void FThread::Create(const std::string& name, std::unique_ptr<IThreadRuntime> th
         m_managedThread.join();
     }
 
-    m_internalRuntime = std::move(threadCode);
+    m_internalRuntime = threadCode;
     m_name = name;
 
     m_managedThread = std::jthread(thread_runtime, this);

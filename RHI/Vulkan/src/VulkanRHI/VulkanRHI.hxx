@@ -25,7 +25,11 @@ static FORCEINLINE const VkAllocationCallbacks* GetMemoryAllocator()
 }
 
 /// @brief Vulkan RHI implementation for Vitruve
-class FVulkanDynamicRHI final : public FGenericRHI
+class FVulkanDynamicRHI final : public FGenericRHI,
+                                private VulkanRHI_ImGui,
+#if VULKAN_DEBUGGING_ENABLED
+                                private VulkanRHI_Debug
+#endif
 {
 public:
     // FGenericRHI implementation
@@ -86,7 +90,7 @@ public:
 
     FVulkanDevice* GetDevice()
     {
-        return Device.get();
+        return Device;
     }
 
     FVulkanPlatform& GetVulkanPlatform()
@@ -102,17 +106,12 @@ private:
     friend class FVulkanCommandContext;
 
 private:
-#if VULKAN_DEBUGGING_ENABLED
-    VulkanRHI_Debug DebugLayer;
-#endif
-    VulkanRHI_ImGui ImGuiStuff;
-
     FVulkanPlatform Platform;
 
     VkInstance m_Instance = VK_NULL_HANDLE;
-    std::unique_ptr<FVulkanDevice> Device;
+    FVulkanDevice* Device = nullptr;
 
-    std::unique_ptr<FVulkanShaderCompiler> ShaderCompiler;
+    FVulkanShaderCompiler* ShaderCompiler = nullptr;
 
     // Used during runtime //
     TArray<FVulkanCommandContext*> CommandContexts;

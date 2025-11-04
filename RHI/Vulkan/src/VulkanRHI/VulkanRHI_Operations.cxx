@@ -31,7 +31,7 @@ FRHIContext* FVulkanDynamicRHI::RHIGetCommandContext()
     FVulkanCommandContext* Context = nullptr;
     if (AvailableCommandContexts.IsEmpty())
     {
-        Context = new FVulkanCommandContext(Device.get(), Device->GraphicsQueue.get(), Device->PresentQueue);
+        Context = new FVulkanCommandContext(Device, Device->GraphicsQueue, Device->PresentQueue);
     }
     else
     {
@@ -140,7 +140,7 @@ VulkanRHI::FVulkanDynamicRHI::CreateGraphicsPipeline(const FRHIGraphicsPipelineS
     {
         return nullptr;
     }
-    return Ref<RVulkanGraphicsPipeline>::Create(Device.get(), Desc);
+    return Ref<RVulkanGraphicsPipeline>::Create(Device, Desc);
 }
 
 Ref<RRHIMaterial> FVulkanDynamicRHI::CreateMaterial(const WeakRef<RRHIGraphicsPipeline>& Pipeline)
@@ -151,7 +151,7 @@ Ref<RRHIMaterial> FVulkanDynamicRHI::CreateMaterial(const WeakRef<RRHIGraphicsPi
     }
     Ref<RVulkanGraphicsPipeline> PipelineRef = Pipeline.Pin();
 
-    Ref<RVulkanMaterial> Material = Ref<RVulkanMaterial>::Create(Device.get(), PipelineRef);
+    Ref<RVulkanMaterial> Material = Ref<RVulkanMaterial>::Create(Device, PipelineRef);
     return Material;
 }
 

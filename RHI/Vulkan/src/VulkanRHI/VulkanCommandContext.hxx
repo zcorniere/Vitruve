@@ -9,7 +9,7 @@ namespace VulkanRHI
 
 class FVulkanDevice;
 class FVulkanQueue;
-class VulkanCommandBufferManager;
+class FVulkanCommandBufferManager;
 
 class RVulkanTexture;
 
@@ -75,19 +75,19 @@ public:
         PendingState->SetPushConstant(Data);
     }
 
-    VulkanCommandBufferManager* GetCommandManager() const
+    FVulkanCommandBufferManager* GetCommandManager() const
     {
-        return CommandManager.get();
+        return CommandManager;
     }
 
     FVulkanPendingState* GetPendingState() const
     {
-        return PendingState.get();
+        return PendingState;
     }
 
 private:
-    std::unique_ptr<FVulkanPendingState> PendingState;
-    std::unique_ptr<VulkanCommandBufferManager> CommandManager;
+    FVulkanPendingState* PendingState = nullptr;
+    FVulkanCommandBufferManager* CommandManager = nullptr;
 
     FVulkanDevice* const Device = nullptr;
     FVulkanQueue* const GfxQueue = nullptr;

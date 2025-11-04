@@ -18,7 +18,7 @@ namespace VulkanRHI
 class FVulkanQueue;
 class FVulkanCmdBuffer;
 class FVulkanMemoryManager;
-class VulkanCommandBufferManager;
+class FVulkanCommandBufferManager;
 
 class FVulkanDevice : public FNamedClass
 {
@@ -72,7 +72,7 @@ public:
     inline FVulkanMemoryManager* GetMemoryManager()
     {
         check(MemoryAllocator);
-        return MemoryAllocator.get();
+        return MemoryAllocator;
     }
 
     FVulkanCommandContext* GetImmediateContext() const
@@ -82,7 +82,7 @@ public:
 
     FVulkanQueue* GetGraphicsQueue() const
     {
-        return GraphicsQueue.get();
+        return GraphicsQueue;
     }
 
 private:
@@ -91,9 +91,9 @@ private:
                               const FVulkanDeviceExtensionArray& DeviceExtensions);
 
 public:
-    std::unique_ptr<FVulkanQueue> GraphicsQueue;
-    std::unique_ptr<FVulkanQueue> ComputeQueue;
-    std::unique_ptr<FVulkanQueue> TransferQueue;
+    FVulkanQueue* GraphicsQueue = nullptr;
+    FVulkanQueue* ComputeQueue = nullptr;
+    FVulkanQueue* TransferQueue = nullptr;
     // Present queue is not a dedicated object, it's just a reference to one of the above queues
     FVulkanQueue* PresentQueue = nullptr;
 
@@ -102,7 +102,7 @@ public:
     FOptionalExtensionStatus ExtensionStatus;
 
 private:
-    std::unique_ptr<FVulkanMemoryManager> MemoryAllocator;
+    FVulkanMemoryManager* MemoryAllocator;
 
     VkDevice Device = VK_NULL_HANDLE;
     VkPhysicalDevice Gpu = VK_NULL_HANDLE;

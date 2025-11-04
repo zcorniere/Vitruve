@@ -41,8 +41,8 @@ void FThreadPool::Resize(unsigned size)
     thread_p.Resize(size);
     for (; old_size < thread_p.Size(); old_size++)
     {
-        std::unique_ptr<WorkerPoolRuntime> Runtime = std::make_unique<WorkerPoolRuntime>(state);
-        thread_p[old_size].Create(std::format("Worker Thread nb {}", old_size), std::move(Runtime));
+        WorkerPoolRuntime* Runtime = new WorkerPoolRuntime(state);
+        thread_p[old_size].Create(std::format("Worker Thread nb {}", old_size), Runtime);
     }
 }
 

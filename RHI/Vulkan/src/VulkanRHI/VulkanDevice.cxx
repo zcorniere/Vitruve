@@ -115,7 +115,7 @@ void FVulkanDevice::InitPhysicalDevice()
         Utils::RequestExit(1, true);
     }
 
-    MemoryAllocator = std::make_unique<FVulkanMemoryManager>(this);
+    MemoryAllocator = new FVulkanMemoryManager(this);
 
     ImmediateContext = static_cast<FVulkanCommandContext*>(RHI::Get()->RHIGetCommandContext());
     ImmediateContext->SetName("ImmediateContext");
@@ -275,21 +275,21 @@ bool FVulkanDevice::CreateDeviceAndQueue(const TArray<const char*>& DeviceLayers
         Extension->PostDeviceCreated(ExtensionStatus);
     }
 
-    GraphicsQueue = std::make_unique<FVulkanQueue>(this, GraphicsQueueFamilyIndex);
+    GraphicsQueue = new FVulkanQueue(this, GraphicsQueueFamilyIndex);
     GraphicsQueue->SetName("Graphics Queue");
 
     if (ComputeQueueFamilyIndex == -1)
     {
         ComputeQueueFamilyIndex = GraphicsQueueFamilyIndex;
     }
-    ComputeQueue = std::make_unique<FVulkanQueue>(this, ComputeQueueFamilyIndex);
+    ComputeQueue = new FVulkanQueue(this, ComputeQueueFamilyIndex);
     ComputeQueue->SetName("Compute Queue");
 
     if (TransferQueueFamilyIndex == -1)
     {
         TransferQueueFamilyIndex = ComputeQueueFamilyIndex;
     }
-    TransferQueue = std::make_unique<FVulkanQueue>(this, TransferQueueFamilyIndex);
+    TransferQueue = new FVulkanQueue(this, TransferQueueFamilyIndex);
     TransferQueue->SetName("Transfer Queue");
 
     LOG(LogVulkanRHI, Info, "Using {} device layers{}", DeviceLayers.Size(), DeviceLayers.Size() ? ":" : ".");
@@ -323,7 +323,7 @@ void FVulkanDevice::SetupPresentQueue(VkSurfaceKHR Surface)
 {
     if (!PresentQueue)
     {
-        if (!DoesQueueSupportPresent(Surface, Gpu, GraphicsQueue.get()))
+        if (!DoesQueueSupportPresent(Surface, Gpu, GraphicsQueue))
         {
             FPlatformMisc::DisplayMessageBox(
                 EBoxMessageType::Ok, "Cannot find a compatible Vulkan device that supports surface presentation.\n\n",
@@ -334,17 +334,17 @@ void FVulkanDevice::SetupPresentQueue(VkSurfaceKHR Surface)
         if (TransferQueue->GetFamilyIndex() != GraphicsQueue->GetFamilyIndex() &&
             TransferQueue->GetFamilyIndex() != ComputeQueue->GetFamilyIndex())
         {
-            DoesQueueSupportPresent(Surface, Gpu, TransferQueue.get());
+            DoesQueueSupportPresent(Surface, Gpu, TransferQueue);
         }
 
-        const bool bCompute = DoesQueueSupportPresent(Surface, Gpu, ComputeQueue.get());
+        const bool bCompute = DoesQueueSupportPresent(Surface, Gpu, ComputeQueue);
         if (ComputeQueue->GetFamilyIndex() != GraphicsQueue->GetFamilyIndex() && bCompute)
         {
-            PresentQueue = ComputeQueue.get();
+            PresentQueue = ComputeQueue;
         }
         else
         {
-            PresentQueue = GraphicsQueue.get();
+            PresentQueue = GraphicsQueue;
         }
         LOG(LogVulkanRHI, Info, "Using {} as the present Queue", PresentQueue->GetName());
     }
@@ -354,14 +354,18 @@ void FVulkanDevice::Destroy()
 {
     WaitUntilIdle();
 
-    MemoryAllocator.reset();
-
-    GraphicsQueue = nullptr;
-    ComputeQueue = nullptr;
-    TransferQueue = nullptr;
+    delete MemoryAllocator;
+    MemoryAllocator = nullptr;
 
     // Present Queue is a copy
     PresentQueue = nullptr;
+
+    delete GraphicsQueue;
+    GraphicsQueue = nullptr;
+    delete ComputeQueue;
+    ComputeQueue = nullptr;
+    delete TransferQueue;
+    TransferQueue = nullptr;
 
     if (Device)
     {

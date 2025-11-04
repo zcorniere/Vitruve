@@ -39,7 +39,7 @@ public:
     ///
     /// @param name the name of the new thread
     /// @param threadCode The runtime to be executed in the thread
-    void Create(const std::string& name, std::unique_ptr<IThreadRuntime> threadCode);
+    void Create(const std::string& name, IThreadRuntime* threadCode);
 
 protected:
     /// Executed from the thread when started
@@ -55,5 +55,5 @@ private:
 private:
     std::string m_name;
     std::jthread m_managedThread;
-    std::unique_ptr<IThreadRuntime> m_internalRuntime;
+    IThreadRuntime* m_internalRuntime;
 };
