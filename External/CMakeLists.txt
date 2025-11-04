@@ -17,6 +17,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy EXCLUDE_FROM_ALL)
 
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tracy/profiler EXCLUDE_FROM_ALL)
 
+add_library(imgui_header INTERFACE)
+target_include_directories(imgui_header INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/imgui ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends)
 add_library(
     imgui STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui.cpp
