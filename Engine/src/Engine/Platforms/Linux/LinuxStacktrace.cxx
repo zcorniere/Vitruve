@@ -83,7 +83,7 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
     std::string_view moduleName = dwfl_module_info(mod, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
     if (!moduleName.empty())
     {
-        auto Position = moduleName.find_last_of('/');
+        size_t Position = moduleName.find_last_of('/');
         if (Position != std::string_view::npos)
         {
             moduleName = moduleName.substr(Position + 1);
@@ -91,16 +91,16 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
         std::strncpy(detailed_info.ModuleName, moduleName.data(), DetailedSymbolInfo::MaxNameLength);
     }
 
-    Dwfl_Line* line = dwfl_module_getsrc(mod, ProgramCounter);
+    Dwfl_Line* const line = dwfl_module_getsrc(mod, ProgramCounter);
     if (line != nullptr)
     {
         std::string_view filename = dwfl_lineinfo(line, nullptr, &detailed_info.LineNumber, nullptr, nullptr, nullptr);
         if (!filename.empty())
         {
-            auto Position = filename.find_first_of("Vitruve/");
+            size_t Position = filename.find("/Vitruve/");
             if (Position != std::string_view::npos)
             {
-                filename = filename.substr(Position);
+                filename = filename.substr(Position + 1);
             }
             std::strncpy(detailed_info.Filename, filename.data(), DetailedSymbolInfo::MaxNameLength);
         }
