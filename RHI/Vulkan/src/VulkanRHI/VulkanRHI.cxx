@@ -163,6 +163,11 @@ void FVulkanDynamicRHI::Init()
 #endif
 
     Device = SelectDevice(m_Instance);
+    if (Device == nullptr)
+    {
+        LOG(LogVulkanRHI, Fatal, "Failed to find a suitable Vulkan device! Exiting...");
+        Utils::RequestExit(1, true);
+    }
 
     Device->InitPhysicalDevice();
     Device->SetName("Main Vulkan Device");
