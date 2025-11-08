@@ -2,7 +2,7 @@
 
 #include "VulkanRHI/VulkanLoader.hxx"
 
-#if VULKAN_CUSTOM_CPU_ALLOCATOR == 1
+#if VULKAN_CUSTOM_CPU_ALLOCATOR
 
 class FVulkanCPUMemoryManager
 {
@@ -17,7 +17,7 @@ public:
                                          VkSystemAllocationScope allocationScope);
 
 public:
-    VulkanCPUMemoryManager();
+    FVulkanCPUMemoryManager();
 };
 
 #endif

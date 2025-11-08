@@ -1,6 +1,6 @@
 #pragma once
 
-#define VULKAN_CUSTOM_CPU_ALLOCATOR 0
+#define VULKAN_CUSTOM_CPU_ALLOCATOR 1
 
 #include <Engine/Vitruve.hxx>
 
