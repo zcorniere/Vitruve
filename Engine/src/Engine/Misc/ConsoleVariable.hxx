@@ -44,8 +44,8 @@ public:
 
     TConsoleVariable(const char* InName, T InDefaultValue, const char* InHelpText)
         : Name(InName)
-        , Value(InDefaultValue)
         , HelpText(InHelpText)
+        , Value(InDefaultValue)
     {
         FConsoleVariableRegistry::Get().RegisterVariable(this);
     }
@@ -79,6 +79,6 @@ public:
 
 private:
     const char* Name;
-    std::atomic<T> Value;
     const char* HelpText;
+    std::atomic<T> Value;
 };
