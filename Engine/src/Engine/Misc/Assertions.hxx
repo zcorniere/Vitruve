@@ -6,8 +6,6 @@
 
 #include <atomic>    // IWYU pragma: keep
 
-#define VIT_ENABLE_STACKTRACE 1
-
 namespace Vitruve::Debug
 {
 
