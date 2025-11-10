@@ -421,9 +421,6 @@ FVulkanDevice* FVulkanDynamicRHI::SelectDevice(VkInstance Instance)
         }
     }
 
-    // merge the two arrays, so that if DiscreteDevice is empty, we can use IntegratedDevice
-    DiscreteDevice.Append(IntegratedDevice);
-
     uint32 DeviceIndex = (uint32)-1;
     FVulkanDevice* SelectedDevice = nullptr;
     if (DiscreteDevice.Size() > 0)
