@@ -4,22 +4,25 @@
 #include <cpplogger/sinks/FileSink.hpp>
 #include <cpplogger/sinks/StdoutSink.hpp>
 
-FLog::FLog()
+FLog::FLog(): CoreLogger("Core")
 {
     std::string LogFileLocation;
     if (FCommandLine::Parse("-logfile=", LogFileLocation))
     {
-        Sinks.Emplace(std::make_unique<cpplogger::FileSink<FLog::BaseFormatter>>(LogFileLocation, false));
+        Sinks.Emplace(new cpplogger::FileSink<FLog::BaseFormatter>(LogFileLocation, false));
     }
-    Sinks.Emplace(std::make_unique<cpplogger::StdoutSink<FLog::ColorFormatter>>(stdout));
+    Sinks.Emplace(new cpplogger::StdoutSink<FLog::ColorFormatter>(stdout));
 
-    CoreLogger = std::make_unique<cpplogger::Logger>("Core");
-    for (std::unique_ptr<cpplogger::ISink>& Sink: Sinks)
+    for (cpplogger::ISink* Sink: Sinks)
     {
-        CoreLogger->addSink(Sink.get());
+        CoreLogger.addSink(Sink);
     }
 }
 
 FLog::~FLog()
 {
+    for (cpplogger::ISink* Sink: Sinks)
+    {
+        delete Sink;
+    }
 }

@@ -37,6 +37,6 @@ public:
     ENGINE_API ~FLog();
 
 private:
-    TArray<std::unique_ptr<cpplogger::ISink>> Sinks;
-    std::unique_ptr<cpplogger::Logger> CoreLogger = nullptr;
+    TArray<cpplogger::ISink*> Sinks;
+    cpplogger::Logger CoreLogger;
 };
