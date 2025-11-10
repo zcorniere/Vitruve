@@ -26,6 +26,7 @@ public:
     FThread& operator=(FThread& other) = delete;
 
     virtual ~FThread();
+
     /// Initialize the thread
     void Start();
     ///
@@ -55,5 +56,5 @@ private:
 private:
     std::string m_name;
     std::jthread m_managedThread;
-    IThreadRuntime* m_internalRuntime;
+    IThreadRuntime* m_internalRuntime = nullptr;
 };

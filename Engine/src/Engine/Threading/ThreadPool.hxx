@@ -19,17 +19,17 @@ class FThreadPool
 private:
     using WorkUnits = std::function<void(unsigned id)>;
 
-    struct State
+    struct FState
     {
         std::mutex q_mutex;
         std::condition_variable q_var;
         std::queue<WorkUnits> qWork;
     };
 
-    class WorkerPoolRuntime : public IThreadRuntime
+    class FWorkerPoolRuntime : public IThreadRuntime
     {
     public:
-        explicit WorkerPoolRuntime(std::shared_ptr<FThreadPool::State> context);
+        explicit FWorkerPoolRuntime(FThreadPool::FState* context);
 
         bool Init(std::stop_token stoken) override;
         std::uint32_t Run() override;
@@ -40,9 +40,9 @@ private:
         static std::atomic_int s_threadIDCounter;
 
     private:
-        int i_threadID;
+        int i_threadID = -1;
         std::stop_token stoken;
-        std::shared_ptr<FThreadPool::State> p_state;
+        FThreadPool::FState* p_state = nullptr;
     };
 
 public:
@@ -75,17 +75,18 @@ public:
         auto packagedFunction = std::make_shared<std::packaged_task<decltype(f(0, args...))(unsigned)>>(
             std::bind(std::forward<F>(f), std::placeholders::_1, std::forward<Args>(args)...));
 
-        WorkUnits storageFunc([packagedFunction](int id) { (*packagedFunction)(id); });
+        WorkUnits storageFunc([packagedFunction](unsigned id) { (*packagedFunction)(id); });
 
         {
-            std::unique_lock lock(state->q_mutex);
-            state->qWork.push(storageFunc);
+            std::unique_lock lock(state.q_mutex);
+            state.qWork.push(storageFunc);
         }
-        state->q_var.notify_one();
+        state.q_var.notify_one();
         return packagedFunction->get_future();
     }
 
     template <typename F>
+    requires(std::is_invocable_r_v<void, F, unsigned>)
     std::shared_ptr<std::latch> ParallelFor(uint32 Count, uint32 ChunkSize, F&& Function)
     {
         if (!ensureAlwaysMsg(!thread_p.IsEmpty(), "Pushing task when no thread are started !"))
@@ -123,6 +124,6 @@ public:
     }
 
 private:
-    std::shared_ptr<State> state;
+    FState state;
     TArray<FThread> thread_p;
 };
