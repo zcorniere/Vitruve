@@ -47,13 +47,13 @@ ENGINE_API void Destroy();
 ENGINE_API void DeferedDeletion(std::function<void()>&& InDeletionFunction);
 ENGINE_API void FlushDeletionQueue(bool bAsync);
 
-/// -------------- RHI Operations --------------
+// -------------- RHI Operations --------------
 
 /// @brief Mark the beginning of a new frame
 ENGINE_API void BeginFrame();
 /// @brief Mark the end of the current frame
 ENGINE_API void EndFrame();
-
+/// @brief Wait until the RHI is idle
 ENGINE_API void RHIWaitUntilIdle();
 
 /// Create a new RHI viewport - through the current RHI

@@ -36,7 +36,7 @@ void RHI::Destroy()
 {
     VIT_PROFILE_FUNC()
 
-    GEngine->AssetRegistry->Purge();
+    GEngine->AssetRegistry.Purge();
 
     RHI::FlushDeletionQueue(false);
     GDynamicRHI->Shutdown();

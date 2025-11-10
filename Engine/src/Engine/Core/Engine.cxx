@@ -1,18 +1,15 @@
 #include "Engine/Core/Engine.hxx"
 
-#include "Engine/Core/Log.hxx"
 #include "Engine/Core/Window.hxx"
 
 #include "Engine/Math/Math.hxx"
-
-#include "AssetRegistry/AssetRegistry.hxx"
 
 uint64 GFrameCounter = 0;
 FEngine* GEngine = nullptr;
 
 DECLARE_LOGGER_CATEGORY(Core, LogEngine, Info)
 
-FEngine::FEngine(): AssetRegistry(std::make_unique<FAssetRegistry>())
+FEngine::FEngine()
 {
     GEngine = this;
 

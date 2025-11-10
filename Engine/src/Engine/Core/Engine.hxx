@@ -32,7 +32,7 @@ public:
     ENGINE_API Ref<RWorld> GetWorld() const;
 
 public:
-    std::unique_ptr<FAssetRegistry> AssetRegistry;
+    FAssetRegistry AssetRegistry;
     FThreadPool m_ThreadPool;
 
 private:
