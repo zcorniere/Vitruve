@@ -4,9 +4,9 @@
 #include "Engine/RHI/GenericRHI.hxx"
 #include "Engine/RHI/RHI.hxx"
 
-#include "Engine/GameFramework/Actor.hxx"
-#include "Engine/GameFramework/Components/MeshComponent.hxx"
-#include "Engine/GameFramework/World.hxx"
+#include "GameFramework/Actor.hxx"
+#include "GameFramework/Components/MeshComponent.hxx"
+#include "GameFramework/World.hxx"
 
 RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandContext())
 {

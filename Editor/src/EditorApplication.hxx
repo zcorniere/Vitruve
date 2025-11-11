@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/GameFramework/World.hxx"
+#include "GameFramework/World.hxx"
 #include <Engine/Core/Application.hxx>
 
 class EditorApplication : public FBaseApplication

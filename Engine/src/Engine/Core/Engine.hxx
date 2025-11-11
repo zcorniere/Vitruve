@@ -1,8 +1,8 @@
 #pragma once
 
 #include "AssetRegistry/AssetRegistry.hxx"
-#include "Engine/GameFramework/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
+#include "GameFramework/World.hxx"
 
 extern ENGINE_API class FEngine* GEngine;
 

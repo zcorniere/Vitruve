@@ -11,7 +11,7 @@
 #include <Engine/RHI/Resources/RHIViewport.hxx>
 
 #include "Actor/Oscillator.hxx"
-#include "Engine/GameFramework/CameraActor.hxx"
+#include "GameFramework/CameraActor.hxx"
 
 #include <cpplogger/sinks/FileSink.hpp>
 #include <cpplogger/sinks/StdoutSink.hpp>

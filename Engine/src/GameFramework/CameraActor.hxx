@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Engine/GameFramework/Actor.hxx"
+#include "GameFramework/Actor.hxx"
 
-#include "Engine/GameFramework/Components/CameraComponent.hxx"
+#include "GameFramework/Components/CameraComponent.hxx"
 
 class ENGINE_API ACameraActor : public AActor
 {

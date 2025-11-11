@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/GameFramework/Components/MeshComponent.hxx"
+#include "GameFramework/Components/MeshComponent.hxx"
 
 class ENGINE_API AActor : public RObject
 {

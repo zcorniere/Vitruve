@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/GameFramework/Components/SceneComponent.hxx"
 #include "Engine/Math/ViewPoint.hxx"
+#include "GameFramework/Components/SceneComponent.hxx"
 
 template <typename T>
 class RCameraComponent : public RSceneComponent

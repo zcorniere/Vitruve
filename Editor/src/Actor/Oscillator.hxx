@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/GameFramework/Actor.hxx"
+#include "GameFramework/Actor.hxx"
 
 class AOscillator : public AActor
 {

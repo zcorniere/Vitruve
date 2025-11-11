@@ -11,27 +11,42 @@ else()
 endif(VIT_NAN_CHECKS)
 
 if(WIN32)
-    file(GLOB PLATFORM_SOURCE_FILES src/Engine/Platforms/Windows/*.cxx)
+    file(GLOB VIT_PLATFORM_SOURCE_FILES src/Engine/Platforms/Windows/*.cxx)
 elseif(UNIX)
-    file(GLOB PLATFORM_SOURCE_FILES src/Engine/Platforms/Linux/*.cxx)
+    file(GLOB VIT_PLATFORM_SOURCE_FILES src/Engine/Platforms/Linux/*.cxx)
 else()
     message(FATAL_ERROR "Platform Not supported !")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(COMPILER_SOURCE_FILE src/Engine/Compilers/ClangCompiler.cxx)
+    set(VIT_COMPILER_SOURCE_FILE src/Engine/Compilers/ClangCompiler.cxx)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(COMPILER_SOURCE_FILE src/Engine/Compilers/GNUCompiler.cxx)
+    set(VIT_COMPILER_SOURCE_FILE src/Engine/Compilers/GNUCompiler.cxx)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(COMPILER_SOURCE_FILE src/Engine/Compilers/MSVCCompiler.cxx)
+    set(VIT_COMPILER_SOURCE_FILE src/Engine/Compilers/MSVCCompiler.cxx)
 else()
     message(FATAL_ERROR "Compiler not supported !")
 endif()
 
 generate_export_header(ENGINE)
 
+set(VIT_ASSET_REGISTRY_SOURCES src/AssetRegistry/AssetRegistry.cxx src/AssetRegistry/Asset.cxx
+                               src/AssetRegistry/MeshFactory.cxx
+)
+
+set(VIT_GAMEFRAMEWORK_SOURCES src/GameFramework/Actor.cxx src/GameFramework/World.cxx src/GameFramework/CameraActor.cxx)
+
+set(VIT_RHI_SOURCES
+    src/Engine/RHI/RHI.cxx
+    src/Engine/RHI/RHIDefinitions.cxx
+    src/Engine/RHI/RHICommandList.cxx
+    src/Engine/RHI/RHICommand.cxx
+    src/Engine/RHI/RHIScene.cxx
+)
+
 add_library(
-    ${PROJECT_NAME} ${VIT_LIBRARY_TYPE}
+    ${PROJECT_NAME}
+    ${VIT_LIBRARY_TYPE}
     src/Engine/Main.cxx
     src/Engine/Core/Log.cxx
     src/Engine/Core/UUID.cxx
@@ -39,18 +54,10 @@ add_library(
     src/Engine/Core/Engine.cxx
     src/Engine/Core/Application.cxx
     src/Engine/Core/Window.cxx
-    src/Engine/RHI/RHI.cxx
-    src/Engine/RHI/RHIDefinitions.cxx
-    src/Engine/RHI/RHICommandList.cxx
-    src/Engine/RHI/RHICommand.cxx
-    src/Engine/RHI/RHIScene.cxx
     src/Engine/Core/Memory/Memory.cxx
     src/Engine/Core/Memory/MiMalloc.cxx
     src/Engine/Core/Memory/StdMalloc.cxx
     src/Engine/Modules/ModuleManager.cxx
-    src/Engine/GameFramework/Actor.cxx
-    src/Engine/GameFramework/World.cxx
-    src/Engine/GameFramework/CameraActor.cxx
     src/Engine/Serialization/StreamWriter.cxx
     src/Engine/Serialization/StreamReader.cxx
     src/Engine/Serialization/FileStream.cxx
@@ -65,11 +72,11 @@ add_library(
     src/Engine/Math/Transform.cxx
     src/Engine/Threading/Thread.cxx
     src/Engine/Threading/ThreadPool.cxx
-    src/AssetRegistry/AssetRegistry.cxx
-    src/AssetRegistry/Asset.cxx
-    src/AssetRegistry/MeshFactory.cxx
-    ${PLATFORM_SOURCE_FILES}
-    ${COMPILER_SOURCE_FILE}
+    ${VIT_PLATFORM_SOURCE_FILES}
+    ${VIT_COMPILER_SOURCE_FILE}
+    ${VIT_ASSET_REGISTRY_SOURCES}
+    ${VIT_RHI_SOURCES}
+    ${VIT_GAMEFRAMEWORK_SOURCES}
 )
 vit_set_standard_options(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
 target_link_libraries(
@@ -89,17 +96,16 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 if(UNIX)
     target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
 
-    if (VIT_ENABLE_STACKTRACE)
+    if(VIT_ENABLE_STACKTRACE)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBDW REQUIRED libdw)
         target_include_directories(${PROJECT_NAME} PRIVATE ${LIBDW_INCLUDE_DIRS})
         target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBDW_LIBRARIES})
         target_compile_options(${PROJECT_NAME} PRIVATE ${LIBDW_CFLAGS_OTHER})
-    endif (VIT_ENABLE_STACKTRACE)
+    endif(VIT_ENABLE_STACKTRACE)
 elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
 endif()
-
 
 # ------------- Tests -------------
 

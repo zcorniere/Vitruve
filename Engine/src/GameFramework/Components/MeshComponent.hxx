@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AssetRegistry/Asset.hxx"
-#include "Engine/GameFramework/Components/SceneComponent.hxx"
+#include "GameFramework/Components/SceneComponent.hxx"
 
 class RMeshComponent : public RSceneComponent
 {
