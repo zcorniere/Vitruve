@@ -229,6 +229,12 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
     {
         return true;
     }
+    // The rendering viewport size doesn't match the ImGui viewport size, probably because of a resize, but we skip
+    // rendering this frame
+    if (Viewport->Size.x != RenderingViewport->GetSize().x || Viewport->Size.y != RenderingViewport->GetSize().y)
+    {
+        return false;
+    }
 
     FVulkanCommandContext* CommandContext = CommandList.GetContext()->Cast<FVulkanCommandContext>();
 
