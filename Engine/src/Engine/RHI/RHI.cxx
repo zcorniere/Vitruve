@@ -12,6 +12,8 @@
 
 ENGINE_API FGenericRHI* GDynamicRHI = nullptr;
 
+static TConsoleVariable CVar_RHIName("r.RHI", "VulkanRHI", "Select the RHI to use (e.g., Vulkan)");
+
 void RHI::Create()
 {
     VIT_PROFILE_FUNC()
@@ -19,7 +21,7 @@ void RHI::Create()
 #if VIT_COMPILE_MONOLITHIC
     IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("");
 #else
-    IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule("VulkanRHI");
+    IModuleInterface* const ModuleInterface = FModuleManager::Get().LoadModule(CVar_RHIName.GetValueAsString());
 #endif    // VIT_COMPILE_MONOLITHIC
     if (!ModuleInterface)
     {

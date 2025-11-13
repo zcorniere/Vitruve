@@ -82,3 +82,53 @@ private:
     const char* HelpText;
     std::atomic<T> Value;
 };
+
+template <>
+class ENGINE_API TConsoleVariable<const char*> final : public IConsoleVariable
+{
+public:
+    using Type = std::string;
+
+    TConsoleVariable(const char* InName, const char* InDefaultValue, const char* InHelpText)
+        : Name(InName)
+        , HelpText(InHelpText)
+        , Value(InDefaultValue)
+    {
+        FConsoleVariableRegistry::Get().RegisterVariable(this);
+    }
+
+    const char* GetName() const override
+    {
+        return Name;
+    }
+
+    std::string GetValue() const
+    {
+        return Value;
+    }
+
+    void SetValue(const std::string& InValue)
+    {
+        Value = InValue;
+    }
+
+    virtual std::string GetValueAsString() const override
+    {
+        return GetValue();
+    }
+
+    virtual void SetFromString(const std::string_view View) override
+    {
+        SetValue(std::string(View));
+    }
+
+    const char* GetHelpText() const override
+    {
+        return HelpText;
+    }
+
+private:
+    const char* Name;
+    const char* HelpText;
+    std::string Value;
+};
