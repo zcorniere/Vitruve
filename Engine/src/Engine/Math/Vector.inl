@@ -42,7 +42,7 @@ template <typename T>
 constexpr T TVector<2, T>::operator[](unsigned index) const
 {
     assert(index < 2);
-    [[assume(index < 4)]];
+    [[assume(index < 2)]];
     return data[index];
 }
 // End TVector 2
@@ -87,7 +87,7 @@ template <typename T>
 constexpr T& TVector<3, T>::operator[](unsigned index)
 {
     assert(index < 3);
-    [[assume(index < 4)]];
+    [[assume(index < 3)]];
     return data[index];
 }
 
@@ -95,7 +95,7 @@ template <typename T>
 constexpr T TVector<3, T>::operator[](unsigned index) const
 {
     assert(index < 3);
-    [[assume(index < 4)]];
+    [[assume(index < 3)]];
     return data[index];
 }
 // End TVector 3
