@@ -303,7 +303,14 @@ bool VulkanRHI_ImGui::RenderImGuiViewport(ImGuiViewport* Viewport, FFRHICommandL
 
             if (pCmd->UserCallback)
             {
-                pCmd->UserCallback(cmdList, pCmd);
+                if (pCmd->UserCallback == ImDrawCallback_ResetRenderState)
+                {
+                    checkNoEntry();    // Not implemented
+                }
+                else
+                {
+                    pCmd->UserCallback(cmdList, pCmd);
+                }
             }
             else
             {
