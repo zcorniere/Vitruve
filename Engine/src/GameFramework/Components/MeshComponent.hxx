@@ -13,6 +13,9 @@ public:
     void SetAsset(Ref<RAsset> InAsset);
     void SetMaterial(Ref<RRHIMaterial> InMaterial);
 
+    Ref<RAsset> GetAsset() const;
+    Ref<RRHIMaterial> GetMaterial() const;
+
 public:
     Ref<RAsset> Asset = nullptr;
     Ref<RRHIMaterial> Material = nullptr;
@@ -28,4 +31,14 @@ inline void RMeshComponent::SetMaterial(Ref<RRHIMaterial> InMaterial)
 {
     Material = InMaterial;
     MarkRenderStateDirty();
+}
+
+inline Ref<RAsset> RMeshComponent::GetAsset() const
+{
+    return Asset;
+}
+
+inline Ref<RRHIMaterial> RMeshComponent::GetMaterial() const
+{
+    return Material;
 }

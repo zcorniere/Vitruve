@@ -9,6 +9,8 @@ template <typename T>
 requires std::is_floating_point_v<T>
 struct TQuaternion
 {
+    static TQuaternion FromEulerAngles(T Pitch, T Yaw, T Roll);
+
     using Type = T;
     union
     {

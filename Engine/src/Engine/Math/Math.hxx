@@ -57,4 +57,18 @@ constexpr TVector<3, T> Cross(const TVector<3, T>& x, const TVector<3, T>& y)
     return TVector<3, T>(x.y * y.z - y.y * x.z, x.z * y.x - y.z * x.x, x.x * y.y - y.x * x.y);
 }
 
+template <typename T, unsigned TColumns, unsigned TRows>
+constexpr TMatrix<TColumns, TRows, T> Transpose(const TMatrix<TRows, TColumns, T>& Matrix)
+{
+    TMatrix<TColumns, TRows, T> Result;
+    for (unsigned i = 0; i < TRows; ++i)
+    {
+        for (unsigned j = 0; j < TColumns; ++j)
+        {
+            Result[j][i] = Matrix[i][j];
+        }
+    }
+    return Result;
+}
+
 }    // namespace Math

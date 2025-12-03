@@ -9,6 +9,12 @@ AOscillator::AOscillator()
     Maximum = {0.0f, 0.0f, 6.0f};
     Direction = {0.0f, 0.0f, 1.0f};
 
+    ScaleMultiplier = (float)rand() / (float)RAND_MAX / 2.0f;
+
+    RotationMultiplier.x = (float)rand() / (float)RAND_MAX / 20.0f;
+    RotationMultiplier.y = (float)rand() / (float)RAND_MAX / 20.0f;
+    RotationMultiplier.z = (float)rand() / (float)RAND_MAX / 20.0f;
+
     Ref<RAsset> UsedAsset;
     if (rand() % 2)
     {
@@ -25,6 +31,12 @@ AOscillator::AOscillator()
 
 AOscillator::~AOscillator()
 {
+}
+
+void AOscillator::BeginPlay()
+{
+    Super::BeginPlay();
+    SetNamef("{}_{}", GetName(), GetMesh()->GetAsset()->GetName());
 }
 
 void AOscillator::Tick(double DeltaTime)
@@ -45,6 +57,27 @@ void AOscillator::Tick(double DeltaTime)
     {
         Direction.z *= -1;
     }
-
     SetActorLocation(NewLocation);
+
+    if (GetName().contains("Box"))
+    {
+        const FQuaternion DeltaRotation = FQuaternion::FromEulerAngles(RotationMultiplier.x * float(DeltaTime),
+                                                                       RotationMultiplier.y * float(DeltaTime),
+                                                                       RotationMultiplier.z * float(DeltaTime));
+
+        const FQuaternion NewRotation = DeltaRotation * GetRootComponent()->GetRelativeTransform().GetRotation();
+        SetActorRotation(NewRotation);
+    }
+    else if (GetName().contains("Capsule"))
+    {
+        const FVector3 ScaledDelta = ScaleMultiplier * float(DeltaTime);
+        const FVector3 NewScale = GetRootComponent()->GetRelativeTransform().GetScale() + ScaledDelta;
+
+        if (NewScale.x > ScaleMaximum || NewScale.x < ScaleMinimum)
+        {
+            ScaleMultiplier *= -1;
+        }
+
+        SetActorScale(NewScale);
+    }
 }

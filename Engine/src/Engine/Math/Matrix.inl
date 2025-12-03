@@ -143,10 +143,10 @@ requires(TRows > 0 && TColumns > 0)
 constexpr TVector<TColumns, T> operator*(const TMatrix<TRows, TColumns, T>& lhs, const TVector<TColumns, T>& rhs)
 {
     TVector<TColumns, T> Result;
-    for (size_t i = 0; i < TRows; ++i)
+    for (unsigned i = 0; i < TRows; ++i)
     {
         T Sum = T{};
-        for (size_t j = 0; j < TColumns; ++j)
+        for (unsigned j = 0; j < TColumns; ++j)
         {
             Sum += lhs[i][j] * rhs[j];
         }

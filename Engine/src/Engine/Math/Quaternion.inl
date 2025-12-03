@@ -161,6 +161,36 @@ constexpr void CheckNaN(const TQuaternion<T>& q)
 #endif    // VIT_NAN_CHECKS
 }
 
+template <typename T>
+requires std::is_floating_point_v<T>
+TQuaternion<T> TQuaternion<T>::FromEulerAngles(T Pitch, T Yaw, T Roll)
+{
+    TQuaternion<T> QPitch;
+    TQuaternion<T> QYaw;
+    TQuaternion<T> QRoll;
+
+    const T HalfPitch = Pitch * T(0.5);
+    const T HalfYaw = Yaw * T(0.5);
+    const T HalfRoll = Roll * T(0.5);
+
+    QPitch.w = std::cos(HalfPitch);
+    QPitch.x = std::sin(HalfPitch);
+    QPitch.y = T(0);
+    QPitch.z = T(0);
+
+    QYaw.w = std::cos(HalfYaw);
+    QYaw.x = T(0);
+    QYaw.y = std::sin(HalfYaw);
+    QYaw.z = T(0);
+
+    QRoll.w = std::cos(HalfRoll);
+    QRoll.x = T(0);
+    QRoll.y = T(0);
+    QRoll.z = std::sin(HalfRoll);
+
+    return QYaw * QPitch * QRoll;
+}
+
 }    // namespace Math
 
 template <typename T>
