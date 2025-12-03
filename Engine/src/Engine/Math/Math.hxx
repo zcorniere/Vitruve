@@ -41,7 +41,13 @@ constexpr T Dot(const TVector<Size, T>& lhs, const TVector<Size, T>& rhs)
 template <typename T, unsigned Size>
 constexpr TVector<Size, T> Normalize(const TVector<Size, T>& Vector)
 {
-    const T InverseSqrt = T(1) / sqrt(Dot(Vector, Vector));
+    const T Sqrt = sqrt(Dot(Vector, Vector));
+    if (Sqrt == T(0)) [[unlikely]]
+    {
+        LOG(LogMath, Warning, "Trying to normalize a zero-length vector");
+        return Vector;
+    }
+    const T InverseSqrt = T(1) / Sqrt;
     return Vector * InverseSqrt;
 }
 

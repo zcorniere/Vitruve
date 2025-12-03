@@ -83,7 +83,11 @@ requires std::is_floating_point_v<T>
 constexpr void TQuaternion<T>::Inverse()
 {
     const T Norm = Dot(*this);
-    assert(Norm != 0);
+    if (Norm == T(0)) [[unlikely]]
+    {
+        LOG(LogMath, Warning, "Trying to invert a zero-length quaternion");
+        return;
+    }
 
     x = -x / Norm;
     y = -y / Norm;
@@ -112,7 +116,11 @@ requires std::is_floating_point_v<T>
 constexpr void TQuaternion<T>::Normalize()
 {
     const T Length = this->Length();
-    assert(Length != 0);
+    if (Length == T(0)) [[unlikely]]
+    {
+        LOG(LogMath, Warning, "Trying to normalize a zero-length quaternion");
+        return;
+    }
 
     const T Norm = T(1) / Length;
 

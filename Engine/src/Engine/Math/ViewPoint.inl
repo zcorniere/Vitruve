@@ -13,9 +13,16 @@ constexpr void TViewPoint<T>::ComputeProjectionMatrix()
     TMatrix4<T> NewProjectionMatrix;
     NewProjectionMatrix[0, 0] = T(1) / (m_AspectRatio * tanHalfFOV);
     NewProjectionMatrix[1, 1] = T(1) / tanHalfFOV;
-    NewProjectionMatrix[2, 2] = (m_Far + m_Near) / (m_Near - m_Far);
     NewProjectionMatrix[2, 3] = T(-1);
-    NewProjectionMatrix[3, 2] = (T(2) * m_Far * m_Near) / (m_Near - m_Far);
+    if (m_Near != m_Far) [[unlikely]]
+    {
+        NewProjectionMatrix[2, 2] = (m_Far + m_Near) / (m_Near - m_Far);
+        NewProjectionMatrix[3, 2] = (T(2) * m_Far * m_Near) / (m_Near - m_Far);
+    }
+    else
+    {
+        LOG(LogMath, Warning, "Near and Far planes are equal in ViewPoint<{}>", RTTI::TypeName<T>());
+    }
 
     NewProjectionMatrix[1, 1] *= -1;
 
