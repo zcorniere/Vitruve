@@ -9,7 +9,9 @@ static Dwfl* dwfl = nullptr;
 
 void FLinuxStacktrace::InitDWARF()
 {
+#if VIT_ENABLE_STACKTRACE
     VIT_PROFILE_FUNC()
+
     static const Dwfl_Callbacks callbacks = {
         .find_elf = dwfl_linux_proc_find_elf,
         .find_debuginfo = dwfl_standard_find_debuginfo,
@@ -19,10 +21,12 @@ void FLinuxStacktrace::InitDWARF()
     dwfl = dwfl_begin(&callbacks);
 
     RefreshDWARF();
+#endif    // VIT_ENABLE_STACKTRACE
 }
 
 void FLinuxStacktrace::RefreshDWARF()
 {
+#if VIT_ENABLE_STACKTRACE
     VIT_PROFILE_FUNC()
     if (dwfl_linux_proc_report(dwfl, getpid()) == -1)
     {
@@ -34,14 +38,17 @@ void FLinuxStacktrace::RefreshDWARF()
     {
         dwfl_report_end(dwfl, nullptr, nullptr);
     }
+#endif    // VIT_ENABLE_STACKTRACE
 }
 
 void FLinuxStacktrace::ShutdownDWARF()
 {
+#if VIT_ENABLE_STACKTRACE
     if (dwfl != nullptr)
     {
         dwfl_end(dwfl);
     }
+#endif    // VIT_ENABLE_STACKTRACE
 }
 
 StacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
@@ -74,6 +81,7 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
         return false;
     }
 
+#if VIT_ENABLE_STACKTRACE
     Dwfl_Module* const mod = dwfl_addrmodule(dwfl, ProgramCounter);
     if (mod == nullptr)
     {
@@ -111,5 +119,6 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
     {
         std::strncpy(detailed_info.FunctionName, symbolName, DetailedSymbolInfo::MaxNameLength);
     }
+#endif    // VIT_ENABLE_STA  CKTRACE
     return true;
 }
