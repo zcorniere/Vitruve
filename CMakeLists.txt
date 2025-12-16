@@ -61,8 +61,8 @@ else()
     message(STATUS "LTO not supported")
 endif()
 
-option(OPTIMIZE_FOR_NATIVE "Build with -march=native (AVX2 by default)" OFF)
-if(OPTIMIZE_FOR_NATIVE)
+option(VIT_OPTIMIZE_FOR_NATIVE "Build with -march=native (AVX2 by default)" OFF)
+if(VIT_OPTIMIZE_FOR_NATIVE)
     message(STATUS "Building with -march=native")
 else()
     message(STATUS "Building without -march=native")
@@ -133,8 +133,12 @@ function(vit_set_standard_options target precompile_header)
                    CXX_EXTENSIONS NO
                    POSITION_INDEPENDENT_CODE ON
     )
-    target_compile_definitions(${target} PUBLIC VITRUVE_BUILD_TYPE="$<CONFIG>")
-
+    target_compile_definitions(
+        ${target}
+        PUBLIC VITRUVE_BUILD_SHIPPING=$<BOOL:$<CONFIG:Release>> VITRUVE_BUILD_DEBUG=$<BOOL:$<CONFIG:Debug>>
+               VITRUVE_BUILD_RELWITHDEBINFO=$<BOOL:$<CONFIG:RelWithDebInfo>>
+               VITRUVE_BUILD_MINSIZEREL=$<BOOL:$<CONFIG:MinSizeRel>>
+    )
     if(WIN32)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -167,13 +171,13 @@ function(vit_set_standard_options target precompile_header)
                 /wd4702 # unreachable code
                 /wd5030> # unknown attribute
     )
-    if(OPTIMIZE_FOR_NATIVE)
-        if (MSVC)
+    if(VIT_OPTIMIZE_FOR_NATIVE)
+        if(MSVC)
             target_compile_options(${target} PUBLIC /arch:AVX2)
         else()
             target_compile_options(${target} PUBLIC -march=native)
         endif()
-    endif(OPTIMIZE_FOR_NATIVE)
+    endif(VIT_OPTIMIZE_FOR_NATIVE)
     if(VIT_ENABLE_PROFILING)
         target_link_libraries(${target} PUBLIC Tracy::TracyClient)
     endif(VIT_ENABLE_PROFILING)
