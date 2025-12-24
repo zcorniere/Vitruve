@@ -91,7 +91,11 @@ void FBaseApplication::Tick(const double DeltaTime)
             FConsoleVariableRegistry::Get().SetVariableValue(CVar->GetName(), valueBuffer);
         }
 
-        ImGui::TextWrapped("%s", CVar->GetHelpText());
+        const char* const HelpText = CVar->GetHelpText();
+        if (HelpText)
+        {
+            ImGui::TextWrapped("%s", HelpText);
+        }
         ImGui::PopID();
     }
     ImGui::EndTable();

@@ -42,7 +42,7 @@ class ENGINE_API TConsoleVariable final : public IConsoleVariable
 public:
     using Type = T;
 
-    TConsoleVariable(const char* InName, T InDefaultValue, const char* InHelpText)
+    TConsoleVariable(const char* InName, T InDefaultValue, const char* InHelpText = nullptr)
         : Name(InName)
         , HelpText(InHelpText)
         , Value(InDefaultValue)
@@ -75,6 +75,11 @@ public:
     const char* GetHelpText() const override
     {
         return HelpText;
+    }
+
+    T operator*()
+    {
+        return GetValue();
     }
 
 private:
