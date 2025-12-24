@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Engine/RHI/RHIContext.hxx"
-#include "Engine/RHI/RHIResource.hxx"
+#include "RHI/RHIContext.hxx"
+#include "RHI/RHIResource.hxx"
 
-#include "Engine/RHI/RHI.hxx"
-#include "Engine/RHI/RHIScene.hxx"
+#include "RHI/RHI.hxx"
+#include "RHI/RHIScene.hxx"
 
 DECLARE_LOGGER_CATEGORY(Core, LogRHI, Info);
 

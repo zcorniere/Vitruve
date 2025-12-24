@@ -12,7 +12,7 @@
 
 #include "Engine/Core/Window.hxx"
 #include "Engine/Misc/DataLocation.hxx"
-#include "Engine/RHI/RHICommandList.hxx"
+#include "RHI/RHICommandList.hxx"
 
 namespace VulkanRHI
 {

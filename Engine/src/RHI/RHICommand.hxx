@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/RHI/RHICommandList.hxx"
-#include "Engine/RHI/Resources/RHITexture.hxx"
+#include "RHI/RHICommandList.hxx"
+#include "RHI/Resources/RHITexture.hxx"
 
 #define RHICOMMAND_MACRO(CommandName)      \
     struct CommandName##String             \

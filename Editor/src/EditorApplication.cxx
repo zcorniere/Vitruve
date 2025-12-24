@@ -1,14 +1,14 @@
 #include "EditorApplication.hxx"
 
 #include "Engine/Core/Engine.hxx"
-#include "Engine/RHI/RHI.hxx"
-#include "Engine/RHI/RHIScene.hxx"
+#include "RHI/RHI.hxx"
+#include "RHI/RHIScene.hxx"
 
 #include "AssetRegistry/AssetRegistry.hxx"
 #include <Engine/Core/Log.hxx>
 #include <Engine/Platforms/PlatformMisc.hxx>
-#include <Engine/RHI/RHICommandList.hxx>
-#include <Engine/RHI/Resources/RHIViewport.hxx>
+#include <RHI/RHICommandList.hxx>
+#include <RHI/Resources/RHIViewport.hxx>
 
 #include "Actor/Oscillator.hxx"
 #include "GameFramework/CameraActor.hxx"

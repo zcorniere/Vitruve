@@ -2,8 +2,8 @@
 
 #include <source_location>
 
-#include "Engine/RHI/RHIDefinitions.hxx"
-#include "Engine/RHI/Resources/RHIShader.hxx"
+#include "RHI/RHIDefinitions.hxx"
+#include "RHI/Resources/RHIShader.hxx"
 #include "VulkanRHI/Resources/VulkanShader.hxx"
 
 #define VK_CHECK_RESULT(f)                                  \

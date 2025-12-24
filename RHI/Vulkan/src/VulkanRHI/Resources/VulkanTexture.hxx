@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/RHI/Resources/RHITexture.hxx"
+#include "RHI/Resources/RHITexture.hxx"
 
 namespace VulkanRHI
 {

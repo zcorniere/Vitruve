@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/RHI/RHIDefinitions.hxx"
-#include "Engine/RHI/RHIResource.hxx"
+#include "RHI/RHIDefinitions.hxx"
+#include "RHI/RHIResource.hxx"
 
 enum class ETextureWrap
 {

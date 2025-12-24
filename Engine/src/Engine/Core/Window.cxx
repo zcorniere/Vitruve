@@ -6,8 +6,8 @@
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/MiscDefines.hxx"
 #include "Engine/Misc/Utils.hxx"
-#include "Engine/RHI/GenericRHI.hxx"
-#include "Engine/RHI/RHI.hxx"
+#include "RHI/GenericRHI.hxx"
+#include "RHI/RHI.hxx"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>

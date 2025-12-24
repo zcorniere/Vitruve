@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/RHI/Resources/RHIMaterial.hxx"
+#include "RHI/Resources/RHIMaterial.hxx"
 
 #include "VulkanRHI/DescriptorPoolManager.hxx"
 

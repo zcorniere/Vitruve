@@ -2,7 +2,7 @@
 
 #include "Engine/Core/Events/ApplicationEvent.hxx"
 #include "Engine/Core/Window.hxx"
-#include "Engine/RHI/Resources/RHIViewport.hxx"
+#include "RHI/Resources/RHIViewport.hxx"
 
 extern class IApplication* GApplication;
 

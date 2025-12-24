@@ -33,11 +33,11 @@ protected:
 };
 
 // IWYU pragma: begin_exports
-#include "Engine/RHI/Resources/RHIBuffer.hxx"
-#include "Engine/RHI/Resources/RHIGraphicsPipeline.hxx"
-#include "Engine/RHI/Resources/RHIShader.hxx"
-#include "Engine/RHI/Resources/RHITexture.hxx"
-#include "Engine/RHI/Resources/RHIViewport.hxx"
+#include "RHI/Resources/RHIBuffer.hxx"
+#include "RHI/Resources/RHIGraphicsPipeline.hxx"
+#include "RHI/Resources/RHIShader.hxx"
+#include "RHI/Resources/RHITexture.hxx"
+#include "RHI/Resources/RHIViewport.hxx"
 
-#include "Engine/RHI/Resources/RHIMaterial.hxx"
+#include "RHI/Resources/RHIMaterial.hxx"
 // IWYU pragma: end_exports

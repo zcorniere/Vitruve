@@ -3,8 +3,8 @@
 #include "Application.hxx"
 #include "Engine/Core/Window.hxx"
 #include "Engine/Misc/ConsoleVariable.hxx"
-#include "Engine/RHI/RHI.hxx"
-#include "Engine/RHI/Resources/RHIViewport.hxx"
+#include "RHI/RHI.hxx"
+#include "RHI/Resources/RHIViewport.hxx"
 
 #include <imgui.h>
 

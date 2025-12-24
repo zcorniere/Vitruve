@@ -1,10 +1,10 @@
-#include "Engine/RHI/RHI.hxx"
+#include "RHI/RHI.hxx"
 
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Core/Window.hxx"
 #include "Engine/Misc/Utils.hxx"
-#include "Engine/RHI/GenericRHI.hxx"
-#include "Engine/RHI/RHICommandList.hxx"
+#include "RHI/GenericRHI.hxx"
+#include "RHI/RHICommandList.hxx"
 
 #include "AssetRegistry/AssetRegistry.hxx"
 #include "Engine/Modules/ModuleInterface.hxx"

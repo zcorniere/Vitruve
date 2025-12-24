@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Engine/Math/Transform.hxx"
-#include "Engine/RHI/RHICommandList.hxx"
-#include "Engine/RHI/RHIContext.hxx"
-#include "Engine/RHI/Resources/RHITexture.hxx"
 #include "Engine/Threading/Lock.hxx"
 #include "GameFramework/Components/CameraComponent.hxx"
+#include "RHI/RHICommandList.hxx"
+#include "RHI/RHIContext.hxx"
+#include "RHI/Resources/RHITexture.hxx"
 
 #include <future>
 

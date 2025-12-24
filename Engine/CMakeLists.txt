@@ -37,11 +37,11 @@ set(VIT_ASSET_REGISTRY_SOURCES src/AssetRegistry/AssetRegistry.cxx src/AssetRegi
 set(VIT_GAMEFRAMEWORK_SOURCES src/GameFramework/Actor.cxx src/GameFramework/World.cxx src/GameFramework/CameraActor.cxx)
 
 set(VIT_RHI_SOURCES
-    src/Engine/RHI/RHI.cxx
-    src/Engine/RHI/RHIDefinitions.cxx
-    src/Engine/RHI/RHICommandList.cxx
-    src/Engine/RHI/RHICommand.cxx
-    src/Engine/RHI/RHIScene.cxx
+    src/RHI/RHI.cxx
+    src/RHI/RHIDefinitions.cxx
+    src/RHI/RHICommandList.cxx
+    src/RHI/RHICommand.cxx
+    src/RHI/RHIScene.cxx
 )
 
 add_library(

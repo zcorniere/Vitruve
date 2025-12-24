@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/RHI/GenericRHI.hxx"
+#include "RHI/GenericRHI.hxx"
 #include "VulkanRHI/VulkanPlatform.hxx"
 #include "VulkanRHI/VulkanRHI_Debug.hxx"
 #include "VulkanRHI/VulkanRHI_ImGui.hxx"

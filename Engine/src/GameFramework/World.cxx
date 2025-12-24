@@ -1,8 +1,8 @@
 #include "GameFramework/World.hxx"
 
 #include "Engine/Core/Engine.hxx"
-#include "Engine/RHI/GenericRHI.hxx"
-#include "Engine/RHI/RHIScene.hxx"
+#include "RHI/GenericRHI.hxx"
+#include "RHI/RHIScene.hxx"
 
 #include "GameFramework/Actor.hxx"
 

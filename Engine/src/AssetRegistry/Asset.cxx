@@ -1,6 +1,6 @@
 #include "AssetRegistry/Asset.hxx"
 
-#include "Engine/RHI/RHI.hxx"
+#include "RHI/RHI.hxx"
 
 RModel::RModel(const std::filesystem::path& Path): AssetPath(Path.string())
 {

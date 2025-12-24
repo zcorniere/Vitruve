@@ -4,8 +4,8 @@
 #include "Engine/Misc/CommandLine.hxx"
 #include "Engine/Misc/Timer.hxx"
 #include "Engine/Misc/Utils.hxx"
-#include "Engine/RHI/GenericRHI.hxx"
-#include "Engine/RHI/RHI.hxx"
+#include "RHI/GenericRHI.hxx"
+#include "RHI/RHI.hxx"
 
 #ifdef PLATFORM_WINDOWS
     #include <windows.h>

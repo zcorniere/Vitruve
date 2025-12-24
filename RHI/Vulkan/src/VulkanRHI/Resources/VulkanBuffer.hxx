@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/RHI/Resources/RHIBuffer.hxx"
+#include "RHI/Resources/RHIBuffer.hxx"
 
 namespace VulkanRHI
 {
