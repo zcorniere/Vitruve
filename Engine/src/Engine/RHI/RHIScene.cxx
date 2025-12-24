@@ -243,15 +243,15 @@ void RRHIScene::TickRenderer(FFRHICommandList& CommandList)
         VIT_PROFILE_FUNC("RRHIScene::TickRenderer - Draw")
         for (auto& [Key, Requests]: RenderCalls)
         {
-            if (!Key.Asset->IsLoadedOnGPU())
+            if (Key.Asset->GetLocation() != EAssetLocation::LoadedVRAM)
             {
-                Key.Asset->LoadOnGPU();
+                Key.Asset->ChangeLocation(EAssetLocation::LoadedVRAM);
                 continue;
             }
             CommandList.SetMaterial(Key.Material);
 
             Ref<RRHIBuffer> TransformVertexBuffer = TransformBuffers[Key.Asset->ID()];
-            RAsset::FDrawInfo Cube = Key.Asset->GetDrawInfo();
+            RModel::FDrawInfo Cube = Key.Asset->GetDrawInfo();
 
             ensure(Key.Asset->GetVertexBuffer() != nullptr);
             ensure(TransformVertexBuffer != nullptr);

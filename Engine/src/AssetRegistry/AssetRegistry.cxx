@@ -7,10 +7,10 @@ DECLARE_LOGGER_CATEGORY(Core, LogAssetRegistry, Info)
 
 FAssetRegistry::FAssetRegistry()
 {
-    Ref<RAsset> CubeAsset = MeshFactory::CreateBox({1.0f, 1.0f, 1.0f});
+    Ref<RModel> CubeAsset = MeshFactory::CreateBox({1.0f, 1.0f, 1.0f});
     RegisterMemoryOnlyAsset(CubeAsset);
 
-    Ref<RAsset> CapsuleAsset = MeshFactory::CreateCapsule(1.0f, 2.0f);
+    Ref<RModel> CapsuleAsset = MeshFactory::CreateCapsule(1.0f, 2.0f);
     RegisterMemoryOnlyAsset(CapsuleAsset);
 }
 
@@ -18,10 +18,11 @@ FAssetRegistry::~FAssetRegistry()
 {
 }
 
-Ref<RAsset> FAssetRegistry::LoadAsset(const std::filesystem::path& Path)
+Ref<RModel> FAssetRegistry::LoadAsset(const std::filesystem::path& Path)
 {
-    auto Asset = Ref<RAsset>::Create(Path);
-    if (Asset->Load())
+    auto Asset = Ref<RModel>::Create(Path);
+    Asset->ChangeLocation(EAssetLocation::LoadedRAM);
+
     {
         AssetRegistry.Insert(Asset->GetName(), Asset);
         AssetRegistryById.Insert(Asset->ID(), Asset);
@@ -30,7 +31,7 @@ Ref<RAsset> FAssetRegistry::LoadAsset(const std::filesystem::path& Path)
     return nullptr;
 }
 
-Ref<RAsset> FAssetRegistry::RegisterMemoryOnlyAsset(Ref<RAsset>& Asset)
+Ref<RModel> FAssetRegistry::RegisterMemoryOnlyAsset(Ref<RModel>& Asset)
 {
     if (!AssetRegistry.Contains(Asset->GetName()))
     {
@@ -54,9 +55,9 @@ Ref<RRHIMaterial> FAssetRegistry::RegisterMemoryOnlyMaterial(Ref<RRHIMaterial>& 
     return nullptr;
 }
 
-Ref<RAsset> FAssetRegistry::GetAsset(const std::string& Name) const
+Ref<RModel> FAssetRegistry::GetAsset(const std::string& Name) const
 {
-    const Ref<RAsset>* Asset = AssetRegistry.Find(Name);
+    const Ref<RModel>* Asset = AssetRegistry.Find(Name);
     if (Asset)
     {
         return *Asset;
@@ -76,9 +77,9 @@ Ref<RRHIMaterial> FAssetRegistry::GetMaterial(const std::string& Name) const
     return nullptr;
 }
 
-Ref<RAsset> FAssetRegistry::GetAssetByID(uint64 ID) const
+Ref<RModel> FAssetRegistry::GetAssetByID(uint64 ID) const
 {
-    const Ref<RAsset>* Asset = AssetRegistryById.Find(ID);
+    const Ref<RModel>* Asset = AssetRegistryById.Find(ID);
     if (Asset)
     {
         return *Asset;
@@ -100,10 +101,10 @@ Ref<RRHIMaterial> FAssetRegistry::GetMaterialByID(uint64 ID) const
 
 void FAssetRegistry::UnloadAsset(const std::string& Name)
 {
-    Ref<RAsset>* Asset = AssetRegistry.Find(Name);
+    Ref<RModel>* Asset = AssetRegistry.Find(Name);
     if (Asset)
     {
-        (*Asset)->Unload();
+        (*Asset)->ChangeLocation(EAssetLocation::Disk);
         AssetRegistry.Remove(Name);
     }
 }
@@ -112,7 +113,7 @@ void FAssetRegistry::Purge()
 {
     for (auto& [Name, Asset]: AssetRegistry)
     {
-        Asset->Unload();
+        Asset->ChangeLocation(EAssetLocation::Disk);
     }
     AssetRegistry.Clear();
     AssetRegistryById.Clear();

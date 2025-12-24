@@ -3,7 +3,6 @@
 #include "Engine/Containers/ResourceArray.hxx"
 #include "Engine/RHI/Resources/RHIBuffer.hxx"
 
-
 BEGIN_UNALIGNED_PARAMETER_STRUCT(FVertex)
 PARAMETER(FVector3, Position)
 PARAMETER(FVector3, Normal)
@@ -12,9 +11,27 @@ PARAMETER(FVector3, Binormal)
 PARAMETER(UVector2, Texcoord)
 END_PARAMETER_STRUCT();
 
+enum class EAssetLocation : uint8
+{
+    Disk,
+    LoadedRAM,
+    LoadedVRAM,
+};
+
 class RAsset : public RObject
 {
-    RTTI_DECLARE_TYPEINFO(RAsset, RObject);
+    RTTI_DECLARE_TYPEINFO(RAsset, RObject)
+
+public:
+    virtual EAssetLocation GetLocation() const = 0;
+
+    virtual EAssetLocation ChangeLocation(EAssetLocation NewStatus) = 0;
+    virtual bool IsLocationChanging() const = 0;
+};
+
+class RModel : public RAsset
+{
+    RTTI_DECLARE_TYPEINFO(RModel, RAsset);
 
 public:
     struct FDrawInfo
@@ -25,24 +42,14 @@ public:
     };
 
 public:
-    RAsset(const std::filesystem::path& Path);
-    RAsset(const TResourceArray<FVertex>& Vertices, const TResourceArray<uint32>& Indices);
-    ~RAsset();
+    RModel(const std::filesystem::path& Path);
+    RModel(const TResourceArray<FVertex>& Vertices, const TResourceArray<uint32>& Indices);
+    ~RModel();
 
-    bool Load();
-    bool LoadOnGPU();
-    void Unload();
-    void UnloadFromGPU();
+    virtual EAssetLocation GetLocation() const override;
 
-    bool IsLoaded() const
-    {
-        return VertexData.IsEmpty() && IndexData.IsEmpty();
-    }
-
-    bool IsLoadedOnGPU() const
-    {
-        return VertexBuffer != nullptr && IndexBuffer != nullptr;
-    }
+    virtual EAssetLocation ChangeLocation(EAssetLocation NewStatus) override;
+    virtual bool IsLocationChanging() const override;
 
     const Ref<RRHIBuffer> GetVertexBuffer() const
     {
@@ -54,14 +61,24 @@ public:
         return IndexBuffer;
     }
 
+    bool IsMemoryOnly() const
+    {
+        return AssetPath.empty();
+    }
     FDrawInfo GetDrawInfo() const
     {
         return {VertexData.Size(), IndexData.Size(), IndexData.Size()};
     }
 
 private:
-    bool bIsMemoryOnly = false;
-    std::string AssetPath;
+    bool Load();
+    bool Unload();
+
+private:
+    EAssetLocation CurrentLocation = EAssetLocation::Disk;
+    std::optional<EAssetLocation> NextLocation = std::nullopt;
+
+    std::string AssetPath = "";
 
     Ref<RRHIBuffer> VertexBuffer = nullptr;
     Ref<RRHIBuffer> IndexBuffer = nullptr;

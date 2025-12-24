@@ -2,7 +2,7 @@
 
 #include <numbers>
 
-Ref<RAsset> MeshFactory::CreateBox(const FVector3& size)
+Ref<RModel> MeshFactory::CreateBox(const FVector3& size)
 {
     TResourceArray<FVertex> vertices;
     vertices.Resize(8);
@@ -27,7 +27,7 @@ Ref<RAsset> MeshFactory::CreateBox(const FVector3& size)
     TResourceArray<uint32> indices{0, 1, 2, 2, 3, 0, 1, 5, 6, 6, 2, 1, 7, 6, 5, 5, 4, 7,
                                    4, 0, 3, 3, 7, 4, 4, 5, 1, 1, 0, 4, 3, 2, 6, 6, 7, 3};
 
-    return Ref<RAsset>::CreateNamed("Box", vertices, indices);
+    return Ref<RModel>::CreateNamed("Box", vertices, indices);
 }
 
 static void CalculateRing(size_t segments, float radius, float z, float dz, float height, float actualRadius,
@@ -46,7 +46,7 @@ static void CalculateRing(size_t segments, float radius, float z, float dz, floa
 }
 
 // Create a capsule mesh with the given radius and height.
-Ref<RAsset> MeshFactory::CreateCapsule(float radius, float height)
+Ref<RModel> MeshFactory::CreateCapsule(float radius, float height)
 {
     const float subdivisionsHeight = 8.f;
     const float ringsBody = subdivisionsHeight + 1.f;
@@ -94,5 +94,5 @@ Ref<RAsset> MeshFactory::CreateCapsule(float radius, float height)
         }
     }
 
-    return Ref<RAsset>::CreateNamed("Capsule", vertices, indices);
+    return Ref<RModel>::CreateNamed("Capsule", vertices, indices);
 }

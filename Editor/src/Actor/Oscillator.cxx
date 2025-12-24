@@ -15,7 +15,7 @@ AOscillator::AOscillator()
     RotationMultiplier.y = (float)rand() / (float)RAND_MAX / 20.0f;
     RotationMultiplier.z = (float)rand() / (float)RAND_MAX / 20.0f;
 
-    Ref<RAsset> UsedAsset;
+    Ref<RModel> UsedAsset;
     if (rand() % 2)
     {
         UsedAsset = GEngine->AssetRegistry.GetCapsuleAsset();

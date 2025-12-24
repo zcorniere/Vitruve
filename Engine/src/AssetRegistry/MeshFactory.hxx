@@ -5,7 +5,7 @@
 namespace MeshFactory
 {
 
-Ref<RAsset> CreateBox(const FVector3& size);
-Ref<RAsset> CreateCapsule(float radius, float height);
+Ref<RModel> CreateBox(const FVector3& size);
+Ref<RModel> CreateCapsule(float radius, float height);
 
 }    // namespace MeshFactory

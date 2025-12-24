@@ -10,18 +10,18 @@ public:
     RMeshComponent() = default;
     ~RMeshComponent() = default;
 
-    void SetAsset(Ref<RAsset> InAsset);
+    void SetAsset(Ref<RModel> InAsset);
     void SetMaterial(Ref<RRHIMaterial> InMaterial);
 
-    Ref<RAsset> GetAsset() const;
+    Ref<RModel> GetAsset() const;
     Ref<RRHIMaterial> GetMaterial() const;
 
 public:
-    Ref<RAsset> Asset = nullptr;
+    Ref<RModel> Asset = nullptr;
     Ref<RRHIMaterial> Material = nullptr;
 };
 
-inline void RMeshComponent::SetAsset(Ref<RAsset> InAsset)
+inline void RMeshComponent::SetAsset(Ref<RModel> InAsset)
 {
     Asset = InAsset;
     MarkRenderStateDirty();
@@ -33,7 +33,7 @@ inline void RMeshComponent::SetMaterial(Ref<RRHIMaterial> InMaterial)
     MarkRenderStateDirty();
 }
 
-inline Ref<RAsset> RMeshComponent::GetAsset() const
+inline Ref<RModel> RMeshComponent::GetAsset() const
 {
     return Asset;
 }

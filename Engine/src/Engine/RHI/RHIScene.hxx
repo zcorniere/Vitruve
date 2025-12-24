@@ -12,7 +12,7 @@
 class RMeshComponent;
 class RWorld;
 class RRHIScene;
-class RAsset;
+class RModel;
 class AActor;
 class RRHIMaterial;
 
@@ -25,7 +25,7 @@ enum class ERenderSceneLockType
 struct FRenderRequestKey
 {
     RRHIMaterial* Material = nullptr;
-    RAsset* Asset = nullptr;
+    RModel* Asset = nullptr;
 
     bool operator==(const FRenderRequestKey& Other) const = default;
 };
@@ -39,7 +39,7 @@ struct hash<FRenderRequestKey>
 {
     FORCEINLINE std::size_t operator()(const FRenderRequestKey& Key) const
     {
-        return std::hash<RAsset*>{}(Key.Asset) ^ std::hash<RRHIMaterial*>{}(Key.Material);
+        return std::hash<RModel*>{}(Key.Asset) ^ std::hash<RRHIMaterial*>{}(Key.Material);
     }
 };
 
