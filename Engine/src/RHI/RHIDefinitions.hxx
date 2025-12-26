@@ -6,6 +6,7 @@
 enum class EImageDimension : uint8
 {
     Texture2D,
+    Texture3D,
 };
 
 /// @brief Format of an RHI Texture

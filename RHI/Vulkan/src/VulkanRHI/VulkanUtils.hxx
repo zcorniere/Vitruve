@@ -132,6 +132,8 @@ FORCEINLINE VkImageViewType TextureDimensionToVkImageViewType(EImageDimension Di
     {
         case EImageDimension::Texture2D:
             return VK_IMAGE_VIEW_TYPE_2D;
+        case EImageDimension::Texture3D:
+            return VK_IMAGE_VIEW_TYPE_3D;
     }
     checkNoEntry();
 }
@@ -244,6 +246,8 @@ FORCEINLINE VkImageType TextureDimensionToVkImageType(EImageDimension Dimension)
     {
         case EImageDimension::Texture2D:
             return VK_IMAGE_TYPE_2D;
+        case EImageDimension::Texture3D:
+            return VK_IMAGE_TYPE_3D;
     }
     checkNoEntry();
 }
