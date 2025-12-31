@@ -13,8 +13,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     (void)hPrevInstance;
     (void)nShowCmd;
     (void)lpCmdLine;
-    
-    // TODO: Convert lpCmdLine to argc/argv
+
     return EngineMain(__argc, __argv, &CreateApplication);
 }
-
