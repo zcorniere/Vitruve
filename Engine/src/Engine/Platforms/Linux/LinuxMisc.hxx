@@ -39,7 +39,7 @@ public:
     static bool BaseAllocator(void* TargetMemory);
 
     /// @copydoc GenericMisc::LoadExternalModule
-    static IExternalModule* LoadExternalModule(const std::string& ModuleName);
+    static IExternalModule* LoadExternalModule(const std::string_view& ModuleName);
 
     /// @brief Return the XDG_CONFIG path
     static std::filesystem::path GetConfigPath();

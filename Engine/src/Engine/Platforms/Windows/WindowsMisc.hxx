@@ -14,7 +14,7 @@ public:
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const override;
     virtual bool IsValid() const override
     {
-       return ModuleHandle != nullptr;
+        return ModuleHandle != nullptr;
     }
 
 private:
@@ -35,7 +35,7 @@ public:
     static bool BaseAllocator(void* TargetMemory);
 
     /// @copydoc FGenericMisc::LoadExternalModule
-    static IExternalModule* LoadExternalModule(const std::string& ModuleName);
+    static IExternalModule* LoadExternalModule(const std::string_view& ModuleName);
 
     /// @copydoc FGenericMisc::GetConfigPath
     static std::filesystem::path GetConfigPath();

@@ -139,7 +139,7 @@ FWindowsExternalModule::FWindowsExternalModule(std::string_view ModulePath)
     ModuleHandle = ::LoadLibrary(ModulePath.data());
     if (!ModuleHandle)
     {
-       LOG(LogPlatformMisc, Error, "Failed to open External module: {}", GetLastError());
+        LOG(LogPlatformMisc, Warning, "Failed to open External module: {}", GetLastError());
     }
 }
 
@@ -148,7 +148,7 @@ FWindowsExternalModule::~FWindowsExternalModule()
     bool bSuccess = ::FreeLibrary(HMODULE(ModuleHandle));
     if (!bSuccess)
     {
-       LOG(LogPlatformMisc, Error, "Failed to unload external module: {}", GetLastError());
+        LOG(LogPlatformMisc, Warning, "Failed to unload external module: {}", GetLastError());
     }
 }
 
@@ -157,7 +157,7 @@ void* FWindowsExternalModule::GetSymbol_Internal(std::string_view SymbolName) co
     void* Symbol = ::GetProcAddress(HMODULE(ModuleHandle), SymbolName.data());
     if (!Symbol)
     {
-       LOG(LogPlatformMisc, Error, "Failed to find symbol \"{:s}\": {}", SymbolName, GetLastError());
+        LOG(LogPlatformMisc, Error, "Failed to find symbol \"{:s}\": {}", SymbolName, GetLastError());
     }
     return Symbol;
 }
@@ -170,7 +170,7 @@ bool FWindowsMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-IExternalModule* FWindowsMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FWindowsMisc::LoadExternalModule(const std::string_view& ModuleName)
 {
     VIT_PROFILE_FUNC()
 

@@ -154,9 +154,12 @@ FLinuxExternalModule::FLinuxExternalModule(std::string_view ModulePath)
     ModuleHandle = dlopen(ModulePath.data(), RTLD_NOW | RTLD_LOCAL);
     if (ModuleHandle == nullptr)
     {
-        LOG(LogPlatform, Error, "Failed to load module {:s}: {:s}", ModulePath, dlerror());
+        LOG(LogPlatform, Warning, "Failed to load module {:s}: {:s}", ModulePath, dlerror());
     }
-    FPlatformStacktrace::RefreshDWARF();
+    else
+    {
+        FPlatformStacktrace::RefreshDWARF();
+    }
 }
 
 FLinuxExternalModule::~FLinuxExternalModule()
@@ -195,7 +198,7 @@ bool FLinuxMisc::BaseAllocator(void* TargetMemory)
     return true;
 }
 
-IExternalModule* FLinuxMisc::LoadExternalModule(const std::string& ModuleName)
+IExternalModule* FLinuxMisc::LoadExternalModule(const std::string_view& ModuleName)
 {
     VIT_PROFILE_FUNC()
 
