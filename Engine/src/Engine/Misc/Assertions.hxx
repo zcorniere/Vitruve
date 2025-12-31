@@ -98,16 +98,16 @@ private:
     #define check(Expression) VITRUVE_CHECK_IMPL(Expression)
     #define checkSlow(Expression)
     #define checkMsg(Expression, ...) VITRUVE_CHECK_IMPL(Expression)
-    #define checkNoEntry()             \
-        {                              \
-            ::Compiler::Unreachable(); \
+    #define checkNoEntry()              \
+        {                               \
+            ::FCompiler::Unreachable(); \
         }
     #define checkNoReentry()                                                    \
         {                                                                       \
             static std::atomic_bool MACRO_EXPENDER(beenHere, __LINE__) = false; \
             if (MACRO_EXPENDER(beenHere, __LINE__) == true) [[unlikely]]        \
             {                                                                   \
-                ::Compiler::Unreachable();                                      \
+                ::FCompiler::Unreachable();                                     \
             }                                                                   \
             MACRO_EXPENDER(beenHere, __LINE__) = true;                          \
         }
