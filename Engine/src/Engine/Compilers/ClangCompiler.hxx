@@ -21,7 +21,7 @@ static_assert(false, "Clang Compiler header included without compiling with clan
 ///
 /// @brief Wrapper around clang intrinsics function
 ///
-class ENGINE_API ClangCompiler : public GenericCompiler
+class ENGINE_API FClangCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,
@@ -40,4 +40,4 @@ public:
 };
 
 /// Alias of the correct compiler currently used
-using Compiler = ClangCompiler;
+using FCompiler = FClangCompiler;

@@ -28,7 +28,7 @@ static_assert(false, "MSVC Compiler header included without compiling with MSVC"
 ///
 /// @brief Wrapper around MSCV intrinsics functions
 ///
-class  MSVCCompiler : public GenericCompiler
+class FMSVCCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,
@@ -47,4 +47,4 @@ public:
 };
 
 /// Alias of the correct compiler currently used
-using Compiler = MSVCCompiler;
+using FCompiler = FMSVCCompiler;

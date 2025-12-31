@@ -2,7 +2,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogGNUCompiler, Info);
 
-std::string GNUCompiler::Demangle(const std::string_view& name)
+std::string FGNUCompiler::Demangle(const std::string_view& name)
 {
     if (name.empty())
         return "";

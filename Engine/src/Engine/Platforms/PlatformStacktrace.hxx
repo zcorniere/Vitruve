@@ -5,7 +5,7 @@
 /// @brief Holds information about the symbol located at ProgramCounter.
 ///
 /// This struct is supposed to only be used during the stacktrace generation, and should not be cached !
-struct DetailedSymbolInfo
+struct FDetailedSymbolInfo
 {
     static constexpr int MaxNameLength = 1024;
 
@@ -18,10 +18,10 @@ struct DetailedSymbolInfo
     char Filename[MaxNameLength];
     int32 LineNumber;
 };
-static_assert(std::is_trivial<DetailedSymbolInfo>::value, "DetailedSymbolInfo must be trivial");
+static_assert(std::is_trivial<FDetailedSymbolInfo>::value, "DetailedSymbolInfo must be trivial");
 
 /// @brief Hold the raw information about a stacktrace
-struct StacktraceContent
+struct FStacktraceContent
 {
     static constexpr int MaxDepth = 99;
 
@@ -35,14 +35,14 @@ struct StacktraceContent
     int64 StackTrace[MaxDepth];
     /// @brief Absolute max depth
 };
-static_assert(std::is_trivial<StacktraceContent>::value, "StacktraceContent must be trivial");
+static_assert(std::is_trivial<FStacktraceContent>::value, "StacktraceContent must be trivial");
 
 /// Generic stacktrace collection
 class ENGINE_API FGenericStacktrace
 {
 public:
     /// @brief Return a stacktrace of the current running process
-    static StacktraceContent GetStackTraceFromReturnAddress(void* returnAddress)
+    static FStacktraceContent GetStackTraceFromReturnAddress(void* returnAddress)
     {
         (void)returnAddress;
         return {};
@@ -50,7 +50,7 @@ public:
 
     /// @brief Try to gather information on the symbol located at ProgramCounter
     /// @return false if no information was found, true otherwise (even if the information are incomplete)
-    static bool TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedSymbolInfo& detailed_info)
+    static bool TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetailedSymbolInfo& detailed_info)
     {
         (void)ProgramCounter;
         (void)detailed_info;

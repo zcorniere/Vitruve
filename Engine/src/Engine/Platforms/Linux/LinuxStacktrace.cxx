@@ -51,9 +51,9 @@ void FLinuxStacktrace::ShutdownDWARF()
 #endif    // VIT_ENABLE_STACKTRACE
 }
 
-StacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
+FStacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
 {
-    StacktraceContent trace;
+    FStacktraceContent trace;
     trace.Depth = backtrace(reinterpret_cast<void**>(trace.StackTrace), trace.MaxDepth);
     trace.CurrentDepth = trace.Depth;
 
@@ -73,7 +73,7 @@ StacktraceContent FLinuxStacktrace::GetStackTraceFromReturnAddress(void* returnA
     return trace;
 }
 
-bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedSymbolInfo& detailed_info)
+bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetailedSymbolInfo& detailed_info)
 {
     detailed_info.ProgramCounter = ProgramCounter;
     if (dwfl == nullptr)
@@ -96,7 +96,7 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
         {
             moduleName = moduleName.substr(Position + 1);
         }
-        std::strncpy(detailed_info.ModuleName, moduleName.data(), DetailedSymbolInfo::MaxNameLength);
+        std::strncpy(detailed_info.ModuleName, moduleName.data(), FDetailedSymbolInfo::MaxNameLength);
     }
 
     Dwfl_Line* const line = dwfl_module_getsrc(mod, ProgramCounter);
@@ -110,15 +110,15 @@ bool FLinuxStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedS
             {
                 filename = filename.substr(Position + 1);
             }
-            std::strncpy(detailed_info.Filename, filename.data(), DetailedSymbolInfo::MaxNameLength);
+            std::strncpy(detailed_info.Filename, filename.data(), FDetailedSymbolInfo::MaxNameLength);
         }
     }
 
     const char* const symbolName = dwfl_module_addrname(mod, ProgramCounter);
     if (symbolName != nullptr)
     {
-        std::strncpy(detailed_info.FunctionName, symbolName, DetailedSymbolInfo::MaxNameLength);
+        std::strncpy(detailed_info.FunctionName, symbolName, FDetailedSymbolInfo::MaxNameLength);
     }
-#endif    // VIT_ENABLE_STA  CKTRACE
+#endif    // VIT_ENABLE_STACKTRACE
     return true;
 }

@@ -11,8 +11,8 @@ public:
     static void ShutdownDWARF();
 
     /// @brief Return a stacktrace of the current running process
-    static StacktraceContent GetStackTraceFromReturnAddress(void* returnAddress);
+    static FStacktraceContent GetStackTraceFromReturnAddress(void* returnAddress);
 
-    static bool TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedSymbolInfo& detailed_info);
+    static bool TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetailedSymbolInfo& detailed_info);
 };
 using FPlatformStacktrace = FLinuxStacktrace;

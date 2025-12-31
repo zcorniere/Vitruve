@@ -72,7 +72,7 @@ private:
     #define checkNoEntry()                                             \
         {                                                              \
             checkMsg(false, "Enclosing block should never be called"); \
-            ::Compiler::Unreachable();                                 \
+            ::FCompiler::Unreachable();                                \
         }
     #define checkNoReentry()                                                                            \
         {                                                                                               \

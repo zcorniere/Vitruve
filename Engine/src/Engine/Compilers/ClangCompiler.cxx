@@ -2,7 +2,7 @@
 
 DECLARE_LOGGER_CATEGORY(Core, LogClangCompiler, Info);
 
-std::string ClangCompiler::Demangle(const std::string_view& name)
+std::string FClangCompiler::Demangle(const std::string_view& name)
 {
     if (name.empty())
         return "";

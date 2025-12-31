@@ -27,7 +27,7 @@ static_assert(false, "GNU Compiler header included without compiling with GNU");
 ///
 /// @brief Wrapper around GCC intrinsics functions
 ///
-class ENGINE_API GNUCompiler : public GenericCompiler
+class ENGINE_API FGNUCompiler : public GenericCompiler
 {
 public:
     /// Return the address of the current function,
@@ -46,4 +46,4 @@ public:
 };
 
 /// Alias of the correct compiler currently used
-using Compiler = GNUCompiler;
+using FCompiler = FGNUCompiler;
