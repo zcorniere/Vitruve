@@ -38,6 +38,7 @@ bool FVulkanPlatform::LoadVulkanLibrary()
 
     if (VulkanModuleHandle == nullptr)
     {
+        LOG(LogVulkanRHI, Fatal, "Failed to load {}", VulkanLibraryName);
         return false;
     }
 
