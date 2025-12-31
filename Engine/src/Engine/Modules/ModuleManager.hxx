@@ -45,6 +45,7 @@ public:
 private:
     void LoadModuleWithPath(const std::string_view& ModuleName, const std::filesystem::path& Path,
                             FModuleHolder& OutHolder);
+    void TryLoadModule(const std::string_view& ModuleName, FModuleHolder& OutHolder);
 
 private:
     TArray<std::filesystem::path> DLLSearchPaths;

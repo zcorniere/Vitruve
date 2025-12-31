@@ -145,13 +145,7 @@ function(vit_set_standard_options target precompile_header)
         endif()
         target_compile_definitions(${target} PUBLIC _CRT_SECURE_NO_WARNINGS)
     else()
-        set_target_properties(
-            ${target}
-            PROPERTIES BUILD_RPATH "$ORIGIN:$ORIGIN/lib"
-                       INSTALL_RPATH "$ORIGIN:$ORIGIN/lib"
-                       CXX_VISIBILITY_PRESET hidden
-                       VISIBILITY_INLINES_HIDDEN 1
-        )
+        set_target_properties(${target} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN 1)
     endif()
 
     target_compile_options(
@@ -199,15 +193,24 @@ function(vit_add_platforms_entrypoint target)
 endfunction(vit_add_platforms_entrypoint)
 
 function(vit_copy_dlls_to_target_dir TARGET_NAME)
-    # Copy all additional DLL/shared library targets passed after TARGET_NAME
-    foreach(DLL_TARGET IN LISTS ARGN)
+    if(WIN32)
         add_custom_command(
             TARGET ${TARGET_NAME}
             POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${DLL_TARGET}> $<TARGET_FILE_DIR:${TARGET_NAME}>
-            COMMENT "Copying $<TARGET_FILE:${DLL_TARGET}> to $<TARGET_FILE_DIR:${TARGET_NAME}>"
+            COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${TARGET_NAME}> $<TARGET_RUNTIME_DLLS:${TARGET_NAME}>
+            COMMAND_EXPAND_LISTS
         )
-    endforeach()
+    else()
+        # Copy all additional DLL/shared library targets passed after TARGET_NAME
+        foreach(DLL_TARGET IN LISTS ARGN)
+            set_target_properties(
+                ${TARGET_NAME}
+                PROPERTIES
+                    BUILD_RPATH
+                    "\$ORIGIN/$<PATH:RELATIVE_PATH,$<TARGET_FILE_DIR:${DLL_TARGET}>,$<TARGET_FILE_DIR:${TARGET_NAME}>>"
+            )
+        endforeach()
+    endif()
 endfunction(vit_copy_dlls_to_target_dir)
 
 add_subdirectory(External/)

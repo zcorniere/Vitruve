@@ -36,17 +36,29 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
     }
 
     LOG(LogModuleManager, Info, "Loading module {:s}", ModuleName);
-    Holder.State = EModuleState::Error;
-    Holder.ErrorStatus = EModuleErrorStatus::NotFound;
-    for (const std::filesystem::path& Path: DLLSearchPaths)
+#if defined(PLATFORM_LINUX)
+    // Try to see if it in the RPATH first
+    TryLoadModule(ModuleName, Holder);
+    if (Holder.State != EModuleState::Loaded)
+#endif    // PLATFORM_LINUX
     {
-        LoadModuleWithPath(ModuleName, Path, Holder);
-        if (Holder.State == EModuleState::Loaded)
+        Holder.State = EModuleState::Error;
+        Holder.ErrorStatus = EModuleErrorStatus::NotFound;
+        Holder = FModuleHolder();
+        for (const std::filesystem::path& Path: DLLSearchPaths)
         {
-            break;
+            LoadModuleWithPath(ModuleName, Path, Holder);
+            if (Holder.State == EModuleState::Loaded)
+            {
+                break;
+            }
         }
     }
-    if (Holder.State == EModuleState::Error)
+    if (Holder.State == EModuleState::Unloaded)
+    {
+        LOG(LogModuleManager, Warning, "Module {:s} was not found", ModuleName);
+    }
+    else if (Holder.State == EModuleState::Error)
     {
         switch (Holder.ErrorStatus)
         {
@@ -65,8 +77,11 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
         }
         return nullptr;
     }
-    Holder.Module->StartupModule();
-    Holder.State = EModuleState::Started;
+    else
+    {
+        Holder.Module->StartupModule();
+        Holder.State = EModuleState::Started;
+    }
     return Holder.Module;
 }
 
@@ -96,50 +111,63 @@ void FModuleManager::UnloadModule(const std::string_view& ModuleName)
     delete Pair.Get<1>().LibraryHolder;
 }
 
+static std::string GetModuleFullName(const std::string_view& ModuleName)
+{
+#if defined(PLATFORM_WINDOWS)
+    return std::format("VitruveEngine_{:s}.dll", ModuleName);
+#elif defined(PLATFORM_LINUX)
+    return std::format("libVitruveEngine_{:s}.so", ModuleName);
+#endif
+}
+
+void FModuleManager::TryLoadModule(const std::string_view& ModuleName, FModuleHolder& OutHolder)
+{
+    VIT_PROFILE_FUNC()
+
+    const std::string FullName = GetModuleFullName(ModuleName);
+
+    // Load the library object
+    OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(FullName);
+    if (!OutHolder.LibraryHolder->IsValid())
+    {
+        OutHolder.State = EModuleState::Error;
+        OutHolder.ErrorStatus = EModuleErrorStatus::Malformed;
+        delete OutHolder.LibraryHolder;
+        return;
+    }
+
+    // Grab our entry point
+    using ModuleCreateFn = IModuleInterface* (*)();
+    ModuleCreateFn CreateModule = OutHolder.LibraryHolder->GetSymbol<ModuleCreateFn>("CreateModule");
+    if (!CreateModule)
+    {
+        OutHolder.State = EModuleState::Error;
+        OutHolder.ErrorStatus = EModuleErrorStatus::EntryPointNotFound;
+        delete OutHolder.LibraryHolder;
+        return;
+    }
+
+    // Create our object
+    OutHolder.Module = CreateModule();
+    OutHolder.State = EModuleState::Loaded;
+    OutHolder.ErrorStatus = EModuleErrorStatus::None;
+    return;
+}
+
 void FModuleManager::LoadModuleWithPath(const std::string_view& ModuleName, const std::filesystem::path& Path,
                                         FModuleHolder& OutHolder)
 {
     VIT_PROFILE_FUNC()
 
-#if defined(PLATFORM_WINDOWS)
-    const std::string FullPath = std::format("VitruveEngine_{:s}.dll", ModuleName);
-#elif defined(PLATFORM_LINUX)
-    const std::string FullPath = std::format("libVitruveEngine_{:s}.so", ModuleName);
-#endif
+    const std::string FullName = GetModuleFullName(ModuleName);
 
     for (const std::filesystem::directory_entry& Entry: std::filesystem::recursive_directory_iterator(Path))
     {
 
-        if (Entry.path().filename() != FullPath)
+        if (Entry.path().filename() != FullName)
         {
             continue;
         }
-
-        // Load the library object
-        OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(Entry.path().string());
-        if (!OutHolder.LibraryHolder->IsValid())
-        {
-            OutHolder.State = EModuleState::Error;
-            OutHolder.ErrorStatus = EModuleErrorStatus::Malformed;
-            delete OutHolder.LibraryHolder;
-            return;
-        }
-
-        // Grab our entry point
-        using ModuleCreateFn = IModuleInterface* (*)();
-        ModuleCreateFn CreateModule = OutHolder.LibraryHolder->GetSymbol<ModuleCreateFn>("CreateModule");
-        if (!CreateModule)
-        {
-            OutHolder.State = EModuleState::Error;
-            OutHolder.ErrorStatus = EModuleErrorStatus::EntryPointNotFound;
-            delete OutHolder.LibraryHolder;
-            return;
-        }
-
-        // Create our object
-        OutHolder.Module = CreateModule();
-        OutHolder.State = EModuleState::Loaded;
-        OutHolder.ErrorStatus = EModuleErrorStatus::None;
-        return;
+        return TryLoadModule(Entry.path().string(), OutHolder);
     }
 }

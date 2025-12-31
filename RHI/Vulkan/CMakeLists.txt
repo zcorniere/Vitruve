@@ -30,12 +30,18 @@ target_link_libraries(
             Vulkan::Headers
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine)
+if(UNIX)
+    set_target_properties(
+        VitruveEngine
+        PROPERTIES BUILD_RPATH
+                   "\$ORIGIN/$<PATH:RELATIVE_PATH,$<TARGET_FILE_DIR:${PROJECT_NAME}>,$<TARGET_FILE_DIR:VitruveEngine>>"
+    )
+endif(UNIX)
 if(VIT_ENABLE_VULKAN_DEBUGGING)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_DEBUGGING_ENABLED=1)
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC VULKAN_DEBUGGING_ENABLED=0)
 endif()
-
 
 # ------------- Tests -------------
 
