@@ -6,10 +6,10 @@
 
 #include <dbghelp.h>
 
-StacktraceContent FWindowsStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
+FStacktraceContent FWindowsStacktrace::GetStackTraceFromReturnAddress(void* returnAddress)
 {
-    StacktraceContent trace;
-    std::memset(&trace, 0, sizeof(StacktraceContent));
+    FStacktraceContent trace;
+    std::memset(&trace, 0, sizeof(FStacktraceContent));
     trace.Depth = CaptureStackBackTrace(0, trace.MaxDepth, reinterpret_cast<void**>(trace.StackTrace), 0);
     trace.CurrentDepth = 0;
 
@@ -28,7 +28,7 @@ StacktraceContent FWindowsStacktrace::GetStackTraceFromReturnAddress(void* retur
     return trace;
 }
 
-bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, DetailedSymbolInfo& detailed_info)
+bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetailedSymbolInfo& detailed_info)
 {
     DWORD64 dwAddress = ProgramCounter;
     detailed_info.ProgramCounter = ProgramCounter;
@@ -67,7 +67,7 @@ bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, Detaile
             {
                 ModuleName = ModulePath;
             }
-            std::strncpy(detailed_info.ModuleName, ModuleName, DetailedSymbolInfo::MaxNameLength);
+            std::strncpy(detailed_info.ModuleName, ModuleName, FDetailedSymbolInfo::MaxNameLength);
         }
     }
 
@@ -88,7 +88,7 @@ bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, Detaile
             {
                 cFilenamePath = cFilePath;
             }
-            std::strncpy(detailed_info.Filename, cFilenamePath, DetailedSymbolInfo::MaxNameLength);
+            std::strncpy(detailed_info.Filename, cFilenamePath, FDetailedSymbolInfo::MaxNameLength);
             detailed_info.LineNumber = line.LineNumber;
         }
     }
