@@ -25,6 +25,8 @@ static uint32 VulkanVersionToShaderc(uint32 Version)
             return shaderc_env_version_vulkan_1_2;
         case VK_API_VERSION_1_3:
             return shaderc_env_version_vulkan_1_3;
+        case VK_API_VERSION_1_4:
+            return shaderc_env_version_vulkan_1_4;
     }
     checkNoEntry();
     return 0;
