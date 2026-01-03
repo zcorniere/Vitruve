@@ -15,5 +15,5 @@ void main()
     outNormal = inNormal;
 
     vec4 worldPosition = Matrix * vec4(inPosition, 1.0);
-    gl_Position = u_Camera.viewproj * worldPosition;
+    gl_Position = u_Camera.Viewproj * worldPosition;
 }

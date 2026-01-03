@@ -98,7 +98,37 @@ public:
     PARAMETER(FMatrix4, Projection)
     END_PARAMETER_STRUCT();
 
+    BEGIN_PARAMETER_STRUCT(UPointLight)
+    PARAMETER(FVector3, Position)
+    PARAMETER(float, Multiplier)
+    PARAMETER(FVector3, Radiance)
+    PARAMETER(float, MinRadius)
+    PARAMETER(float, Radius)
+    PARAMETER(float, Falloff)
+    PARAMETER(float, LightSize)
+    PARAMETER(bool, CastsShadows)
+    END_PARAMETER_STRUCT();
+
+    BEGIN_PARAMETER_STRUCT(UDirectionalLight)
+    PARAMETER(FVector3, Direction)
+    PARAMETER(float, ShadowAmount)
+    PARAMETER(FVector3, Radiance)
+    PARAMETER(float, Multiplier)
+    END_PARAMETER_STRUCT();
+
 private:
+    struct UPointLightArray
+    {
+        uint32 LightCount;
+        UPointLight Lights[1024];
+    };
+
+    struct UDirectionalLightArray
+    {
+        uint32 LightCount;
+        UDirectionalLight Lights[1024];
+    };
+
     struct FMeshRepresentation
     {
         FTransform Transform = {};
@@ -141,6 +171,9 @@ private:
 
 private:
     FRHIRenderPassTarget RenderPassTarget;
+
+    TArray<UPointLight> PointLights;
+    Ref<RRHIBuffer> u_PointLightBuffer = nullptr;
 
     UCameraData CameraData;
     Ref<RRHIBuffer> u_CameraBuffer = nullptr;

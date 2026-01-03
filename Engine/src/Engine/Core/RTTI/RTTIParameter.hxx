@@ -123,6 +123,7 @@ enum class EParameterType : uint8
 
     Struct,
 
+    Bool,
     Int32,
     Uint32,
     Float,
@@ -174,6 +175,17 @@ struct FParameter
 
 template <typename T, EParameterStructOption Option>
 struct TSupportedParameterType;
+
+template <EParameterStructOption Option>
+struct TSupportedParameterType<bool, Option>
+{
+    using OriginalType = bool;
+    using AlignedType = bool;
+    static constexpr EParameterType Type = EParameterType::Bool;
+    static constexpr uint64 NumColumns = 1;
+    static constexpr uint64 NumRows = 1;
+    static constexpr uint64 Alignment = alignof(AlignedType);
+};
 
 template <EParameterStructOption Option>
 struct TSupportedParameterType<int32, Option>

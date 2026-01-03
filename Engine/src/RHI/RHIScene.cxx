@@ -25,6 +25,28 @@ RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandConte
     // Register to the world events
     OwnerWorld->OnActorAddedToWorld.Add(this, &RRHIScene::OnActorAddedToWorld);
     OwnerWorld->OnActorRemovedFromWorld.Add(this, &RRHIScene::OnActorRemovedFromWorld);
+
+    UPointLight Light;
+    Light.Position = {1.2, 1.0, 2.0};
+    Light.Radiance = {1.0, 1.0, 1.0};
+    Light.Radius = 2.0f;
+    Light.Multiplier = 1.f;
+
+    PointLights.Add(Light);
+
+    UPointLightArray GPUArray;
+    GPUArray.LightCount = PointLights.Size();
+    std::memcpy(GPUArray.Lights, PointLights.Raw(), PointLights.Size() * sizeof(UPointLight));
+    TResourceArray<UPointLightArray> Array;
+    Array.Add(GPUArray);
+
+    u_PointLightBuffer = RHI::CreateBuffer(FRHIBufferDesc{
+        .Size = sizeof(UPointLightArray),
+        .Stride = sizeof(UPointLightArray),
+        .Usage = EBufferUsageFlags::UniformBuffer | EBufferUsageFlags::KeepCPUAccessible,
+        .ResourceArray = &Array,
+        .DebugName = "Point Light Buffer",
+    });
 }
 
 RRHIScene::RRHIScene(RWorld* OwnerWorld, const FRHIRenderPassTarget& InRenderPassTarget): RRHIScene(OwnerWorld)
@@ -83,6 +105,7 @@ void RRHIScene::PreTick()
             if (!Mesh.Mesh->Material->WasBaked())
             {
                 Mesh.Mesh->Material->SetInput("Camera", u_CameraBuffer);
+                Mesh.Mesh->Material->SetInput("PointLights", u_PointLightBuffer);
                 Mesh.Mesh->Material->Bake();
             }
 
