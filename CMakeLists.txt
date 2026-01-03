@@ -131,8 +131,13 @@ function(vit_set_standard_options target precompile_header)
         PROPERTIES CXX_STANDARD 23
                    CXX_STANDARD_REQUIRED YES
                    CXX_EXTENSIONS NO
-                   POSITION_INDEPENDENT_CODE ON
     )
+    if(VIT_COMPILE_MONOLITHIC)
+        set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE OFF)
+    else()
+        set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    endif(VIT_COMPILE_MONOLITHIC)
+
     target_compile_definitions(
         ${target}
         PUBLIC VITRUVE_BUILD_SHIPPING=$<BOOL:$<CONFIG:Release>> VITRUVE_BUILD_DEBUG=$<BOOL:$<CONFIG:Debug>>
