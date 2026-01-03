@@ -26,27 +26,54 @@ RRHIScene::RRHIScene(RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommandConte
     OwnerWorld->OnActorAddedToWorld.Add(this, &RRHIScene::OnActorAddedToWorld);
     OwnerWorld->OnActorRemovedFromWorld.Add(this, &RRHIScene::OnActorRemovedFromWorld);
 
-    UPointLight Light;
-    Light.Position = {1.2, 1.0, 2.0};
-    Light.Radiance = {1.0, 1.0, 1.0};
-    Light.Radius = 2.0f;
-    Light.Multiplier = 1.f;
+    /// WIP
+    {
+        UPointLight Light;
+        Light.Position = {1.2, 1.0, 2.0};
+        Light.Radiance = {1.0, 1.0, 1.0};
+        Light.Radius = 2.0f;
+        Light.Multiplier = 1.f;
 
-    PointLights.Add(Light);
+        PointLights.Add(Light);
 
-    UPointLightArray GPUArray;
-    GPUArray.LightCount = PointLights.Size();
-    std::memcpy(GPUArray.Lights, PointLights.Raw(), PointLights.Size() * sizeof(UPointLight));
-    TResourceArray<UPointLightArray> Array;
-    Array.Add(GPUArray);
+        UPointLightArray GPUArray;
+        GPUArray.LightCount = PointLights.Size();
+        std::memcpy(GPUArray.Lights, PointLights.Raw(), PointLights.Size() * sizeof(UPointLight));
+        TResourceArray<UPointLightArray> Array;
+        Array.Add(GPUArray);
 
-    u_PointLightBuffer = RHI::CreateBuffer(FRHIBufferDesc{
-        .Size = sizeof(UPointLightArray),
-        .Stride = sizeof(UPointLightArray),
-        .Usage = EBufferUsageFlags::UniformBuffer | EBufferUsageFlags::KeepCPUAccessible,
-        .ResourceArray = &Array,
-        .DebugName = "Point Light Buffer",
-    });
+        u_PointLightBuffer = RHI::CreateBuffer(FRHIBufferDesc{
+            .Size = sizeof(UPointLightArray),
+            .Stride = sizeof(UPointLightArray),
+            .Usage = EBufferUsageFlags::UniformBuffer | EBufferUsageFlags::KeepCPUAccessible,
+            .ResourceArray = &Array,
+            .DebugName = "Point Light Buffer",
+        });
+    }
+
+    {
+        UDirectionalLight Light;
+        Light.Direction = {0, 0, 0};
+        Light.Multiplier = 1.f;
+        Light.Radiance = {1.0f};
+
+        DirectionalLights.Add(Light);
+
+        UDirectionalLightArray GPUArray;
+        GPUArray.LightCount = DirectionalLights.Size();
+        std::memcpy(GPUArray.Lights, PointLights.Raw(), PointLights.Size() * sizeof(UPointLight));
+        TResourceArray<UDirectionalLightArray> Array;
+        Array.Add(GPUArray);
+
+        u_DirectionalLightBuffer = RHI::CreateBuffer(FRHIBufferDesc{
+            .Size = sizeof(UDirectionalLightArray),
+            .Stride = sizeof(UDirectionalLightArray),
+            .Usage = EBufferUsageFlags::UniformBuffer | EBufferUsageFlags::KeepCPUAccessible,
+            .ResourceArray = &Array,
+            .DebugName = "Directional Light Buffer",
+        });
+    }
+    /// WIP
 }
 
 RRHIScene::RRHIScene(RWorld* OwnerWorld, const FRHIRenderPassTarget& InRenderPassTarget): RRHIScene(OwnerWorld)
@@ -106,6 +133,7 @@ void RRHIScene::PreTick()
             {
                 Mesh.Mesh->Material->SetInput("Camera", u_CameraBuffer);
                 Mesh.Mesh->Material->SetInput("PointLights", u_PointLightBuffer);
+                Mesh.Mesh->Material->SetInput("DirectionalLights", u_DirectionalLightBuffer);
                 Mesh.Mesh->Material->Bake();
             }
 

@@ -35,6 +35,27 @@ vec3 ComputePointLightParticipation(PointLight Light)
     return (ambient + ((diffuse + specular) * Light.Multiplier));
 }
 
+vec3 ComputeDirectionalLightParticipation(DirectionalLight Light)
+{
+    // ambient
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * Light.Radiance;
+
+    // diffuse
+    vec3 norm = normalize(inNormal);
+    vec3 lightDir = normalize(-Light.Direction);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * Light.Radiance;
+
+    // specular
+    float specularStrength = 0.5;
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(lightDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * Light.Radiance;
+
+    return (ambient + ((diffuse + specular) * Light.Multiplier));
+}
+
 void main()
 {
     vec3 PointLight = vec3(0);
@@ -42,5 +63,11 @@ void main()
     {
         PointLight += ComputePointLightParticipation(u_PointLights.Lights[i]);
     }
-    outColor = vec4(PointLight, 1.0);
+
+    vec3 DirectionalLight = vec3(0);
+    for (int i = 0; i < u_DirectionalLights.LightCount; i++)
+    {
+        DirectionalLight += ComputeDirectionalLightParticipation(u_DirectionalLights.Lights[i]);
+    }
+    outColor = vec4(PointLight + DirectionalLight, 1.0);
 }

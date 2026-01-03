@@ -28,7 +28,7 @@ struct DirectionalLight
 layout(std140, set = 0, binding = 1) uniform DirectionalLights
 {
     uint LightCount;
-    DirectionalLight Lights[1024];
+    DirectionalLight Lights[4];
 }
 u_DirectionalLights;
 

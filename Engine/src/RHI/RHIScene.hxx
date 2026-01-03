@@ -126,7 +126,7 @@ private:
     struct UDirectionalLightArray
     {
         uint32 LightCount;
-        UDirectionalLight Lights[1024];
+        UDirectionalLight Lights[4];
     };
 
     struct FMeshRepresentation
@@ -174,6 +174,9 @@ private:
 
     TArray<UPointLight> PointLights;
     Ref<RRHIBuffer> u_PointLightBuffer = nullptr;
+
+    TArray<UDirectionalLight> DirectionalLights;
+    Ref<RRHIBuffer> u_DirectionalLightBuffer = nullptr;
 
     UCameraData CameraData;
     Ref<RRHIBuffer> u_CameraBuffer = nullptr;
