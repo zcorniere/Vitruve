@@ -454,7 +454,7 @@ static void GetDescriptorSetReflectionForType(
             Info.Parameter.Size = Compiler.get_declared_struct_size(SPIRType);
         }
 
-        LOG(LogVulkanShaderCompiler, Info, "  {}", Info);
+        LOG(LogVulkanShaderCompiler, Info, "({},{}) {}", Set, Binding, Info);
         for (unsigned int i = 0; i < SPIRType.member_types.size(); ++i)
         {
             spirv_cross::TypeID ID = SPIRType.member_types[i];
