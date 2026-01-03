@@ -1,7 +1,7 @@
 #version 450
-#extension GL_ARB_shading_language_include : require
+#extension GL_GOOGLE_include_directive : enable
 
-#include <include/Buffers.glsl>
+#include "../include/Buffers.glsl"
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;

@@ -1,5 +1,3 @@
-#pragma once
-
 /// Set 0 - Scene information
 struct PointLight
 {

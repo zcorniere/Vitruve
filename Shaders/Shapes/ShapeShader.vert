@@ -1,9 +1,9 @@
 #version 460
-#extension GL_ARB_shading_language_include : require
+#extension GL_GOOGLE_include_directive : enable
 
-#include <include/Buffers.glsl>
+#include "../include/Buffers.glsl"
 
-#include <include/VertexInput.glsl>
+#include "../include/VertexInput.glsl"
 
 layout(location = 0) out vec3 outPosition;
 layout(location = 1) out vec3 outNormal;
