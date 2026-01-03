@@ -64,10 +64,11 @@ void FVulkanPendingState::PrepareForDraw(FVulkanCmdBuffer* CommandBuffer)
     }
 
     CurrentPipeline->Bind(CommandBuffer->GetHandle());
-    for (VkDescriptorSet Set: DescriptorSets)
+    if (!DescriptorSets.IsEmpty())
     {
         VulkanAPI::vkCmdBindDescriptorSets(CommandBuffer->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                           CurrentPipeline->GetPipelineLayout(), 0, 1, &Set, 0, nullptr);
+                                           CurrentPipeline->GetPipelineLayout(), 0, DescriptorSets.Size(),
+                                           DescriptorSets.Raw(), 0, nullptr);
     }
     if (PushConstantData.Size() > 0)
     {

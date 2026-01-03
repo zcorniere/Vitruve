@@ -354,13 +354,13 @@ bool RVulkanGraphicsPipeline::CreatePipelineLayout()
 
 void RVulkanGraphicsPipeline::CreateDescriptorSetLayout()
 {
-    unsigned MaxSets = 0;
+    unsigned SetCount = 0;
     for (const WeakRef<RVulkanShader>& Shader: GetShaders())
     {
-        MaxSets = std::max(MaxSets, Shader->GetReflectionData().DescriptorSetDeclaration.Size());
+        SetCount = std::max(SetCount, Shader->GetReflectionData().DescriptorSetDeclaration.Size());
     }
 
-    TArray<TArray<VkDescriptorSetLayoutBinding>> DescriptorSetBindings(MaxSets);
+    TArray<TArray<VkDescriptorSetLayoutBinding>> DescriptorSetBindings(SetCount);
     for (const WeakRef<RVulkanShader>& Shader: GetShaders())
     {
         for (auto& [Set, Layout]: Shader->GetReflectionData().DescriptorSetDeclaration)

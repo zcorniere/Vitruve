@@ -17,6 +17,7 @@ public:
         None = 0,
         Texture,
         StorageBuffer,
+        UniformBuffer,
     };
 
     struct FRenderPassInputDeclaration
@@ -82,7 +83,7 @@ public:
 
 private:
     void CreateDescriptorPool(unsigned InMaxSets);
-    void CreateDescriptorSets();
+    void CreateDescriptorSets(unsigned InMaxSets);
     void CollectDescriptorSetInfo();
 
 private:

@@ -41,8 +41,8 @@ void FDescriptorSetManager::Destroy()
 
 void FDescriptorSetManager::Bake()
 {
-    CreateDescriptorPool(1);
-    CreateDescriptorSets();
+    CreateDescriptorPool(InputResources.Size());
+    CreateDescriptorSets(InputResources.Size());
 
     TArray<VkWriteDescriptorSet> WriteDescriptorSetsArray;
     for (auto& [Set, Bindings]: WriteDescriptorSet)
@@ -235,18 +235,18 @@ void FDescriptorSetManager::CreateDescriptorPool(unsigned InMaxSets)
                                                       &DescriptorPoolHandle));
 }
 
-void FDescriptorSetManager::CreateDescriptorSets()
+void FDescriptorSetManager::CreateDescriptorSets(unsigned InMaxSets)
 {
     VkDescriptorSetAllocateInfo AllocateInfo{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .pNext = nullptr,
         .descriptorPool = DescriptorPoolHandle,
-        .descriptorSetCount = 1,
+        .descriptorSetCount = InMaxSets,
         .pSetLayouts = AssociatedPipeline->GetDescriptorSetLayouts().Raw(),
     };
     ensure(DescriptorSets.IsEmpty());
 
-    DescriptorSets.Resize(1);
+    DescriptorSets.Resize(InMaxSets);
     VK_CHECK_RESULT(VulkanAPI::vkAllocateDescriptorSets(Device->GetHandle(), &AllocateInfo, DescriptorSets.Raw()));
 }
 
@@ -258,8 +258,9 @@ void FDescriptorSetManager::CollectDescriptorSetInfo()
         switch (Type)
         {
             case ShaderResource::FDescriptorSetInfo::EDescriptorType::StorageBuffer:
-            case ShaderResource::FDescriptorSetInfo::EDescriptorType::UniformBuffer:
                 return ERenderPassInputType::StorageBuffer;
+            case ShaderResource::FDescriptorSetInfo::EDescriptorType::UniformBuffer:
+                return ERenderPassInputType::UniformBuffer;
             case ShaderResource::FDescriptorSetInfo::EDescriptorType::Sampler:
                 return ERenderPassInputType::Texture;
         }
