@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameFramework/World.hxx"
+#include "ECS/World.hxx"
 #include <Engine/Core/Application.hxx>
 
 class EditorApplication : public FBaseApplication
@@ -16,7 +16,8 @@ public:
     void Tick(const double DeltaTime) override;
 
 private:
-    Ref<RWorld> World;
+    Ref<ecs::RWorld> World = nullptr;
+    ecs::FEntity CameraEntity;
 };
 
 IApplication* CreateApplication();
