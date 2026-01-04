@@ -1,8 +1,8 @@
 #pragma once
 
 #include "AssetRegistry/AssetRegistry.hxx"
+#include "ECS/World.hxx"
 #include "Engine/Threading/ThreadPool.hxx"
-#include "GameFramework/World.hxx"
 
 extern ENGINE_API class FEngine* GEngine;
 
@@ -27,14 +27,13 @@ public:
     void PreTick();
     void PostTick();
 
-    ENGINE_API Ref<RWorld> CreateWorld();
-    ENGINE_API void SetWorld(Ref<RWorld> World);
-    ENGINE_API Ref<RWorld> GetWorld() const;
+    ENGINE_API void SetWorld(Ref<ecs::RWorld> World);
+    ENGINE_API Ref<ecs::RWorld> GetWorld() const;
 
 public:
     FAssetRegistry AssetRegistry;
     FThreadPool m_ThreadPool;
 
 private:
-    Ref<RWorld> LoadedWorld = nullptr;
+    Ref<ecs::RWorld> LoadedWorld = nullptr;
 };

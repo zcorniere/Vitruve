@@ -21,12 +21,14 @@ struct FunctionTraits<ReturnType(Args...)> : FunctionTraits<ReturnType (*)(Args.
 template <typename ClassType, typename ReturnType, typename... Args>
 struct FunctionTraits<ReturnType (ClassType::*)(Args...) const> : FunctionTraits<ReturnType (*)(Args...)>
 {
+    using Class = ClassType;
 };
 
 // Specialization for pointers to member function or lambdas
 template <typename ClassType, typename ReturnType, typename... Args>
 struct FunctionTraits<ReturnType (ClassType::*)(Args...)> : FunctionTraits<ReturnType (*)(Args...)>
 {
+    using Class = ClassType;
 };
 
 template <typename T>

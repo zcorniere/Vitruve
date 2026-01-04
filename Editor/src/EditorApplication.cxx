@@ -10,8 +10,7 @@
 #include <RHI/RHICommandList.hxx>
 #include <RHI/Resources/RHIViewport.hxx>
 
-#include "Actor/Oscillator.hxx"
-#include "GameFramework/CameraActor.hxx"
+#include "Components/Oscillator.hxx"
 
 #include <cpplogger/sinks/FileSink.hpp>
 #include <cpplogger/sinks/StdoutSink.hpp>
@@ -82,18 +81,16 @@ bool EditorApplication::OnEngineInitialization()
     DepthTexture.Format = EImageFormat::D32_SFLOAT;
     DepthTexture.Flags = ETextureUsageFlags::DepthStencilTargetable;
 
-    World = GEngine->CreateWorld();
+    World = ecs::CreateWorld();
     World->SetName("Editor World");
     GEngine->SetWorld(World);
-    World->GetScene()->SetRenderPassTarget({
-        MainViewport,
-    });
-
-    Ref<ACameraActor> CameraActor =
-        World->CreateActor<ACameraActor>("Main Camera", FTransform({0, 15, 0}, {}, {1, 1, 1}));
-    RCameraComponent<float>* CameraComponent = CameraActor->GetComponent<RCameraComponent<float>>();
-    CameraComponent->SetFOV(80.0f);
-    CameraComponent->SetNearFar(0.1f, 1000.0f);
+    CameraEntity = World->CreateEntity()
+                       .WithComponent(ecs::FRenderTargetComponent{
+                           .Viewport = MainViewport,
+                       })
+                       .WithComponent(ecs::FTransformComponent{{0, 15, 0}, {}, {1, 1, 1}})
+                       .WithComponent(ecs::FCameraComponent())
+                       .Build();
 
     const unsigned GridSize = 10;
     for (float Row = 0; Row < GridSize; Row++)
@@ -107,7 +104,14 @@ bool EditorApplication::OnEngineInitialization()
             FQuaternion Rotation;
             FVector3 Scale = {1, 1, 1};
 
-            World->CreateActor<AOscillator>(Name, FTransform(Position, Rotation, Scale));
+            World->CreateEntity()
+                .WithComponent(ecs::FMeshComponent{
+                    .Asset = GEngine->AssetRegistry.GetCapsuleAsset(),
+                    .Material = Material,
+                    .RenderTarget = CameraEntity,
+                })
+                .WithComponent(ecs::FTransformComponent(Position, Rotation, Scale))
+                .WithComponent(FOscillator());
         }
     }
 
@@ -117,7 +121,7 @@ bool EditorApplication::OnEngineInitialization()
 void EditorApplication::OnEngineDestruction()
 {
     World = nullptr;
-    GEngine->SetWorld(nullptr);
+    ecs::DestroyWorld(World);
     Super::OnEngineDestruction();
 }
 
