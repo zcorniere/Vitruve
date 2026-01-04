@@ -88,7 +88,6 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
     {
         Holder.State = EModuleState::Error;
         Holder.ErrorStatus = EModuleErrorStatus::NotFound;
-        Holder = FModuleHolder();
         for (const std::filesystem::path& Path: DLLSearchPaths)
         {
             LoadModuleWithPath(ModuleName, Path, Holder);

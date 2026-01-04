@@ -48,9 +48,9 @@ FORCEINLINE int EngineLoop(IApplication* (*ApplicationEntryPoint)())
 
         Application->Tick(DeltaTime);
 
-        if (WeakRef<RWorld> World = GEngine->GetWorld())
+        if (WeakRef<ecs::RWorld> World = GEngine->GetWorld())
         {
-            World->Tick(DeltaTime);
+            World->Update(DeltaTime);
         }
 
         // Tick the RHI

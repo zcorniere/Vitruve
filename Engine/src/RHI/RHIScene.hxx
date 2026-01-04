@@ -1,16 +1,22 @@
 #pragma once
 
+#include "ECS/Component/RHIComponent.hxx"
 #include "Engine/Math/Transform.hxx"
 #include "Engine/Threading/Lock.hxx"
-#include "GameFramework/Components/CameraComponent.hxx"
 #include "RHI/RHICommandList.hxx"
 #include "RHI/RHIContext.hxx"
-#include "RHI/Resources/RHITexture.hxx"
+
+#include "ECS/Component/CameraComponent.hxx"
+#include "ECS/Component/MeshComponent.hxx"
+#include "ECS/Component/RHIComponent.hxx"
 
 #include <future>
 
-class RMeshComponent;
+namespace ecs
+{
 class RWorld;
+}    // namespace ecs
+
 class RRHIScene;
 class RModel;
 class AActor;
@@ -83,15 +89,6 @@ class RRHIScene : public RObject
     RTTI_DECLARE_TYPEINFO(RRHIScene, RObject);
 
 public:
-    struct FRHIRenderPassTarget
-    {
-        WeakRef<RRHIViewport> Viewport = nullptr;
-
-        TArray<FRHIRenderTarget> ColorTargets = {};
-        std::optional<FRHIRenderTarget> DepthTarget = std::nullopt;
-        UVector2 Size = {0, 0};
-    };
-
     BEGIN_PARAMETER_STRUCT(UCameraData)
     PARAMETER(FMatrix4, ViewProjection)
     PARAMETER(FMatrix4, View)
@@ -134,7 +131,7 @@ private:
         FTransform Transform = {};
         uint32 TransformBufferIndex = std::numeric_limits<uint32>::max();
         uint32 RenderBufferIndex = std::numeric_limits<uint32>::max();
-        WeakRef<RMeshComponent> Mesh = nullptr;
+        // WeakRef<RMeshComponent> Mesh = nullptr;
     };
 
     struct FActorRepresentationUpdateRequest
@@ -145,32 +142,28 @@ private:
 
 public:
     RRHIScene() = delete;
-    RRHIScene(RWorld* OuterWorld);
-    RRHIScene(RWorld* OuterWorld, const FRHIRenderPassTarget& InRenderPassTarget);
+    RRHIScene(ecs::RWorld* OuterWorld);
     virtual ~RRHIScene();
 
-    ENGINE_API void SetViewport(Ref<RRHIViewport>& InViewport);
-    WeakRef<RRHIViewport> GetViewport() const
+    WeakRef<RRHIViewport> GetViewport(unsigned ViewportIndex = 0) const
     {
-        return RenderPassTarget.Viewport;
+        return RenderPassTarget[ViewportIndex].Viewport;
     }
-    ENGINE_API void SetRenderPassTarget(const FRHIRenderPassTarget& InRenderPassTarget);
 
-    void PreTick();
-    void PostTick(double DeltaTime);
-    void UpdateActorLocation(uint64 Id, const FTransform& NewTransform);
+    ENGINE_API void CollectRenderablesSystem(ecs::FMeshComponent& Mesh, ecs::FTransformComponent& Transform);
+    ENGINE_API void CameraSystem(ecs::FCameraComponent& Camera, ecs::FRenderTargetComponent& InRenderPassTarget,
+                                 ecs::FTransformComponent& Transform);
+    ENGINE_API void CollectRenderTargets(ecs::FRenderTargetComponent& RenderTarget);
+
+    void Tick(double DeltaTime);
 
     ENGINE_API void TickRenderer(FFRHICommandList& CommandList);
 
 private:
-    void OnActorAddedToWorld(AActor* Actor);
-    void OnActorRemovedFromWorld(AActor* Actor);
-    void UpdateCameraAspectRatio();
-
     void Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch);
 
 private:
-    FRHIRenderPassTarget RenderPassTarget;
+    TArray<ecs::FRenderTargetComponent> RenderPassTarget;
 
     TArray<UPointLight> PointLights;
     Ref<RRHIBuffer> u_PointLightBuffer = nullptr;
@@ -178,7 +171,8 @@ private:
     TArray<UDirectionalLight> DirectionalLights;
     Ref<RRHIBuffer> u_DirectionalLightBuffer = nullptr;
 
-    UCameraData CameraData;
+    bool bCameraDataDirty = true;
+    UCameraData CameraData{};
     Ref<RRHIBuffer> u_CameraBuffer = nullptr;
 
     TMap<uint64, TResourceArray<FMatrix4>> TransformResourceArray;
@@ -186,7 +180,6 @@ private:
     TMap<FRenderRequestKey, TArray<FMeshRepresentation*>> RenderCalls;
 
     TMap<uint64, TArray<FMeshRepresentation>> WorldActorRepresentation;
-    TArray<WeakRef<RCameraComponent<float>>> CameraComponents;
 
     FRWFifoLock ContextLock;
     FRHIContext* const Context = nullptr;

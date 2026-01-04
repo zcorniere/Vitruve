@@ -1,18 +1,17 @@
 #pragma once
 
-#include "GameFramework/Actor.hxx"
+#include "ECS/Component/MeshComponent.hxx"
 
-class AOscillator : public AActor
+struct FOscillator
 {
-    RTTI_DECLARE_TYPEINFO(AOscillator, AActor)
 public:
-    AOscillator();
-    virtual ~AOscillator();
+    static void System(ecs::FTransformComponent& Transform, FOscillator& Oscillator);
 
-    void BeginPlay() override;
-    void Tick(double DeltaTime) override;
+    RTTI_DECLARE_TYPEINFO_MINIMAL(FOscillator);
 
 public:
+    FOscillator();
+
     float Multiplier = 1.0f;
     FVector3 Direction = {0.0f, 0.0f, 0.0f};
     FVector3 Maximum = {0.0f, 0.0f, 0.0f};

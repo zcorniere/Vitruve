@@ -1,7 +1,7 @@
 project(VitruveEditor)
 set(CMAKE_FOLDER "Vitruve")
 
-add_executable(${PROJECT_NAME} src/EditorApplication.cxx src/Actor/Oscillator.cxx)
+add_executable(${PROJECT_NAME} src/EditorApplication.cxx src/Components/Oscillator.cxx)
 target_link_libraries(${PROJECT_NAME} PRIVATE VitruveEngine imgui)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 vit_link_to_module(${PROJECT_NAME} VitruveEngine_VulkanRHI "RHIVulkan")

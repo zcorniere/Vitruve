@@ -34,9 +34,7 @@ set(VIT_ASSET_REGISTRY_SOURCES src/AssetRegistry/AssetRegistry.cxx src/AssetRegi
                                src/AssetRegistry/MeshFactory.cxx
 )
 
-set(VIT_GAMEFRAMEWORK_SOURCES src/GameFramework/Actor.cxx src/GameFramework/World.cxx src/GameFramework/CameraActor.cxx
-                              src/GameFramework/LightActor.cxx
-)
+set(VIT_ECS_SOURCES src/ECS/World.cxx src/ECS/ComponentStorage.cxx src/ECS/ECS.cxx src/ECS/SystemScheduler.cxx)
 
 set(VIT_RHI_SOURCES
     src/RHI/RHI.cxx
@@ -78,7 +76,7 @@ add_library(
     ${VIT_COMPILER_SOURCE_FILE}
     ${VIT_ASSET_REGISTRY_SOURCES}
     ${VIT_RHI_SOURCES}
-    ${VIT_GAMEFRAMEWORK_SOURCES}
+    ${VIT_ECS_SOURCES}
 )
 vit_set_standard_options(${PROJECT_NAME} "${CMAKE_SOURCE_DIR}/Engine/src/Engine/Vitruve.hxx")
 target_link_libraries(

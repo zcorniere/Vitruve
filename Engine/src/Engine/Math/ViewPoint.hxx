@@ -106,11 +106,11 @@ private:
 
 private:
     /// @brief The field of view in radians
-    T m_FOV = 0;
+    T m_FOV = 80;
 
     T m_AspectRatio = 0;
-    T m_Near = 0;
-    T m_Far = 0;
+    T m_Near = 0.001;
+    T m_Far = std::numeric_limits<T>::max();
 
     bool bProjectionMatrixDirty = true;
     TMatrix4<T> m_ProjectionMatrix;
