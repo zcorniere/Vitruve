@@ -126,8 +126,7 @@ bool EditorApplication::OnEngineInitialization()
 
 void EditorApplication::OnEngineDestruction()
 {
-    World = nullptr;
-    ecs::DestroyWorld(World);
+    ecs::DestroyWorld(&World);
     Super::OnEngineDestruction();
 }
 

@@ -34,14 +34,17 @@ Ref<RWorld> CreateWorld()
     return NewWorld;
 }
 
-void DestroyWorld(Ref<RWorld>& World)
+void DestroyWorld(Ref<RWorld>* World)
 {
-    if (GEngine->GetWorld() == World)
+    if (GEngine->GetWorld() == *World)
     {
         GEngine->SetWorld(nullptr);
     }
-    check(World->GetRefCount() == 1);
-    World = nullptr;
+    if (!ensure(((*World)->GetRefCount() == 1)))
+    {
+        LOG(LogECS, Warning, "Deleting a world that is still referenced somewhere ! {}", (*World)->GetRefCount());
+    }
+    *World = nullptr;
 }
 
 }    // namespace ecs
