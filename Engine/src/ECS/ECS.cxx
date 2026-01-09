@@ -20,7 +20,7 @@ Ref<RWorld> CreateWorld()
     NewWorld->RegisterComponent<ecs::FRenderTargetComponent>();
 
     // Register the basic systems
-    FSystem CollectRenderablesSystem(NewWorld->GetScene(), &RRHIScene::CollectRenderablesSystem);
+    FSystem CollectRenderablesSystem(NewWorld->GetScene(), &RRHIScene::RenderSystem);
     NewWorld->RegisterSystem(std::move(CollectRenderablesSystem));
 
     FSystem CameraSystem(NewWorld->GetScene(), &RRHIScene::CameraSystem);
