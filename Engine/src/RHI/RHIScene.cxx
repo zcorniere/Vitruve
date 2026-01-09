@@ -2,7 +2,6 @@
 
 #include "ECS/World.hxx"
 
-#include "Engine/Core/Engine.hxx"
 #include "RHI/GenericRHI.hxx"
 #include "RHI/RHI.hxx"
 
@@ -75,6 +74,36 @@ RRHIScene::~RRHIScene()
     RHI::Get()->RHIReleaseCommandContext(Context);
 }
 
+void RRHIScene::RenderSystem(Vitruve::FUUID& ID, ecs::FTransformComponent& Transform, ecs::FMeshComponent& Mesh)
+{
+    FRenderRequestKey Key{Mesh.Material.Raw(), Mesh.Asset.Raw()};
+    TArray<FMeshRepresentation>& RenderRequests = RenderCalls.FindOrAdd(Key);
+
+    // Find the mesh in the scene
+    FMeshRepresentation* FoundMesh = nullptr;
+    for (FMeshRepresentation& Iter: RenderRequests)
+    {
+        if (Iter.EntityID == ID)
+        {
+            FoundMesh = &Iter;
+            break;
+        }
+    }
+    if (!FoundMesh)
+    {
+        FoundMesh = &RenderRequests.Emplace();
+        FoundMesh->RenderBufferIndex = RenderRequests.Size() - 1;
+    }
+
+    // Check if the mesh has been initialized in the transform buffers
+    if (FoundMesh->TransformBufferIndex == std::numeric_limits<uint32>::max())
+    {
+        TResourceArray<FMatrix4>& RequestArrays = TransformResourceArray.FindOrAdd(Mesh.Asset->ID());
+        RequestArrays.Add({});
+        FoundMesh->TransformBufferIndex = RequestArrays.Size() - 1;
+    }
+}
+
 void RRHIScene::CollectRenderTargets(ecs::FRenderTargetComponent& InRenderPassTarget)
 {
     if (InRenderPassTarget.AssignedSceneIndex == -1)
@@ -120,14 +149,6 @@ void RRHIScene::Tick(double DeltaTime)
                 TResourceArray<UCameraData> Array{CameraData};
                 CommandList.CopyResourceArrayToBuffer(&Array, u_CameraBuffer, 0, 0, sizeof(UCameraData));
             });
-    }
-    {
-        VIT_PROFILE_FUNC("RRHIScene::Tick - Update Transform Buffers - Wait")
-        if (AsyncTaskUpdateResult.valid())
-        {
-            AsyncTaskUpdateResult.wait();
-            AsyncTaskUpdateResult = std::future<void>();
-        }
     }
 
     {
@@ -216,42 +237,6 @@ void RRHIScene::TickRenderer(FFRHICommandList& CommandList)
         CommandList.EndRenderingViewport(RenderTarget.Viewport.Raw());
     }
 }
-
-// void RRHIScene::Async_UpdateActorRepresentations(FRHISceneUpdateBatch& Batch)
-// {
-//     VIT_PROFILE_FUNC()
-
-//     Math::ComputeModelMatrixBatch(Batch.Actors.Size(), Batch.PositionX.Raw(), Batch.PositionY.Raw(),
-//                                   Batch.PositionZ.Raw(), Batch.QuaternionX.Raw(), Batch.QuaternionY.Raw(),
-//                                   Batch.QuaternionZ.Raw(), Batch.QuaternionW.Raw(), Batch.ScaleX.Raw(),
-//                                   Batch.ScaleY.Raw(), Batch.ScaleZ.Raw(), Batch.MatrixArray.Raw());
-
-//     for (unsigned i = 0; i < Batch.Actors.Size();)
-//     {
-//         VIT_PROFILE_FUNC("Update Actor Representations")
-
-//         uint64 ActorId = Batch.Actors[i];
-//         TRenderSceneLock<ERenderSceneLockType::Read> Lock(this);
-//         TArray<FMeshRepresentation>* Iter = WorldActorRepresentation.Find(ActorId);
-//         ensure(Iter);
-
-//         for (FMeshRepresentation& Mesh: *Iter)
-//         {
-//             ensure(ActorId == Batch.Actors[i]);    //  make sure that we're still with the same actor
-//             if (Mesh.Mesh->Asset == nullptr || Mesh.Mesh->Material == nullptr)
-//             {
-//                 continue;
-//             }
-
-//             // Update the transform resource array
-//             TransformResourceArray.FindOrAdd(Mesh.Mesh->Asset->ID())[Mesh.TransformBufferIndex] =
-//             Batch.MatrixArray[i]; Mesh.Transform.ModelMatrix = Batch.MatrixArray[i]; Mesh.Transform.bModelMatrixDirty
-//             = false;
-
-//             i++;
-//         }
-//     }
-// }
 
 FRHISceneUpdateBatch::FRHISceneUpdateBatch(unsigned Count)
 {

@@ -128,10 +128,10 @@ private:
 
     struct FMeshRepresentation
     {
+        uint64 EntityID = 0;
         FTransform Transform = {};
         uint32 TransformBufferIndex = std::numeric_limits<uint32>::max();
         uint32 RenderBufferIndex = std::numeric_limits<uint32>::max();
-        // WeakRef<RMeshComponent> Mesh = nullptr;
     };
 
     struct FActorRepresentationUpdateRequest
@@ -150,9 +150,10 @@ public:
         return RenderPassTarget[ViewportIndex].Viewport;
     }
 
-    ENGINE_API void CollectRenderablesSystem(ecs::FMeshComponent& Mesh, ecs::FTransformComponent& Transform);
-    ENGINE_API void CameraSystem(ecs::FCameraComponent& Camera, ecs::FRenderTargetComponent& InRenderPassTarget,
-                                 ecs::FTransformComponent& Transform);
+    ENGINE_API void RenderSystem(Vitruve::FUUID& ID, ecs::FTransformComponent& Transform, ecs::FMeshComponent& Mesh);
+    ENGINE_API
+    void CameraSystem(ecs::FCameraComponent& Camera, ecs::FRenderTargetComponent& InRenderPassTarget,
+                      ecs::FTransformComponent& Transform);
     ENGINE_API void CollectRenderTargets(ecs::FRenderTargetComponent& RenderTarget);
 
     void Tick(double DeltaTime);
@@ -177,17 +178,10 @@ private:
 
     TMap<uint64, TResourceArray<FMatrix4>> TransformResourceArray;
     TMap<uint64, Ref<RRHIBuffer>> TransformBuffers;
-    TMap<FRenderRequestKey, TArray<FMeshRepresentation*>> RenderCalls;
-
-    TMap<uint64, TArray<FMeshRepresentation>> WorldActorRepresentation;
+    TMap<FRenderRequestKey, TArray<FMeshRepresentation>> RenderCalls;
 
     FRWFifoLock ContextLock;
     FRHIContext* const Context = nullptr;
-
-    std::future<void> AsyncTaskUpdateResult;
-
-    std::mutex ActorAttentionMutex;
-    TMap<uint64, FActorRepresentationUpdateRequest> ActorThatNeedAttention;
 
     template <ERenderSceneLockType LockType>
     friend class TRenderSceneLock;
