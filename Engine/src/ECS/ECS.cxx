@@ -22,7 +22,7 @@ Ref<RWorld> CreateWorld()
     NewWorld->RegisterComponent<ecs::FPointLightComponent>();
     NewWorld->RegisterComponent<ecs::FDirectionalLightComponent>();
     // Register the basic systems
-    FSystem CollectRenderablesSystem(NewWorld->GetScene(), &RRHIScene::CollectRenderablesSystem);
+    FSystem CollectRenderablesSystem(NewWorld->GetScene(), &RRHIScene::RenderSystem);
     NewWorld->RegisterSystem(std::move(CollectRenderablesSystem));
 
     FSystem CameraSystem(NewWorld->GetScene(), &RRHIScene::CameraSystem);
