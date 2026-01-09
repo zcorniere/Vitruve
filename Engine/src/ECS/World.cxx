@@ -10,6 +10,8 @@ RWorld::RWorld()
 {
     Scene = Ref<RRHIScene>::Create(this);
     RHI::Get()->RegisterScene(Scene);
+
+    RegisterComponent<Vitruve::FUUID>();
 }
 
 RWorld::~RWorld()
@@ -26,7 +28,8 @@ void RWorld::Update(float DeltaTime)
 
 FEntityBuilder RWorld::CreateEntity()
 {
-    return Storage.BuildEntity();
+    // Create a new entity and give it the UUID component
+    return Storage.BuildEntity().WithComponent(Vitruve::FUUID());
 }
 
 void RWorld::DestroyEntity(FEntity EntityID)

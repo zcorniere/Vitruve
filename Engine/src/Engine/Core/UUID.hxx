@@ -5,6 +5,8 @@ namespace Vitruve
 
 class ENGINE_API FUUID
 {
+    RTTI_DECLARE_TYPEINFO_MINIMAL(FUUID);
+
 public:
     FUUID();
     explicit FUUID(uint64 uuid);
