@@ -46,6 +46,11 @@ public:
         Map[EntityID] = ComponentsArray.Size() - 1;
     }
 
+    bool Has(FEntity EntityID)
+    {
+        return Map.contains(EntityID);
+    }
+
     T& Get(FEntity EntityID)
     {
         auto it = Map.find(EntityID);
@@ -128,6 +133,10 @@ public:
         Result.Reserve(FirstComponents->GetArray().Size());
         for (const auto& [EntityID, Component]: FirstComponents->GetMap())
         {
+            if (!(GetComponentArray<RestTypes>()->Has(EntityID) && ...))
+            {
+                continue;
+            }
             std::tuple<FirstType&, RestTypes&...> Tuple{*Component, GetComponentArray<RestTypes>()->Get(EntityID)...};
             Result.Add(std::make_pair(EntityID, Tuple));
         }
