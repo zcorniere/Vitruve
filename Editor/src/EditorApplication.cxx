@@ -80,6 +80,7 @@ bool EditorApplication::OnEngineInitialization()
 
     World = ecs::CreateWorld();
     World->SetName("Editor World");
+    World->RegisterComponent<FOscillator>();
     GEngine->SetWorld(World);
     CameraEntity = World->CreateEntity()
                        .WithComponent(ecs::FRenderTargetComponent{
@@ -108,7 +109,8 @@ bool EditorApplication::OnEngineInitialization()
                     .RenderTarget = CameraEntity,
                 })
                 .WithComponent(ecs::FTransformComponent(Position, Rotation, Scale))
-                .WithComponent(FOscillator());
+                .WithComponent(FOscillator())
+                .Build();
         }
     }
 
