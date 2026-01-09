@@ -13,7 +13,7 @@ struct FMeshComponent
     RTTI_DECLARE_TYPEINFO_MINIMAL(FMeshComponent);
 
 public:
-    Ref<RAsset> Asset;
+    Ref<RModel> Asset;
     Ref<RRHIMaterial> Material;
 
     FEntity RenderTarget;
