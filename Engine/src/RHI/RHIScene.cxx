@@ -80,15 +80,8 @@ void RRHIScene::RenderSystem(Vitruve::FUUID& ID, ecs::FTransformComponent& Trans
     TArray<FMeshRepresentation>& RenderRequests = RenderCalls.FindOrAdd(Key);
 
     // Find the mesh in the scene
-    FMeshRepresentation* FoundMesh = nullptr;
-    for (FMeshRepresentation& Iter: RenderRequests)
-    {
-        if (Iter.EntityID == ID)
-        {
-            FoundMesh = &Iter;
-            break;
-        }
-    }
+    FMeshRepresentation* FoundMesh =
+        RenderRequests.FindByLambda([&ID](const FMeshRepresentation& Iter) { return Iter.EntityID == ID; });
     if (!FoundMesh)
     {
         FoundMesh = &RenderRequests.Emplace();
