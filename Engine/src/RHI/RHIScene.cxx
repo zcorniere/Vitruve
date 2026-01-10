@@ -102,6 +102,14 @@ void RRHIScene::RenderSystem(Vitruve::FUUID& ID, ecs::FTransformComponent& Trans
         RequestArrays.Add({});
         FoundMesh->TransformBufferIndex = RequestArrays.Size() - 1;
     }
+
+    if (!Mesh.Material->WasBaked())
+    {
+        Mesh.Material->SetInput("Camera", u_CameraBuffer);
+        Mesh.Material->SetInput("PointLights", u_PointLightBuffer);
+        Mesh.Material->SetInput("DirectionalLights", u_DirectionalLightBuffer);
+        Mesh.Material->Bake();
+    }
 }
 
 void RRHIScene::CollectRenderTargets(ecs::FRenderTargetComponent& InRenderPassTarget)
