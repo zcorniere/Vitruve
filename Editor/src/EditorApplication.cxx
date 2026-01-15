@@ -121,6 +121,8 @@ bool EditorApplication::OnEngineInitialization()
         }
     }
 
+    World->RegisterSystem(FOscillator::System);
+
     return true;
 }
 
