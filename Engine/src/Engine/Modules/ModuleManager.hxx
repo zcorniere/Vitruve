@@ -35,6 +35,7 @@ public:
 
 private:
     FModuleManager();
+    ~FModuleManager();
 
 public:
     void AddDLLSearchPath(const std::filesystem::path& Path);

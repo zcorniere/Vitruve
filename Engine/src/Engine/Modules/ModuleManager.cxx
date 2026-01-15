@@ -14,9 +14,22 @@ FModuleManager::FModuleManager()
     DLLSearchPaths.Add(FPlatform::GetExecutablePath().parent_path());
 }
 
+FModuleManager::~FModuleManager()
+{
+}
+
 void FModuleManager::AddDLLSearchPath(const std::filesystem::path& Path)
 {
     DLLSearchPaths.Add(Path);
+}
+
+static std::string GetModuleFullName(const std::string_view& ModuleName)
+{
+#if defined(PLATFORM_WINDOWS)
+    return std::format("VitruveEngine_{:s}.dll", ModuleName);
+#elif defined(PLATFORM_LINUX)
+    return std::format("libVitruveEngine_{:s}.so", ModuleName);
+#endif
 }
 
 IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
@@ -37,8 +50,10 @@ IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
 
     LOG(LogModuleManager, Info, "Loading module {:s}", ModuleName);
 #if defined(PLATFORM_LINUX)
+    const std::string FullName = GetModuleFullName(ModuleName);
+
     // Try to see if it in the RPATH first
-    TryLoadModule(ModuleName, Holder);
+    TryLoadModule(FullName, Holder);
     if (Holder.State != EModuleState::Loaded)
 #endif    // PLATFORM_LINUX
     {
@@ -111,23 +126,11 @@ void FModuleManager::UnloadModule(const std::string_view& ModuleName)
     delete Pair.Get<1>().LibraryHolder;
 }
 
-static std::string GetModuleFullName(const std::string_view& ModuleName)
-{
-#if defined(PLATFORM_WINDOWS)
-    return std::format("VitruveEngine_{:s}.dll", ModuleName);
-#elif defined(PLATFORM_LINUX)
-    return std::format("libVitruveEngine_{:s}.so", ModuleName);
-#endif
-}
-
 void FModuleManager::TryLoadModule(const std::string_view& ModuleName, FModuleHolder& OutHolder)
 {
     VIT_PROFILE_FUNC()
-
-    const std::string FullName = GetModuleFullName(ModuleName);
-
     // Load the library object
-    OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(FullName);
+    OutHolder.LibraryHolder = FPlatformMisc::LoadExternalModule(ModuleName);
     if (!OutHolder.LibraryHolder->IsValid())
     {
         OutHolder.State = EModuleState::Error;
@@ -168,6 +171,6 @@ void FModuleManager::LoadModuleWithPath(const std::string_view& ModuleName, cons
         {
             continue;
         }
-        return TryLoadModule(Entry.path().string(), OutHolder);
+        return TryLoadModule(std::filesystem::absolute(Entry).string(), OutHolder);
     }
 }
