@@ -22,6 +22,8 @@ constexpr void TViewPoint<T>::ComputeProjectionMatrix()
     else
     {
         LOG(LogMath, Warning, "Near and Far planes are equal in ViewPoint<{}>", RTTI::TypeName<T>());
+        NewProjectionMatrix[2, 2] = 0;
+        NewProjectionMatrix[3, 2] = 0;
     }
 
     NewProjectionMatrix[1, 1] *= -1;
