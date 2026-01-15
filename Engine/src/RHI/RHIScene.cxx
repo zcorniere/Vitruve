@@ -9,7 +9,7 @@ RRHIScene::RRHIScene(ecs::RWorld* OwnerWorld): Context(RHI::Get()->RHIGetCommand
 {
     u_CameraBuffer = RHI::CreateBuffer(FRHIBufferDesc{
         .Size = sizeof(UCameraData),
-        .Stride = sizeof(UCameraData),
+        .Stride = 0,
         .Usage = EBufferUsageFlags::UniformBuffer | EBufferUsageFlags::KeepCPUAccessible,
         .ResourceArray = nullptr,
         .DebugName = "Camera Buffer",
@@ -89,11 +89,15 @@ void RRHIScene::RenderSystem(Vitruve::FUUID& ID, ecs::FTransformComponent& Trans
     }
 
     // Check if the mesh has been initialized in the transform buffers
+    TResourceArray<FMatrix4>& RequestArrays = TransformResourceArray.FindOrAdd(Mesh.Asset->ID());
     if (FoundMesh->TransformBufferIndex == std::numeric_limits<uint32>::max())
     {
-        TResourceArray<FMatrix4>& RequestArrays = TransformResourceArray.FindOrAdd(Mesh.Asset->ID());
-        RequestArrays.Add({});
         FoundMesh->TransformBufferIndex = RequestArrays.Size() - 1;
+        RequestArrays.Add(Transform.GetModelMatrix());
+    }
+    else
+    {
+        RequestArrays[FoundMesh->TransformBufferIndex] = Transform.GetModelMatrix();
     }
 
     if (!Mesh.Material->WasBaked())
