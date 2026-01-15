@@ -118,14 +118,7 @@ bool EditorApplication::OnEngineInitialization()
         }
     }
 
-    {
-        Ref<ADirectionalLightActor> DirectionalLight = World->CreateActor<ADirectionalLightActor>("Directional Light");
-    }
-    {
-        Ref<APointLightActor> PointLight = World->CreateActor<APointLightActor>("Point Light");
-        PointLight->SetActorLocation({1.2, 1.0, 2.0});
-        PointLight->LightComponent->Radius = 2.0f;
-    }
+    World->RegisterSystem(FOscillator::System);
 
     return true;
 }
