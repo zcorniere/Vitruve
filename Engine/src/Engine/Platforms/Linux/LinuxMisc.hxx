@@ -22,7 +22,7 @@ private:
     virtual void* GetSymbol_Internal(std::string_view SymbolName) const override;
 
 private:
-    void* ModuleHandle;
+    void* ModuleHandle = nullptr;
 };
 
 /// @brief Miscellaneous Linux feature
