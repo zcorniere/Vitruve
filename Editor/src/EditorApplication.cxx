@@ -82,12 +82,16 @@ bool EditorApplication::OnEngineInitialization()
     World->SetName("Editor World");
     World->RegisterComponent<FOscillator>();
     GEngine->SetWorld(World);
+
+    ecs::FCameraComponent Camera;
+    Camera.ViewPoint.SetNear(0.1f);
+    Camera.ViewPoint.SetFar(1'000.f);
     CameraEntity = World->CreateEntity()
                        .WithComponent(ecs::FRenderTargetComponent{
                            .Viewport = MainViewport,
                        })
                        .WithComponent(ecs::FTransformComponent{{0, 15, 0}, {}, {1, 1, 1}})
-                       .WithComponent(ecs::FCameraComponent())
+                       .WithComponent(Camera)
                        .Build();
 
     const unsigned GridSize = 10;
