@@ -9,6 +9,7 @@ namespace ecs
 RWorld::RWorld()
 {
     Scene = Ref<RRHIScene>::Create(this);
+    Scene->SetNamef("{}_Scene", GetName());
     RHI::Get()->RegisterScene(Scene);
 
     RegisterComponent<Vitruve::FUUID>();
