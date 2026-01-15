@@ -110,7 +110,7 @@ private:
 
     T m_AspectRatio = 0;
     T m_Near = 0.001;
-    T m_Far = std::numeric_limits<T>::max();
+    T m_Far = 1'000'000;
 
     bool bProjectionMatrixDirty = true;
     TMatrix4<T> m_ProjectionMatrix;
