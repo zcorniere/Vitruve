@@ -114,6 +114,7 @@ bool EditorApplication::OnEngineInitialization()
                 })
                 .WithComponent(ecs::FTransformComponent(Position, Rotation, Scale))
                 .WithComponent(FOscillator())
+                .WithComponent<ecs::FDeltaTime>()
                 .Build();
         }
     }

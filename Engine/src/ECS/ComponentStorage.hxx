@@ -174,7 +174,7 @@ public:
     }
 
     template <typename T>
-    FEntityBuilder& WithComponent(T Component)
+    FEntityBuilder& WithComponent(T Component = {})
     {
         Storage.StoreComponent<T>(EntityID, Component);
         return *this;

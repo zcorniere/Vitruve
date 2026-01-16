@@ -1,11 +1,12 @@
 #pragma once
 
 #include "ECS/Component/MeshComponent.hxx"
+#include "ECS/World.hxx"
 
 struct FOscillator
 {
 public:
-    static void System(ecs::FTransformComponent& Transform, FOscillator& Oscillator);
+    static void System(ecs::FDeltaTime DeltaTime, ecs::FTransformComponent& Transform, FOscillator& Oscillator);
 
     RTTI_DECLARE_TYPEINFO_MINIMAL(FOscillator);
 
