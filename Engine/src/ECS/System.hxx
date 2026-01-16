@@ -7,6 +7,8 @@
 namespace ecs
 {
 
+DECLARE_LOGGER_CATEGORY(Core, LogSystem, Warning);
+
 namespace details
 {
 
@@ -23,28 +25,46 @@ namespace details
     {
         static constexpr auto wrap_system(auto system)
         {
-            return [system](ecs::RWorld* World)
+            return [system](ecs::RWorld* World) -> bool
             {
                 TComponentArray components_map =
                     World->GetComponentStorage().JoinComponents<cleaned_component<Components>...>();
 
+                if (components_map.IsEmpty())
+                {
+                    LOG(LogSystem, Error, "System {} does not have any entity to run on",
+                        RTTI::TypeName<decltype(system)>());
+                    return false;
+                }
+
                 for (auto& [Entity, components]: components_map)
+                {
                     std::apply(system, components);
+                }
+                return true;
             };
         }
 
         template <typename TClass>
         static constexpr auto wrap_system(TClass* InContext, auto system)
         {
-            return [InContext, system](ecs::RWorld* World)
+            return [InContext, system](ecs::RWorld* World) -> bool
             {
                 TComponentArray components_map =
                     World->GetComponentStorage().JoinComponents<cleaned_component<Components>...>();
+
+                if (components_map.IsEmpty())
+                {
+                    LOG(LogSystem, Error, "System {} does not have any entity to run on",
+                        RTTI::TypeName<decltype(system)>());
+                    return false;
+                }
 
                 for (auto& [Entity, components]: components_map)
                 {
                     std::apply(std::bind_front(system, InContext), components);
                 }
+                return true;
             };
         }
     };
@@ -77,10 +97,10 @@ public:
     FSystem(const FSystem&) = default;
     FSystem(FSystem&&) = default;
 
-    void Call(RWorld*) const;
+    bool Call(RWorld*) const;
 
 private:
-    std::function<void(RWorld*)> CallWrapper;
+    std::function<bool(RWorld*)> CallWrapper;
 };
 
 }    // namespace ecs

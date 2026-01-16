@@ -4,9 +4,9 @@
 
 #include "ECS/System.hxx"
 
-void ecs::FSystem::Call(RWorld* world) const
+bool ecs::FSystem::Call(RWorld* world) const
 {
-    CallWrapper(world);
+    return CallWrapper(world);
 }
 
 void ecs::FSystemScheduler::AddSystem(FSystem&& system)
@@ -16,8 +16,12 @@ void ecs::FSystemScheduler::AddSystem(FSystem&& system)
 
 void ecs::FSystemScheduler::Update(RWorld* world)
 {
-    for (FSystem& system: SystemStorage)
+
+    for (unsigned i = 0; i < SystemStorage.Size(); i++)
     {
-        system.Call(world);
+        if (!SystemStorage[i].Call(world))
+        {
+            // TODO: remove system if they fail to execute
+        }
     }
 }
