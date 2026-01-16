@@ -9,6 +9,22 @@
 namespace ecs
 {
 
+template <typename T>
+struct TDeltaTime
+{
+    RTTI_DECLARE_TYPEINFO_MINIMAL(TDeltaTime<T>);
+
+public:
+    T DeltaTime = 0.0;
+
+    operator T() const
+    {
+        return DeltaTime;
+    }
+};
+using FDeltaTime = TDeltaTime<float>;
+using DDeltaTime = TDeltaTime<double>;
+
 class RWorld : public RObject
 {
     RTTI_DECLARE_TYPEINFO(RWorld, RObject);
@@ -52,6 +68,7 @@ public:
 
 private:
     float fDeltaTime;
+
     Ref<RRHIScene> Scene;
 
     FSystemScheduler Scheduler;

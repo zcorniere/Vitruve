@@ -1,8 +1,5 @@
 #include "Oscillator.hxx"
 
-#include "AssetRegistry/AssetRegistry.hxx"
-#include "Engine/Core/Engine.hxx"
-
 FOscillator::FOscillator()
 {
     Minimum = {0.0f, 0.0f, -6.0f};
@@ -16,10 +13,10 @@ FOscillator::FOscillator()
     RotationMultiplier.z = (float)rand() / (float)RAND_MAX / 20.0f;
 }
 
-void FOscillator::System(ecs::FTransformComponent& Transform, FOscillator& Oscillator)
+void FOscillator::System(ecs::FDeltaTime DeltaTime, ecs::FTransformComponent& Transform, FOscillator& Oscillator)
 {
 
-    const FVector3 Delta = Oscillator.Direction * Oscillator.Multiplier;    // float(DeltaTime);
+    const FVector3 Delta = Oscillator.Direction * Oscillator.Multiplier * float(DeltaTime);
     const FVector3 NewLocation = Transform.GetLocation() + Delta;
     if (NewLocation.x > Oscillator.Maximum.x || NewLocation.x < Oscillator.Minimum.x)
     {

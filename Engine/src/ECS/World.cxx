@@ -13,16 +13,18 @@ RWorld::RWorld()
     RHI::Get()->RegisterScene(Scene);
 
     RegisterComponent<Vitruve::FUUID>();
+    RegisterComponent<FDeltaTime>();
+
+    RegisterSystem([World = this](FDeltaTime& Time) { Time.DeltaTime = World->GetDeltaTime(); });
 }
 
 RWorld::~RWorld()
 {
 }
 
-void RWorld::Update(float DeltaTime)
+void RWorld::Update(float InDeltaTime)
 {
-    fDeltaTime = DeltaTime;
-
+    fDeltaTime = InDeltaTime;
     Scheduler.Update(this);
     Scene->Tick(fDeltaTime);
 }
