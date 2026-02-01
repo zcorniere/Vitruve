@@ -18,7 +18,7 @@ public:
 
     template <typename T>
     requires std::derived_from<T, AActor>
-    Ref<T> CreateActor(std::string Name, FTransform Transform)
+    Ref<T> CreateActor(std::string Name, FTransform Transform = {})
     {
         VIT_PROFILE_FUNC();
         Ref<T> Actor = Ref<T>::CreateNamed(Name);
