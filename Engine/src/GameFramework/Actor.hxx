@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameFramework/Components/LightComponent.hxx"
 #include "GameFramework/Components/MeshComponent.hxx"
 
 class ENGINE_API AActor : public RObject
@@ -41,25 +40,3 @@ private:
     WeakRef<RSceneComponent> RootComponent = nullptr;
     Ref<RMeshComponent> MeshComponent = nullptr;
 };
-
-template <class LightType>
-requires std::derived_from<LightType, RLightComponent>
-class ENGINE_API ATLightActor : public AActor
-{
-    RTTI_DECLARE_TYPEINFO(ATLightActor<LightType>, AActor)
-public:
-    ATLightActor()
-    {
-        LightComponent = Ref<LightType>::Create();
-    }
-    LightType* GetLight()
-    {
-        return LightComponent;
-    }
-
-public:
-    Ref<LightType> LightComponent = nullptr;
-};
-
-using ADirectionalLightActor = ATLightActor<RDirectionalLightComponent>;
-using APointLightActor = ATLightActor<RPointLightComponent>;

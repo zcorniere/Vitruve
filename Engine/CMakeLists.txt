@@ -34,7 +34,9 @@ set(VIT_ASSET_REGISTRY_SOURCES src/AssetRegistry/AssetRegistry.cxx src/AssetRegi
                                src/AssetRegistry/MeshFactory.cxx
 )
 
-set(VIT_GAMEFRAMEWORK_SOURCES src/GameFramework/Actor.cxx src/GameFramework/World.cxx src/GameFramework/CameraActor.cxx)
+set(VIT_GAMEFRAMEWORK_SOURCES src/GameFramework/Actor.cxx src/GameFramework/World.cxx src/GameFramework/CameraActor.cxx
+                              src/GameFramework/LightActor.cxx
+)
 
 set(VIT_RHI_SOURCES
     src/RHI/RHI.cxx
