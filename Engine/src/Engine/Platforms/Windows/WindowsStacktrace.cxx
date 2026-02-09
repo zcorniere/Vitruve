@@ -30,6 +30,7 @@ FStacktraceContent FWindowsStacktrace::GetStackTraceFromReturnAddress(void* retu
 
 bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetailedSymbolInfo& detailed_info)
 {
+#if VIT_ENABLE_STACKTRACE
     DWORD64 dwAddress = ProgramCounter;
     detailed_info.ProgramCounter = ProgramCounter;
 
@@ -92,6 +93,6 @@ bool FWindowsStacktrace::TryFillDetailedSymbolInfo(int64 ProgramCounter, FDetail
             detailed_info.LineNumber = line.LineNumber;
         }
     }
-
+#endif // VIT_ENABLE_STACKTRACE
     return true;
 }
