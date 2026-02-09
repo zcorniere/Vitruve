@@ -133,13 +133,24 @@ static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ <= 16, "Expecting 16-byte default
 
 #if VIT_COMPILE_MONOLITHIC
     #define MODULE_BOILERPLATE
+    #define IMPLEMENT_MODULE(ExportMacro, ModuleClass)                           \
+        static bool ModuleClass##_StaticCreator()                                \
+        {                                                                        \
+            IModuleInterface* Interface = new ModuleClass();                     \
+            FModuleManager::Get().LoadModuleFromMemory(Interface);               \
+            return Interface != nullptr;                                         \
+        }                                                                        \
+        static const bool ModuleClass##_Created = ModuleClass##_StaticCreator(); \
+        extern "C" void IMPLEMENT_MODULE_##ModuleClass()                         \
+        {                                                                        \
+        }
 #else
     #define MODULE_BOILERPLATE UE_DEFINE_FMEMORY_WRAPPERS REPLACEMENT_OPERATOR_NEW_AND_DELETE
-#endif    // VIT_COMPILE_MONOLITHIC
 
-#define IMPLEMENT_MODULE(ExportMacro, ModuleClass)          \
-    extern "C" ExportMacro IModuleInterface* CreateModule() \
-    {                                                       \
-        return new ModuleClass();                           \
-    }                                                       \
-    MODULE_BOILERPLATE
+    #define IMPLEMENT_MODULE(ExportMacro, ModuleClass)          \
+        extern "C" ExportMacro IModuleInterface* CreateModule() \
+        {                                                       \
+            return new ModuleClass();                           \
+        }                                                       \
+        MODULE_BOILERPLATE
+#endif    // VIT_COMPILE_MONOLITHIC

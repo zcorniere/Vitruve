@@ -40,6 +40,7 @@ private:
 public:
     void AddDLLSearchPath(const std::filesystem::path& Path);
 
+    IModuleInterface* LoadModuleFromMemory(IModuleInterface* Interface);
     IModuleInterface* LoadModule(const std::string_view& ModuleName);
     void UnloadModule(const std::string_view& ModuleName);
 

@@ -16,6 +16,19 @@ FModuleManager::FModuleManager()
 
 FModuleManager::~FModuleManager()
 {
+    for (auto& [Name, Holder]: Modules)
+    {
+        Holder.Module->ShutdownModule();
+        // Remove our module object
+        delete Holder.Module;
+
+        if (Holder.LibraryHolder)
+        {
+            // Unload the library code
+            delete Holder.LibraryHolder;
+        }
+    }
+    Modules.Clear();
 }
 
 void FModuleManager::AddDLLSearchPath(const std::filesystem::path& Path)
@@ -32,12 +45,25 @@ static std::string GetModuleFullName(const std::string_view& ModuleName)
 #endif
 }
 
+IModuleInterface* FModuleManager::LoadModuleFromMemory(IModuleInterface* Interface)
+{
+    check(Interface);
+    FModuleHolder& Holder = Modules.FindOrAdd(Interface->GetName());
+    Holder.Module = Interface;
+    Holder.LibraryHolder = nullptr;
+    Holder.State = EModuleState::Loaded;
+
+    Holder.Module->StartupModule();
+    Holder.State = EModuleState::Started;
+    return Holder.Module;
+}
+
 IModuleInterface* FModuleManager::LoadModule(const std::string_view& ModuleName)
 {
     VIT_PROFILE_FUNC()
 
     FModuleHolder& Holder = Modules.FindOrAdd(std::string(ModuleName));
-    if (Holder.State == EModuleState::Loaded)
+    if (Holder.State >= EModuleState::Loaded)
     {
         return Holder.Module;
     }
@@ -112,18 +138,22 @@ void FModuleManager::UnloadModule(const std::string_view& ModuleName)
         return;
     }
 
-    if (Pair.Get<1>().State != EModuleState::Started)
+    FModuleHolder& Holder = Pair.Get<1>();
+
+    if (Holder.State != EModuleState::Started)
     {
         LOG(LogModuleManager, Warning, "Module {:s} is not started, cannot unload it", ModuleName);
         return;
     }
-    Pair.Get<1>().Module->ShutdownModule();
-
+    Holder.Module->ShutdownModule();
     // Remove our module object
-    delete Pair.Get<1>().Module;
+    delete Holder.Module;
 
-    // Unload the library code
-    delete Pair.Get<1>().LibraryHolder;
+    if (Holder.LibraryHolder)
+    {
+        // Unload the library code
+        delete Holder.LibraryHolder;
+    }
 }
 
 void FModuleManager::TryLoadModule(const std::string_view& ModuleName, FModuleHolder& OutHolder)

@@ -6,6 +6,7 @@
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Misc/Utils.hxx"
 
+#include "Engine/Modules/ModuleManager.hxx"
 #include "Engine/Platforms/PlatformMisc.hxx"
 
 #include "VulkanRHI/Resources/VulkanViewport.hxx"
@@ -25,6 +26,10 @@
 class FRHIVulkanModule final : public IRHIModule
 {
 public:
+    FRHIVulkanModule()
+    {
+        SetName("VulkanRHI");
+    }
     virtual void StartupModule() override
     {
     }
@@ -32,13 +37,14 @@ public:
     virtual void ShutdownModule() override
     {
     }
+
     virtual FGenericRHI* CreateRHI() override
     {
         return new VulkanRHI::FVulkanDynamicRHI;
     }
 };
 
-IMPLEMENT_MODULE(VULKAN_RHI_API, FRHIVulkanModule)
+IMPLEMENT_MODULE(VULKAN_RHI_API, FRHIVulkanModule);
 
 static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platform,
                                         TArray<const char*> VulkanExtensions);
