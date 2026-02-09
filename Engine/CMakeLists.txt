@@ -97,17 +97,18 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE ENGINE_EXPORTS)
 
 if(UNIX)
     target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
-
-    if(VIT_ENABLE_STACKTRACE)
+endif()
+if(VIT_ENABLE_STACKTRACE)
+    if (UNIX)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBDW REQUIRED libdw)
         target_include_directories(${PROJECT_NAME} PRIVATE ${LIBDW_INCLUDE_DIRS})
         target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBDW_LIBRARIES})
         target_compile_options(${PROJECT_NAME} PRIVATE ${LIBDW_CFLAGS_OTHER})
-    endif(VIT_ENABLE_STACKTRACE)
-elseif(WIN32)
-    target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
-endif()
+    elseif(WIN32)
+        target_link_libraries(${PROJECT_NAME} PUBLIC dbghelp)
+    endif()
+endif(VIT_ENABLE_STACKTRACE)
 
 # ------------- Tests -------------
 

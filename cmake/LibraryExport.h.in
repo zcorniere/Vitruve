@@ -1,13 +1,19 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
-  #ifdef @EXPORT_DEFINE@
-    #define @EXPORT_MACRO@ __declspec(dllexport)
-  #else
-    #define @EXPORT_MACRO@ __declspec(dllimport)
-  #endif
-#elif defined(__GNUC__) && __GNUC__ >= 4
-  #define @EXPORT_MACRO@ __attribute__((visibility("default")))
-#else
+#include "BuildConfig.h"
+
+#if defined(VIT_COMPILE_MONOLITHIC)
   #define @EXPORT_MACRO@
+#else
+  #if defined(_WIN32) || defined(_WIN64)
+    #ifdef @EXPORT_DEFINE@
+      #define @EXPORT_MACRO@ __declspec(dllexport)
+    #else
+      #define @EXPORT_MACRO@ __declspec(dllimport)
+    #endif
+  #elif defined(__GNUC__) && __GNUC__ >= 4
+    #define @EXPORT_MACRO@ __attribute__((visibility("default")))
+  #else
+    #define @EXPORT_MACRO@
+  #endif
 #endif

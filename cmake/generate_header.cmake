@@ -6,9 +6,10 @@ function(generate_export_header macro_name)
     # Use set_property to cache the values for configure_file
     set(EXPORT_MACRO "${macro_name}")
     set(EXPORT_DEFINE "${macro_define}")
+    set(GENERATED_HEADER_PATH "${CMAKE_BINARY_DIR}/generated/${macro_name}_Export.h")
 
     configure_file(
-        "${CMAKE_SOURCE_DIR}/cmake/LibraryExport.h.in" "${CMAKE_BINARY_DIR}/generated/${macro_name}_Export.h" @ONLY
+        "${CMAKE_SOURCE_DIR}/cmake/LibraryExport.h.in" ${GENERATED_HEADER_PATH} @ONLY
     )
 endfunction(generate_export_header)
 
