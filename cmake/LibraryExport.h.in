@@ -2,7 +2,7 @@
 
 #include "BuildConfig.h"
 
-#if defined(VIT_COMPILE_MONOLITHIC)
+#if VIT_COMPILE_MONOLITHIC
   #define @EXPORT_MACRO@
 #else
   #if defined(_WIN32) || defined(_WIN64)
