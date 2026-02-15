@@ -86,10 +86,15 @@ target_link_libraries(
     PUBLIC cpplogger
            magic_enum
            glfw
-           mimalloc-static
            imgui
            ModernDialogs
 )
+
+if(VIT_COMPILE_MONOLITHIC)
+    target_link_libraries(${PROJECT_NAME} PUBLIC mimalloc-static)
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC mimalloc)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:VIT_POISON_ALLOCATION>)
@@ -99,7 +104,7 @@ if(UNIX)
     target_link_libraries(${PROJECT_NAME} PUBLIC xdgpp)
 endif()
 if(VIT_ENABLE_STACKTRACE)
-    if (UNIX)
+    if(UNIX)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBDW REQUIRED libdw)
         target_include_directories(${PROJECT_NAME} PRIVATE ${LIBDW_INCLUDE_DIRS})

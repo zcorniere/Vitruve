@@ -40,11 +40,14 @@ set(MI_BUILD_OBJECT
     CACHE INTERNAL "" FORCE
 )
 set(MI_BUILD_SHARED
-    OFF
+    ${VIT_LIBRARY_TYPE}
     CACHE INTERNAL "" FORCE
 )
-if (NOT MSVC)
-    set(MI_TRACK_VALGRIND "$<IF:$<AND:$<CONFIG:Debug>,$<NOT:$<BOOL:${VIT_ENABLE_ASAN}>>>,ON,OFF>")
+if(NOT MSVC)
+    set(MI_TRACK_VALGRIND
+        "$<IF:$<AND:$<NOT:$<BOOL:${VIT_ENABLE_ASAN}>>,$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>> ,ON,OFF>"
+        CACHE INTERNAL "" FORCE
+    )
 endif()
 set(MI_TRACK_ASAN ${VIT_ENABLE_ASAN})
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mimalloc EXCLUDE_FROM_ALL)
