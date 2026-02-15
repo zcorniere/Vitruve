@@ -217,6 +217,10 @@ function(vit_add_platforms_entrypoint target)
 endfunction(vit_add_platforms_entrypoint)
 
 function(vit_copy_dlls_to_target_dir TARGET_NAME)
+    if(VIT_COMPILE_MONOLITHIC)
+        return()
+    endif(VIT_COMPILE_MONOLITHIC)
+
     if(WIN32)
         add_custom_command(
             TARGET ${TARGET_NAME}
