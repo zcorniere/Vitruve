@@ -224,16 +224,15 @@ function(vit_copy_dlls_to_target_dir TARGET_NAME)
             COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${TARGET_NAME}> $<TARGET_RUNTIME_DLLS:${TARGET_NAME}>
             COMMAND_EXPAND_LISTS
         )
-    else()
-        # Copy all additional DLL/shared library targets passed after TARGET_NAME
-        foreach(DLL_TARGET IN LISTS ARGN)
-            set_target_properties(
-                ${TARGET_NAME}
-                PROPERTIES
-                    BUILD_RPATH
-                    "\$ORIGIN/$<PATH:RELATIVE_PATH,$<TARGET_FILE_DIR:${DLL_TARGET}>,$<TARGET_FILE_DIR:${TARGET_NAME}>>"
-            )
-        endforeach()
+    elseif(UNIX)
+        set_target_properties(${TARGET_NAME} PROPERTIES BUILD_RPATH "\$ORIGIN")
+
+        add_custom_command(
+            TARGET ${TARGET_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_SOURCE_DIR}/cmake/copy_runtime_deps.sh $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${ARGN}>
+            COMMAND_EXPAND_LISTS
+        )
     endif()
 endfunction(vit_copy_dlls_to_target_dir)
 
