@@ -18,9 +18,12 @@ FModuleManager::~FModuleManager()
 {
     for (auto& [Name, Holder]: Modules)
     {
-        Holder.Module->ShutdownModule();
-        // Remove our module object
-        delete Holder.Module;
+        if (Holder.Module)
+        {
+            Holder.Module->ShutdownModule();
+            // Remove our module object
+            delete Holder.Module;
+        }
 
         if (Holder.LibraryHolder)
         {
