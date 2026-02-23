@@ -1,6 +1,6 @@
 [submodule "External/logger-cpp"]
 	path = Engine/External/logger-cpp
-	url = https://github.com/zcorniere/logger-cpp.git
+	url = https://git.corniere.me/zcorniere/logger-cpp.git
 [submodule "External/tracy"]
 	path = External/tracy
 	url = https://github.com/wolfpld/tracy.git
