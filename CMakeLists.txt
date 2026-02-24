@@ -10,7 +10,7 @@ if(EXISTS "${LOC_PATH}")
     )
 endif()
 
-option(BUILD_TESTING "Build the unit tests" ON)
+option(VIT_BUILD_TESTING "Build the unit tests" ON)
 
 include(CheckIPOSupported)
 include(GNUInstallDirs)
