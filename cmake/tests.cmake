@@ -2,6 +2,7 @@
 
 if(VIT_BUILD_TESTING)
     set(BUILD_TESTING ON)
+    enable_testing()
 endif(VIT_BUILD_TESTING)
 
 function(build_tests TARGET)
