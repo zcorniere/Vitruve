@@ -15,6 +15,7 @@ function(build_tests TARGET)
     add_executable(${TEST_NAME} ${ARGN})
     target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/)
     target_link_libraries(${TEST_NAME} PRIVATE Catch2::Catch2WithMain ${TARGET})
+    target_disable_rtti(${TEST_NAME})
     add_dependencies(tests ${TEST_NAME})
 
     add_custom_command(
