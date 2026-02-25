@@ -129,6 +129,7 @@ build_tests(
     tests/Math/Matrix.cxx
     tests/Math/Transform.cxx
     tests/Math/ViewPoint.cxx
+    tests/Core/RTTI/RObject.cxx
     tests/Core/RTTI/RTTI.cxx
     tests/Core/RTTI/RTTIParameter.cxx
     tests/CommandLine.cxx
