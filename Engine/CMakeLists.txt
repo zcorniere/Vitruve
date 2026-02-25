@@ -132,6 +132,7 @@ build_tests(
     tests/Core/RTTI/RTTI.cxx
     tests/Core/RTTI/RTTIParameter.cxx
     tests/CommandLine.cxx
+    tests/Delegate.cxx
 )
 target_precompile_headers(
     ${PROJECT_NAME}_Test
