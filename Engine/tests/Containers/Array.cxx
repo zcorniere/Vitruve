@@ -16,20 +16,20 @@ TEST_CASE("Array: Basic Operation")
     CHECK(TestVec.IsEmpty());
     CHECK(TestVec.Size() == 0);
 
-    CHECK_NOTHROW(TestVec.Add(Value1));
-    CHECK_NOTHROW(TestVec.Size() == 1);
-    CHECK_NOTHROW(TestVec[0] == Value1);
+    CHECK(TestVec.Add(Value1) == Value1);
+    CHECK(TestVec.Size() == 1);
+    CHECK(TestVec[0] == Value1);
 
-    CHECK_NOTHROW(TestVec.Add(Value2));
-    CHECK_NOTHROW(TestVec.Size() == 2);
-    CHECK_NOTHROW(TestVec[0] == Value1);
-    CHECK_NOTHROW(TestVec[1] == Value2);
+    CHECK(TestVec.Add(Value2) == Value2);
+    CHECK(TestVec.Size() == 2);
+    CHECK(TestVec[0] == Value1);
+    CHECK(TestVec[1] == Value2);
 
-    CHECK_NOTHROW(TestVec.Emplace(Value3));
-    CHECK_NOTHROW(TestVec.Size() == 3);
-    CHECK_NOTHROW(TestVec[0] == Value1);
-    CHECK_NOTHROW(TestVec[1] == Value2);
-    CHECK_NOTHROW(TestVec[2] == Value3);
+    CHECK(TestVec.Emplace(Value3) == Value3);
+    CHECK(TestVec.Size() == 3);
+    CHECK(TestVec[0] == Value1);
+    CHECK(TestVec[1] == Value2);
+    CHECK(TestVec[2] == Value3);
 
     const std::string String = std::format("{}", TestVec);
     const std::string ExpectedString = std::format("[{0}, {1}, {2}]", Value1, Value2, Value3);
@@ -37,29 +37,29 @@ TEST_CASE("Array: Basic Operation")
 
     SECTION("Test positive Resize")
     {
-        CHECK_NOTHROW(TestVec.Resize(20));
+        TestVec.Resize(20);
         REQUIRE(TestVec.Size() == 20);
 
-        CHECK_NOTHROW(TestVec[0] == Value1);
-        CHECK_NOTHROW(TestVec.Add(100));
-        CHECK_NOTHROW(TestVec[20] == 100);
+        CHECK(TestVec[0] == Value1);
+        CHECK(TestVec.Add(100) == 100);
+        CHECK(TestVec[20] == 100);
     }
 
     SECTION("Test Negative resize")
     {
-        CHECK_NOTHROW(TestVec.Resize(20));
+        TestVec.Resize(20);
         REQUIRE(TestVec.Size() == 20);
 
-        CHECK_NOTHROW(TestVec[0] == Value1);
-        CHECK_NOTHROW(TestVec[1] == Value2);
-        CHECK_NOTHROW(TestVec[2] == Value3);
+        CHECK(TestVec[0] == Value1);
+        CHECK(TestVec[1] == Value2);
+        CHECK(TestVec[2] == Value3);
         for (unsigned Index = 3; Index < TestVec.Size(); Index++)
         {
-            CHECK_NOTHROW(TestVec[Index] == 0);
+            CHECK(TestVec[Index] == 0);
         }
 
-        CHECK_NOTHROW(TestVec.Add(Value4));
-        CHECK_NOTHROW(TestVec[20] == Value4);
+        CHECK(TestVec.Add(Value4) == Value4);
+        CHECK(TestVec[20] == Value4);
     }
 
     SECTION("Test Append")
@@ -151,9 +151,9 @@ TEST_CASE("Array: Test Advanced Type")
 
     TArray<ComplexType> Vec2;
     Vec2.Emplace(&DtorCounter);
-    Vec2.Add(*TestType);
+    CHECK(Vec2.Add(*TestType) == *TestType);
 
-    CHECK_NOTHROW(Vec2.Size() == 2);
+    CHECK(Vec2.Size() == 2);
     REQUIRE(DtorCounter == 2 + 1);    // 1 for TestType, 2 for Vec2
 
     SECTION("Test Append")
@@ -207,9 +207,9 @@ TEST_CASE("Array: Test Find function")
     {
         REQUIRE(!TestVec.IsEmpty());
         REQUIRE(TestVec.Size() == 3);
-        REQUIRE_NOTHROW(TestVec[0] == Value1);
-        REQUIRE_NOTHROW(TestVec[1] == Value2);
-        REQUIRE_NOTHROW(TestVec[2] == Value3);
+        REQUIRE(TestVec[0] == Value1);
+        REQUIRE(TestVec[1] == Value2);
+        REQUIRE(TestVec[2] == Value3);
     }
 
     SECTION("Test Find()")

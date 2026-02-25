@@ -329,9 +329,8 @@ public:
         const TSize LastIndex = ArraySize > 0 ? ArraySize : 0;
         T* const Ptr = Data + LastIndex;
         CopyItems(Ptr, &Value, 1);
-        T& Item = Back();
         ArraySize++;
-        return Item;
+        return *Ptr;
     }
 
     /// Add an element to the end of the array by copying it
