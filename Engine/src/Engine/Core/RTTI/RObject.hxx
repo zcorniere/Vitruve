@@ -21,11 +21,11 @@ ENGINE_API void AddToLiveReferences(RObject* instance);
 /// Mark the RObject as dead
 ENGINE_API void RemoveFromLiveReferences(RObject* instance);
 /// Is the RObject live ?
-ENGINE_API bool IsLive(RObject* instance);
+ENGINE_API int IsLive(RObject* instance);
 
 /// @brief check is there is any live RObject
 /// @return true is a RObject was not deleted
-bool AreThereAnyLiveObject(bool bPrintObjects = true);
+ENGINE_API bool AreThereAnyLiveObject(bool bPrintObjects = true);
 
 }    // namespace RObjectUtils
 
@@ -71,7 +71,7 @@ public:
     }
 
     /// Get the current ref count
-     std::uint32_t GetRefCount() const
+    std::uint32_t GetRefCount() const
     {
         return m_RefCount.load(std::memory_order_relaxed);
     }

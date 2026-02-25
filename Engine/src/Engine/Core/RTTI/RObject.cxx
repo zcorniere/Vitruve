@@ -23,11 +23,16 @@ void RObjectUtils::RemoveFromLiveReferences(RObject* instance)
     s_LiveReferences.erase(instance);
 }
 
-bool RObjectUtils::IsLive(RObject* instance)
+int RObjectUtils::IsLive(RObject* instance)
 {
     check(instance);
     std::shared_lock lock(s_LiveReferenceMutex);
-    return s_LiveReferences.find(instance) != s_LiveReferences.end();
+    auto Iter = s_LiveReferences.find(instance);
+    if (Iter != s_LiveReferences.end())
+    {
+        return (*Iter)->GetRefCount();
+    }
+    return 0;
 }
 
 bool RObjectUtils::AreThereAnyLiveObject(bool bPrintObjects)
