@@ -124,10 +124,6 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
         __m512d SY = _mm512_load_pd(ScaleY + i);
         __m512d SZ = _mm512_load_pd(ScaleZ + i);
 
-        __m512d PX = _mm512_load_pd(PositionX + i);
-        __m512d PY = _mm512_load_pd(PositionY + i);
-        __m512d PZ = _mm512_load_pd(PositionZ + i);
-
         // Precompute products for rotation matrix ---
         __m512d xx = _mm512_mul_pd(X, X);
         __m512d yy = _mm512_mul_pd(Y, Y);
@@ -188,9 +184,9 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
             M[11] = 0.0f;
 
             // Row 3 (translation)
-            M[12] = PX[j];
-            M[13] = PY[j];
-            M[14] = PZ[j];
+            M[12] = PositionX[i + j];
+            M[13] = PositionY[i + j];
+            M[14] = PositionZ[i + j];
             M[15] = 1.0f;
         }
     }
