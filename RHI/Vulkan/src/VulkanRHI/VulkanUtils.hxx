@@ -66,26 +66,35 @@ FORCEINLINE VkFormat VertexElementToFormat(const EVertexElementType Type)
         case EVertexElementType::Float1:
             return VK_FORMAT_R32_SFLOAT;
         case EVertexElementType::Float2:
+        case EVertexElementType::Float2x2:
             return VK_FORMAT_R32G32_SFLOAT;
         case EVertexElementType::Float3:
+        case EVertexElementType::Float3x3:
             return VK_FORMAT_R32G32B32_SFLOAT;
         case EVertexElementType::Float4:
+        case EVertexElementType::Float4x4:
             return VK_FORMAT_R32G32B32A32_SFLOAT;
         case EVertexElementType::Uint1:
             return VK_FORMAT_R32_UINT;
         case EVertexElementType::Uint2:
+        case EVertexElementType::Uint2x2:
             return VK_FORMAT_R32G32_UINT;
         case EVertexElementType::Uint3:
+        case EVertexElementType::Uint3x3:
             return VK_FORMAT_R32G32B32_UINT;
         case EVertexElementType::Uint4:
+        case EVertexElementType::Uint4x4:
             return VK_FORMAT_R32G32B32A32_UINT;
         case EVertexElementType::Int1:
             return VK_FORMAT_R32_SINT;
         case EVertexElementType::Int2:
+        case EVertexElementType::Int2x2:
             return VK_FORMAT_R32G32_SINT;
         case EVertexElementType::Int3:
+        case EVertexElementType::Int3x3:
             return VK_FORMAT_R32G32B32_SINT;
         case EVertexElementType::Int4:
+        case EVertexElementType::Int4x4:
             return VK_FORMAT_R32G32B32A32_SINT;
     }
     checkNoEntry();

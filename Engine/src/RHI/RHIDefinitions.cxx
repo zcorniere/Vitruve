@@ -30,6 +30,27 @@ uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
             return sizeof(int32) * 3;
         case EVertexElementType::Int4:
             return sizeof(int32) * 4;
+
+        case EVertexElementType::Float2x2:
+            return sizeof(float) * 2 * 2;
+        case EVertexElementType::Float3x3:
+            return sizeof(float) * 3 * 3;
+        case EVertexElementType::Float4x4:
+            return sizeof(float) * 4 * 4;
+
+        case EVertexElementType::Uint2x2:
+            return sizeof(uint32) * 2 * 2;
+        case EVertexElementType::Uint3x3:
+            return sizeof(uint32) * 3 * 3;
+        case EVertexElementType::Uint4x4:
+            return sizeof(uint32) * 4 * 4;
+
+        case EVertexElementType::Int2x2:
+            return sizeof(int32) * 2 * 2;
+        case EVertexElementType::Int3x3:
+            return sizeof(int32) * 3 * 3;
+        case EVertexElementType::Int4x4:
+            return sizeof(int32) * 4 * 4;
     }
     checkNoEntry();
     return 0;

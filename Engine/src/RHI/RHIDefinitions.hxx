@@ -33,6 +33,15 @@ enum class EVertexElementType : uint8
     Int2,
     Int3,
     Int4,
+    Float2x2,
+    Float3x3,
+    Float4x4,
+    Uint2x2,
+    Uint3x3,
+    Uint4x4,
+    Int2x2,
+    Int3x3,
+    Int4x4,
 };
 
 /// @brief The input mode of the vertex

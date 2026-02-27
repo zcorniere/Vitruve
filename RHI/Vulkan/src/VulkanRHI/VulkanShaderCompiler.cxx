@@ -143,25 +143,40 @@ namespace Utils
 
     static std::optional<EVertexElementType> SPRIVTypeToVertexElement(const spirv_cross::SPIRType& Type)
     {
-#define SPIRV_CONVERT_VEC(SpirvType, RaphTypePrefix)                                      \
-    case spirv_cross::SpirvType:                                                          \
-    {                                                                                     \
-        if (!ensureMsg(Type.columns == 1, "Shader stage IO matrices is not supported !")) \
-        {                                                                                 \
-            return std::nullopt;                                                          \
-        }                                                                                 \
-        switch (Type.vecsize)                                                             \
-        {                                                                                 \
-            case 1:                                                                       \
-                return EVertexElementType::RaphTypePrefix##1;                             \
-            case 2:                                                                       \
-                return EVertexElementType::RaphTypePrefix##2;                             \
-            case 3:                                                                       \
-                return EVertexElementType::RaphTypePrefix##3;                             \
-            case 4:                                                                       \
-                return EVertexElementType::RaphTypePrefix##4;                             \
-        }                                                                                 \
-        checkNoEntry();                                                                   \
+#define SPIRV_CONVERT_VEC(SpirvType, RaphTypePrefix)                \
+    case spirv_cross::SpirvType:                                    \
+    {                                                               \
+        if (Type.columns == 1)                                      \
+        {                                                           \
+            switch (Type.vecsize)                                   \
+            {                                                       \
+                case 1:                                             \
+                    return EVertexElementType::RaphTypePrefix##1;   \
+                case 2:                                             \
+                    return EVertexElementType::RaphTypePrefix##2;   \
+                case 3:                                             \
+                    return EVertexElementType::RaphTypePrefix##3;   \
+                case 4:                                             \
+                    return EVertexElementType::RaphTypePrefix##4;   \
+                default:                                            \
+                    checkNoEntry();                                 \
+            }                                                       \
+        }                                                           \
+        else                                                        \
+        {                                                           \
+            check(Type.vecsize == Type.columns);                    \
+            switch (Type.vecsize)                                   \
+            {                                                       \
+                case 2:                                             \
+                    return EVertexElementType::RaphTypePrefix##2x2; \
+                case 3:                                             \
+                    return EVertexElementType::RaphTypePrefix##3x3; \
+                case 4:                                             \
+                    return EVertexElementType::RaphTypePrefix##4x4; \
+                default:                                            \
+                    checkNoEntry();                                 \
+            }                                                       \
+        }                                                           \
     }
 
         switch (Type.basetype)
