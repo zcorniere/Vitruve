@@ -10,10 +10,9 @@ layout(location = 1) out vec3 outNormal;
 
 void main()
 {
-    mat4 Matrix = GetTransformMatrix();
     outPosition = inPosition;
     outNormal = inNormal;
 
-    vec4 worldPosition = Matrix * vec4(inPosition, 1.0);
+    vec4 worldPosition = inTransformMatrix * vec4(inPosition, 1.0);
     gl_Position = u_Camera.Viewproj * worldPosition;
 }
