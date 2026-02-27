@@ -8,6 +8,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
@@ -220,4 +221,42 @@ TEMPLATE_TEST_CASE("Transform Matrices", "[Math][Transform]", float, double)
             }
         }
     }
+}
+
+TEMPLATE_TEST_CASE("ModelMatrix SIMD Benchmark", "[Math][Transform][benchmark][no_ci]", float, double)
+{
+    constexpr size_t Count = 4096;
+    alignas(64) TestType PX[Count], PY[Count], PZ[Count];
+    alignas(64) TestType QX[Count], QY[Count], QZ[Count], QW[Count];
+    alignas(64) TestType SX[Count], SY[Count], SZ[Count];
+    alignas(64) TestType OutModelMatrix[Count * 16];
+
+    // Fill input arrays
+    for (size_t i = 0; i < Count; ++i)
+    {
+        PX[i] = PY[i] = PZ[i] = 1.0f;
+        QX[i] = QY[i] = QZ[i] = 0.0f;
+        QW[i] = 1.0f;
+        SX[i] = SY[i] = SZ[i] = 1.0f;
+    }
+
+    BENCHMARK("AVX2 ModelMatrix")
+    {
+        if (!FPlatformMisc::GetCPUInformation().AVX2)
+        {
+            SKIP("AVX2 is not supported on this CPU");
+        }
+
+        return Math::ComputeModelMatrixBatch_AVX2(Count, PX, PY, PZ, QX, QY, QZ, QW, SX, SY, SZ, OutModelMatrix);
+    };
+
+    BENCHMARK("AVX512 ModelMatrix")
+    {
+        if (!FPlatformMisc::GetCPUInformation().AVX512)
+        {
+            SKIP("AVX512 is not supported on this CPU");
+        }
+
+        return Math::ComputeModelMatrixBatch_AVX512(Count, PX, PY, PZ, QX, QY, QZ, QW, SX, SY, SZ, OutModelMatrix);
+    };
 }
