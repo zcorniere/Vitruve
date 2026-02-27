@@ -15,6 +15,8 @@ struct FCPUInformation
     bool AVX512 = false;
     // Is the AVX2 extension supported ?
     bool AVX2 = false;
+    // IS the FMA extension supported ?
+    bool FMA = false;
     // Is the AES extension supported ?
     bool AES = false;
 };

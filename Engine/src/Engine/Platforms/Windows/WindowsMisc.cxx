@@ -114,6 +114,13 @@ bool SupportAVX2()
     return (Reg[1] & (1 << 5)) != 0;    // AVX2 is bit 5 of EBX
 }
 
+static bool SupportFMA()
+{
+    int Reg[4];
+    __cpuid(Reg, 1);
+    return (Reg[2] & (1 << 12)) != 0;    // FMA is bit 12 of ECX
+}
+
 const FCPUInformation& FWindowsMisc::GetCPUInformation()
 {
     static FCPUInformation Informations = {};
@@ -130,6 +137,7 @@ const FCPUInformation& FWindowsMisc::GetCPUInformation()
     Informations.AES = SupportAES();
     Informations.AVX2 = SupportAVX2();
     Informations.AVX512 = SupportAVX512();
+    Informations.FMA = SupportFMA();
     return Informations;
 }
 // ------------------ Windows External Module --------------------------

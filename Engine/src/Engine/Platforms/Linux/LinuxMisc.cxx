@@ -128,6 +128,12 @@ static bool SupportAVX2()
     __cpuid_count(7, 0, eax, ebx, ecx, edx);
     return (ebx & (1 << 5)) != 0;    // AVX2 is bit 5 of EBX
 }
+static bool SupportFMA()
+{
+    unsigned int eax, ebx, ecx, edx;
+    __cpuid(1, eax, ebx, ecx, edx);
+    return (ecx & (1 << 12)) != 0;    // FMA is bit 12 of ECX
+}
 
 const FCPUInformation& FLinuxMisc::GetCPUInformation()
 {
@@ -143,6 +149,7 @@ const FCPUInformation& FLinuxMisc::GetCPUInformation()
     Info.AVX512 = SupportAVX512();
     Info.AVX2 = SupportAVX2();
     Info.AES = SupportAES();
+    Info.FMA = SupportFMA();
 
     return Info;
 }

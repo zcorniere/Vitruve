@@ -22,6 +22,7 @@ FEngine::FEngine()
     const FCPUInformation& CPUInfo = FPlatformMisc::GetCPUInformation();
     LOG(LogEngine, Info, "Running on {:s} ({:s})", CPUInfo.Vendor, CPUInfo.Brand);
     LOG(LogEngine, Info, "CPU features: ");
+    LOG(LogEngine, Info, "- FMA is {}available", CPUInfo.FMA ? "" : "not ");
     LOG(LogEngine, Info, "- AVX2 is {}available", CPUInfo.AVX2 ? "" : "not ");
     LOG(LogEngine, Info, "- AVX512 is {}available", CPUInfo.AVX512 ? "" : "not ");
 }
