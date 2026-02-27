@@ -6,7 +6,7 @@ namespace Math
 {
 
 template <>
-[[gnu::target("avx2")]]
+[[gnu::target("avx2,fma")]]
 ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTRICT PositionX,
                                                const double* RESTRICT PositionY, const double* RESTRICT PositionZ,
                                                const double* RESTRICT QuaternionX, const double* RESTRICT QuaternionY,
@@ -14,7 +14,12 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
                                                const double* RESTRICT ScaleX, const double* RESTRICT ScaleY,
                                                const double* RESTRICT ScaleZ, double* RESTRICT OutModelMatrix)
 {
-    VIT_PROFILE_FUNC()
+    VIT_PROFILE_FUNC();
+
+    const __m256d one = _mm256_set1_pd(1.0f);
+    const __m256d two = _mm256_set1_pd(2.0f);
+    const __m256d zero = _mm256_setzero_pd();
+
     size_t i = 0;
     for (; i + 3 < Count; i += 4)
     {
@@ -25,8 +30,6 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
         const __m256d SX = _mm256_load_pd(ScaleX + i);
         const __m256d SY = _mm256_load_pd(ScaleY + i);
         const __m256d SZ = _mm256_load_pd(ScaleZ + i);
-        const __m256d one = _mm256_set1_pd(1.0f);
-        const __m256d two = _mm256_set1_pd(2.0f);
 
         const __m256d xx = _mm256_mul_pd(X, X);
         const __m256d yy = _mm256_mul_pd(Y, Y);
@@ -38,31 +41,34 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
         const __m256d wy = _mm256_mul_pd(W, Y);
         const __m256d wz = _mm256_mul_pd(W, Z);
 
-        // MATCH SCALAR VERSION!
-        __m256d m00 = _mm256_sub_pd(one, _mm256_mul_pd(two, _mm256_add_pd(yy, zz)));
-        __m256d m01 = _mm256_mul_pd(two, _mm256_add_pd(xy, wz));
-        __m256d m02 = _mm256_mul_pd(two, _mm256_sub_pd(xz, wy));
+        // Compute rotation matrix elements with FMA
+        // Using fnmadd_pd for -(a*b)+c and fmadd_pd for a*b+c
+        __m256d m00 = _mm256_fnmadd_pd(two, _mm256_add_pd(yy, zz), one);    // 1 - 2*(yy+zz)
+        __m256d m01 = _mm256_fmadd_pd(two, _mm256_add_pd(xy, wz), zero);    // 2*(xy + wz)
+        __m256d m02 = _mm256_fmadd_pd(two, _mm256_sub_pd(xz, wy), zero);    // 2*(xz - wy)
 
-        __m256d m10 = _mm256_mul_pd(two, _mm256_sub_pd(xy, wz));
-        __m256d m11 = _mm256_sub_pd(one, _mm256_mul_pd(two, _mm256_add_pd(xx, zz)));
-        __m256d m12 = _mm256_mul_pd(two, _mm256_add_pd(yz, wx));
+        __m256d m10 = _mm256_fmadd_pd(two, _mm256_sub_pd(xy, wz), zero);    // 2*(xy - wz)
+        __m256d m11 = _mm256_fnmadd_pd(two, _mm256_add_pd(xx, zz), one);    // 1 - 2*(xx + zz)
+        __m256d m12 = _mm256_fmadd_pd(two, _mm256_add_pd(yz, wx), zero);    // 2*(yz + wx)
 
-        __m256d m20 = _mm256_mul_pd(two, _mm256_add_pd(xz, wy));
-        __m256d m21 = _mm256_mul_pd(two, _mm256_sub_pd(yz, wx));
-        __m256d m22 = _mm256_sub_pd(one, _mm256_mul_pd(two, _mm256_add_pd(xx, yy)));
+        __m256d m20 = _mm256_fmadd_pd(two, _mm256_add_pd(xz, wy), zero);    // 2*(xz + wy)
+        __m256d m21 = _mm256_fmadd_pd(two, _mm256_sub_pd(yz, wx), zero);    // 2*(yz - wx)
+        __m256d m22 = _mm256_fnmadd_pd(two, _mm256_add_pd(xx, yy), one);    // 1 - 2*(xx + yy)
 
         // Apply scale
         m00 = _mm256_mul_pd(m00, SX);
         m01 = _mm256_mul_pd(m01, SX);
         m02 = _mm256_mul_pd(m02, SX);
+
         m10 = _mm256_mul_pd(m10, SY);
         m11 = _mm256_mul_pd(m11, SY);
         m12 = _mm256_mul_pd(m12, SY);
+
         m20 = _mm256_mul_pd(m20, SZ);
         m21 = _mm256_mul_pd(m21, SZ);
         m22 = _mm256_mul_pd(m22, SZ);
 
-        // Store each matrix (row-major, 4x4)
+        // Store 8 matrices
         for (int j = 0; j < 4; ++j)
         {
             double* M = OutModelMatrix + (i + j) * 16;
@@ -87,6 +93,7 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
             M[15] = 1.0f;
         }
     }
+
     return i;
 }
 
@@ -99,42 +106,52 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
                                                  const double* RESTRICT ScaleX, const double* RESTRICT ScaleY,
                                                  const double* RESTRICT ScaleZ, double* RESTRICT OutModelMatrix)
 {
-    VIT_PROFILE_FUNC()
+    VIT_PROFILE_FUNC();
     size_t i = 0;
+
+    const __m512d one = _mm512_set1_pd(1.0f);
+    const __m512d two = _mm512_set1_pd(2.0f);
+    const __m512d zero = _mm512_setzero_pd();
+
     for (; i + 7 < Count; i += 8)
     {
-        const __m512d X = _mm512_load_pd(QuaternionX + i);
-        const __m512d Y = _mm512_load_pd(QuaternionY + i);
-        const __m512d Z = _mm512_load_pd(QuaternionZ + i);
-        const __m512d W = _mm512_load_pd(QuaternionW + i);
-        const __m512d SX = _mm512_load_pd(ScaleX + i);
-        const __m512d SY = _mm512_load_pd(ScaleY + i);
-        const __m512d SZ = _mm512_load_pd(ScaleZ + i);
-        const __m512d one = _mm512_set1_pd(1.0f);
-        const __m512d two = _mm512_set1_pd(2.0f);
+        __m512d X = _mm512_load_pd(QuaternionX + i);
+        __m512d Y = _mm512_load_pd(QuaternionY + i);
+        __m512d Z = _mm512_load_pd(QuaternionZ + i);
+        __m512d W = _mm512_load_pd(QuaternionW + i);
 
-        const __m512d xx = _mm512_mul_pd(X, X);
-        const __m512d yy = _mm512_mul_pd(Y, Y);
-        const __m512d zz = _mm512_mul_pd(Z, Z);
-        const __m512d xy = _mm512_mul_pd(X, Y);
-        const __m512d xz = _mm512_mul_pd(X, Z);
-        const __m512d yz = _mm512_mul_pd(Y, Z);
-        const __m512d wx = _mm512_mul_pd(W, X);
-        const __m512d wy = _mm512_mul_pd(W, Y);
-        const __m512d wz = _mm512_mul_pd(W, Z);
+        __m512d SX = _mm512_load_pd(ScaleX + i);
+        __m512d SY = _mm512_load_pd(ScaleY + i);
+        __m512d SZ = _mm512_load_pd(ScaleZ + i);
 
-        // MATCH SCALAR VERSION!
-        __m512d m00 = _mm512_sub_pd(one, _mm512_mul_pd(two, _mm512_add_pd(yy, zz)));
-        __m512d m01 = _mm512_mul_pd(two, _mm512_add_pd(xy, wz));
-        __m512d m02 = _mm512_mul_pd(two, _mm512_sub_pd(xz, wy));
+        __m512d PX = _mm512_load_pd(PositionX + i);
+        __m512d PY = _mm512_load_pd(PositionY + i);
+        __m512d PZ = _mm512_load_pd(PositionZ + i);
 
-        __m512d m10 = _mm512_mul_pd(two, _mm512_sub_pd(xy, wz));
-        __m512d m11 = _mm512_sub_pd(one, _mm512_mul_pd(two, _mm512_add_pd(xx, zz)));
-        __m512d m12 = _mm512_mul_pd(two, _mm512_add_pd(yz, wx));
+        // Precompute products for rotation matrix ---
+        __m512d xx = _mm512_mul_pd(X, X);
+        __m512d yy = _mm512_mul_pd(Y, Y);
+        __m512d zz = _mm512_mul_pd(Z, Z);
+        __m512d xy = _mm512_mul_pd(X, Y);
+        __m512d xz = _mm512_mul_pd(X, Z);
+        __m512d yz = _mm512_mul_pd(Y, Z);
+        __m512d wx = _mm512_mul_pd(W, X);
+        __m512d wy = _mm512_mul_pd(W, Y);
+        __m512d wz = _mm512_mul_pd(W, Z);
 
-        __m512d m20 = _mm512_mul_pd(two, _mm512_add_pd(xz, wy));
-        __m512d m21 = _mm512_mul_pd(two, _mm512_sub_pd(yz, wx));
-        __m512d m22 = _mm512_sub_pd(one, _mm512_mul_pd(two, _mm512_add_pd(xx, yy)));
+        // Compute rotation matrix elements with FMA
+        // Using fnmadd_pd for -(a*b)+c and fmadd_pd for a*b+c
+        __m512d m00 = _mm512_fnmadd_pd(two, _mm512_add_pd(yy, zz), one);    // 1 - 2*(yy+zz)
+        __m512d m01 = _mm512_fmadd_pd(two, _mm512_add_pd(xy, wz), zero);    // 2*(xy + wz)
+        __m512d m02 = _mm512_fmadd_pd(two, _mm512_sub_pd(xz, wy), zero);    // 2*(xz - wy)
+
+        __m512d m10 = _mm512_fmadd_pd(two, _mm512_sub_pd(xy, wz), zero);    // 2*(xy - wz)
+        __m512d m11 = _mm512_fnmadd_pd(two, _mm512_add_pd(xx, zz), one);    // 1 - 2*(xx + zz)
+        __m512d m12 = _mm512_fmadd_pd(two, _mm512_add_pd(yz, wx), zero);    // 2*(yz + wx)
+
+        __m512d m20 = _mm512_fmadd_pd(two, _mm512_add_pd(xz, wy), zero);    // 2*(xz + wy)
+        __m512d m21 = _mm512_fmadd_pd(two, _mm512_sub_pd(yz, wx), zero);    // 2*(yz - wx)
+        __m512d m22 = _mm512_fnmadd_pd(two, _mm512_add_pd(xx, yy), one);    // 1 - 2*(xx + yy)
 
         // Apply scale
         m00 = _mm512_mul_pd(m00, SX);
@@ -147,31 +164,38 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
         m21 = _mm512_mul_pd(m21, SZ);
         m22 = _mm512_mul_pd(m22, SZ);
 
-        // Store each matrix (row-major, 4x4)
+        // Store each matrix lane by lane into AoS buffer
         for (int j = 0; j < 8; ++j)
         {
-            double* M = OutModelMatrix + (i + j) * 16;
+            double* M = OutModelMatrix + (i + j) * 16;    // 4x4 row-major
+
+            // Row 0
             M[0] = ((double*)&m00)[j];
             M[1] = ((double*)&m01)[j];
             M[2] = ((double*)&m02)[j];
             M[3] = 0.0f;
 
+            // Row 1
             M[4] = ((double*)&m10)[j];
             M[5] = ((double*)&m11)[j];
             M[6] = ((double*)&m12)[j];
             M[7] = 0.0f;
 
+            // Row 2
             M[8] = ((double*)&m20)[j];
             M[9] = ((double*)&m21)[j];
             M[10] = ((double*)&m22)[j];
             M[11] = 0.0f;
 
-            M[12] = PositionX[i + j];
-            M[13] = PositionY[i + j];
-            M[14] = PositionZ[i + j];
+            // Row 3 (translation)
+            M[12] = PX[j];
+            M[13] = PY[j];
+            M[14] = PZ[j];
             M[15] = 1.0f;
         }
     }
-    return i;
+
+    return i;    // Number of matrices processed
 }
+
 }    // namespace Math
