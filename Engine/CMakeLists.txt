@@ -88,6 +88,7 @@ target_link_libraries(
            glfw
            imgui
            ModernDialogs
+           slang::slang
 )
 
 if(VIT_COMPILE_MONOLITHIC)

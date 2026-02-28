@@ -14,6 +14,7 @@ option(VIT_BUILD_TESTING "Build the unit tests" ON)
 
 include(CheckIPOSupported)
 include(GNUInstallDirs)
+include(FetchContent)
 include(cmake/tests.cmake)
 include(cmake/find_linker.cmake)
 include(cmake/CompileShaders.cmake)
@@ -233,7 +234,7 @@ function(vit_copy_dlls_to_target_dir TARGET_NAME)
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${TARGET_NAME}> $<TARGET_FILE:${ARGN}>
             COMMAND_EXPAND_LISTS
-        )   
+        )
     elseif(UNIX)
         set_target_properties(${TARGET_NAME} PROPERTIES BUILD_RPATH "\$ORIGIN")
 

@@ -39,7 +39,7 @@ set(MI_BUILD_OBJECT
     OFF
     CACHE INTERNAL "" FORCE
 )
-set(MI_WIN_REDIRECT 
+set(MI_WIN_REDIRECT
     OFF
     CACHE INTERNAL "" FORCE
 )
@@ -70,10 +70,7 @@ set(GLFW_LIBRARY_TYPE
     CACHE STRING "" FORCE
 )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glfw EXCLUDE_FROM_ALL)
-if(VIT_SELECTED_RHI STREQUAL "Vulkan")
-    target_link_libraries(glfw INTERFACE Vulkan::Headers)
-    target_compile_definitions(glfw INTERFACE GLFW_INCLUDE_NONE)
-endif()
+target_compile_definitions(glfw INTERFACE GLFW_INCLUDE_NONE)
 
 # Modern Dialogs
 add_library(
@@ -86,3 +83,32 @@ target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Mode
 
 # glm
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glm EXCLUDE_FROM_ALL)
+
+# slang
+set(SLANG_VERSION "2026.3.1")
+
+if(WIN32)
+    set(SLANG_ARCHIVE "slang-${SLANG_VERSION}-windows-x86_64.zip")
+    set(SLANG_HASH "47faf59a4966dcf636b758f103941be7113e9d43c10ee6e8697de7663bcfc51f")
+elseif(UNIX)
+    set(SLANG_ARCHIVE "slang-${SLANG_VERSION}-linux-x86_64.tar.gz")
+    set(SLANG_HASH "5a3618768f3472cc32f8ef59f5c1e3dedabada6d0d92d5b84508bd5eb10a5e01")
+else()
+    message(FATAL_ERROR "Platform not supported !")
+endif()
+
+fetchcontent_declare(
+    slang
+    URL "https://github.com/shader-slang/slang/releases/download/v${SLANG_VERSION}/${SLANG_ARCHIVE}"
+    URL_HASH SHA256=${SLANG_HASH}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+
+fetchcontent_makeavailable(slang)
+fetchcontent_getproperties(slang)
+
+add_library(slang::slang SHARED IMPORTED GLOBAL)
+set_target_properties(
+    slang::slang PROPERTIES IMPORTED_LOCATION "${slang_SOURCE_DIR}/lib/libslang.so" INTERFACE_INCLUDE_DIRECTORIES
+                                                                                    "${slang_SOURCE_DIR}/include"
+)
