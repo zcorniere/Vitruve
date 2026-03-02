@@ -112,3 +112,50 @@ set_target_properties(
     slang::slang PROPERTIES IMPORTED_LOCATION "${slang_SOURCE_DIR}/lib/libslang.so" INTERFACE_INCLUDE_DIRECTORIES
                                                                                     "${slang_SOURCE_DIR}/include"
 )
+
+# SPIRV-Cross
+set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS
+    ON
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_TESTS
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_CLI
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_GLSL
+    ON
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_HLSL
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_MSL
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_CPP
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_REFLECT
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_C_API
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_ENABLE_UTIL
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(SPIRV_CROSS_FORCE_PIC
+    ON
+    CACHE BOOL "" FORCE
+)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/SPIRV-Cross EXCLUDE_FROM_ALL)

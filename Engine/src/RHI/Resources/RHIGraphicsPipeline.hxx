@@ -20,8 +20,7 @@ enum class EPrimitiveTopology
 
 struct FRHIGraphicsPipelineSpecification
 {
-    std::string VertexShader;
-    std::string FragmentShader;
+    std::string Shader;
 
     struct FVertexBufferLayout
     {

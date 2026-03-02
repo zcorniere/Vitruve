@@ -6,7 +6,6 @@
 #include "Engine/Core/Engine.hxx"
 #include "Engine/Misc/Utils.hxx"
 
-#include "Engine/Modules/ModuleManager.hxx"
 #include "Engine/Platforms/PlatformMisc.hxx"
 
 #include "VulkanRHI/Resources/VulkanViewport.hxx"
@@ -16,7 +15,6 @@
 #include "VulkanRHI/VulkanLoader.hxx"
 #include "VulkanRHI/VulkanPlatform.hxx"
 #include "VulkanRHI/VulkanQueue.hxx"
-#include "VulkanRHI/VulkanShaderCompiler.hxx"
 #include "VulkanRHI/VulkanUtils.hxx"
 
 #include "Engine/Core/Memory/Memory.hxx"
@@ -52,7 +50,7 @@ static std::string GetMissingExtensions(const VulkanRHI::FVulkanPlatform& Platfo
 namespace VulkanRHI
 {
 
-FVulkanDynamicRHI::FVulkanDynamicRHI(): Device(nullptr), ShaderCompiler(nullptr)
+FVulkanDynamicRHI::FVulkanDynamicRHI(): Device(nullptr)
 {
     LOG(LogVulkanRHI, Info, "Built with Vulkan header version {}.{}.{}",
         VK_API_VERSION_MAJOR(VK_HEADER_VERSION_COMPLETE), VK_API_VERSION_MINOR(VK_HEADER_VERSION_COMPLETE),
@@ -178,8 +176,6 @@ void FVulkanDynamicRHI::Init()
     Device->InitPhysicalDevice();
     Device->SetName("Main Vulkan Device");
 
-    ShaderCompiler = new FVulkanShaderCompiler();
-    ShaderCompiler->SetOptimizationLevel(FVulkanShaderCompiler::EOptimizationLevel::PerfWithDebug);
     VulkanRHI_ImGui::Initialize(Device);
 }
 
@@ -266,9 +262,6 @@ void FVulkanDynamicRHI::Shutdown()
     WaitUntilIdle();
 
     VulkanRHI_ImGui::Shutdown();
-
-    delete ShaderCompiler;
-    ShaderCompiler = nullptr;
 
     /// Release the command contexts
     RHIReleaseCommandContext(Device->GetImmediateContext());

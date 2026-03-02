@@ -33,8 +33,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
     io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
     ImGuiPipeline = RHI::CreateGraphicsPipeline(FRHIGraphicsPipelineSpecification{
-        .VertexShader = "ImGui/ImGui.vert",
-        .FragmentShader = "ImGui/ImGui.frag",
+        .Shader = "ImGui.slang",
         .VertexBufferLayouts =
             {
                 {

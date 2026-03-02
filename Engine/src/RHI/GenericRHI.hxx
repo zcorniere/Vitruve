@@ -2,6 +2,7 @@
 
 #include "RHI/RHIContext.hxx"
 #include "RHI/RHIResource.hxx"
+#include "RHI/RHIShaderCompiler.hxx"
 
 #include "RHI/RHI.hxx"
 #include "RHI/RHIScene.hxx"
@@ -69,14 +70,13 @@ public:
     virtual FRHIContext* RHIGetCommandContext() = 0;
     virtual void RHIReleaseCommandContext(FRHIContext*) = 0;
 
+    virtual Ref<RRHIShaderCompiler> CreateShaderCompiler() = 0;
     /// @copydoc RHI::CreateViewport
     virtual Ref<RRHIViewport> CreateViewport(Ref<RWindow> InWindowHandle, UVector2 InSize, bool bCreateDepthBuffer) = 0;
     /// @copydoc RHI::CreateTexture
     virtual Ref<RRHITexture> CreateTexture(const FRHITextureSpecification& InDesc) = 0;
     /// @copydoc RHI::CreateBuffer
     virtual Ref<RRHIBuffer> CreateBuffer(const FRHIBufferDesc& InDesc) = 0;
-    /// @copydoc RHI::CreateShader
-    virtual Ref<RRHIShader> CreateShader(const std::filesystem::path Path, bool bForceCompile) = 0;
     /// @copydoc RHI::CreateGraphicsPipeline
     virtual Ref<RRHIGraphicsPipeline> CreateGraphicsPipeline(const FRHIGraphicsPipelineSpecification& Config) = 0;
     /// @copydoc RHI::CreateMaterial

@@ -27,7 +27,7 @@ void RVulkanShader::RVulkanShaderHandle::SetName(std::string_view Name)
 }
 
 RVulkanShader::RVulkanShader(ERHIShaderType Type, const TArray<uint32>& InSPIRVCode,
-                             const FReflectionData& InReflectionData)
+                             const ShaderResource::FReflectionData& InReflectionData)
     : Super(Type)
     , SPIRVCode(InSPIRVCode)
     , m_ReflectionData(InReflectionData)

@@ -31,8 +31,7 @@ bool EditorApplication::OnEngineInitialization()
     Super::OnEngineInitialization();
 
     FRHIGraphicsPipelineSpecification Spec{
-        .VertexShader = "Shapes/ShapeShader.vert",
-        .FragmentShader = "Shapes/ShapeShader.frag",
+        .Shader = "Shapes/ShapeShader.slang",
         .VertexBufferLayouts =
             {
                 {

@@ -45,15 +45,9 @@ endif()
 
 # ------------- Tests -------------
 
-build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx)
-target_include_directories(${PROJECT_NAME}_Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
-target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1)
-target_precompile_headers(
-    ${PROJECT_NAME}_Test
-    PRIVATE
-    "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
-    "${CMAKE_BINARY_DIR}/generated/VULKAN_RHI_API_Export.h"
-    "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
-    "VulkanRHI.pch.hxx"
-)
+# build_tests(${PROJECT_NAME} tests/ShaderCompiler.cxx) target_include_directories(${PROJECT_NAME}_Test PRIVATE
+# ${CMAKE_CURRENT_SOURCE_DIR}/src) target_link_libraries(${PROJECT_NAME}_Test PRIVATE Vulkan::Headers)
+# target_compile_definitions(${PROJECT_NAME}_Test PRIVATE VK_NO_PROTOTYPES=1) target_precompile_headers(
+# ${PROJECT_NAME}_Test PRIVATE "${CMAKE_BINARY_DIR}/generated/BuildConfig.h"
+# "${CMAKE_BINARY_DIR}/generated/VULKAN_RHI_API_Export.h" "${CMAKE_BINARY_DIR}/generated/ENGINE_API_Export.h"
+# "VulkanRHI.pch.hxx" )

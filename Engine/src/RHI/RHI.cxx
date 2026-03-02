@@ -112,15 +112,9 @@ Ref<RRHIBuffer> RHI::CreateBuffer(const FRHIBufferDesc& InDesc)
     return RHI::Get()->CreateBuffer(InDesc);
 }
 
-Ref<RRHIShader> RHI::CreateShader(const std::filesystem::path Path, bool bForceCompile)
+Ref<RRHIShaderCompiler> RHI::CreateShaderCompiler()
 {
-    return RHI::Get()->CreateShader(Path, bForceCompile);
-}
-
-std::future<Ref<RRHIShader>> RHI::CreateShaderAsync(const std::filesystem::path Path, bool bForceCompile)
-{
-    return GEngine->GetThreadPool().Push([Path, bForceCompile](int)
-                                         { return RHI::Get()->CreateShader(Path, bForceCompile); });
+    return RHI::Get()->CreateShaderCompiler();
 }
 
 Ref<RRHIGraphicsPipeline> RHI::CreateGraphicsPipeline(const FRHIGraphicsPipelineSpecification& Config)

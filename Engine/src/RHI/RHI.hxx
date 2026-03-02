@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RHI/RHIResource.hxx"
+#include "RHI/RHIShaderCompiler.hxx"
 #include <RHI/RHICommandList.hxx>
 
 #include <future>
@@ -63,9 +64,7 @@ ENGINE_API Ref<RRHITexture> CreateTexture(const FRHITextureSpecification& InDesc
 /// Create a new RHI buffer - through the current RHI
 ENGINE_API Ref<RRHIBuffer> CreateBuffer(const FRHIBufferDesc& InDesc);
 /// Create a new RHI shader - through the current RHI
-ENGINE_API Ref<RRHIShader> CreateShader(const std::filesystem::path Path, bool bForceCompile);
-/// Create a new RHI shader - through the current RHI asynchronously
-ENGINE_API std::future<Ref<RRHIShader>> CreateShaderAsync(const std::filesystem::path Path, bool bForceCompile);
+ENGINE_API Ref<RRHIShaderCompiler> CreateShaderCompiler();
 /// Create a new RHI Pipeline - through the current RHI
 ENGINE_API Ref<RRHIGraphicsPipeline> CreateGraphicsPipeline(const FRHIGraphicsPipelineSpecification& Config);
 /// Create a new RHI Material - through the current RHI

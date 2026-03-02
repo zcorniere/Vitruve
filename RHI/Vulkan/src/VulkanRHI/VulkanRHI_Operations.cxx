@@ -62,6 +62,22 @@ void FVulkanDynamicRHI::WaitUntilIdle()
 //
 //  -------------------- RHI Create resources --------------------
 //
+class RVulkanShaderCompiler : public RRHIShaderCompiler
+{
+    RTTI_DECLARE_TYPEINFO(RVulkanShaderCompiler, RRHIShaderCompiler);
+
+public:
+    Ref<RRHIShader> CreateShaderObject(ERHIShaderType Type, const TArray<uint32>& InSPRIVCode,
+                                       const ShaderResource::FReflectionData& InReflectionData) override
+    {
+        return Ref<RVulkanShader>::Create(Type, InSPRIVCode, InReflectionData);
+    }
+};
+
+Ref<RRHIShaderCompiler> FVulkanDynamicRHI::CreateShaderCompiler()
+{
+    return Ref<RVulkanShaderCompiler>::Create();
+}
 
 Ref<RRHIViewport> FVulkanDynamicRHI::CreateViewport(Ref<RWindow> InWindowHandle, UVector2 InSize,
                                                     bool bCreateDepthBuffer)
@@ -84,20 +100,14 @@ Ref<RRHIBuffer> FVulkanDynamicRHI::CreateBuffer(const FRHIBufferDesc& InDesc)
     return Buffer;
 }
 
-Ref<RRHIShader> FVulkanDynamicRHI::CreateShader(const std::filesystem::path Path, bool bForceCompile)
-{
-    std::filesystem::path RefPath = DataLocationFinder::GetShaderPath();
-    Ref<RVulkanShader> Shader = ShaderCompiler->Get(RefPath / Path, bForceCompile);
-    return Shader;
-}
-
 Ref<RRHIGraphicsPipeline>
 VulkanRHI::FVulkanDynamicRHI::CreateGraphicsPipeline(const FRHIGraphicsPipelineSpecification& Config)
 {
-    std::future<Ref<RRHIShader>> VertexShader = RHI::CreateShaderAsync(Config.VertexShader, false);
-    std::future<Ref<RRHIShader>> FragmentShader = RHI::CreateShaderAsync(Config.FragmentShader, false);
+    Ref<RRHIShaderCompiler> Compiler = RHI::CreateShaderCompiler();
 
     FGraphicsPipelineDescription Desc;
+    Desc.VertexShader = Compiler->Get(Config.Shader, "vertexMain", false);
+    Desc.FragmentShader = Compiler->Get(Config.Shader, "fragmentMain", false);
     Desc.Rasterizer.CullMode = ConvertToVulkanType(Config.Rasterizer.CullMode);
     Desc.Rasterizer.FrontFaceCulling = ConvertToVulkanType(Config.Rasterizer.FrontFaceCulling);
     Desc.Rasterizer.PolygonMode = ConvertToVulkanType(Config.Rasterizer.PolygonMode);
@@ -134,8 +144,6 @@ VulkanRHI::FVulkanDynamicRHI::CreateGraphicsPipeline(const FRHIGraphicsPipelineS
         Binding.Binding = BufferLayoutIndex;
     }
 
-    Desc.VertexShader = VertexShader.get();
-    Desc.FragmentShader = FragmentShader.get();
     if (!Desc.Validate())
     {
         return nullptr;

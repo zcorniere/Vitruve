@@ -4,7 +4,6 @@
 #include "VulkanRHI/VulkanPlatform.hxx"
 #include "VulkanRHI/VulkanRHI_Debug.hxx"
 #include "VulkanRHI/VulkanRHI_ImGui.hxx"
-#include "VulkanRHI/VulkanShaderCompiler.hxx"
 
 DECLARE_LOGGER_CATEGORY(Core, LogVulkanRHI, Info);
 
@@ -66,11 +65,11 @@ public:
     virtual FRHIContext* RHIGetCommandContext() override;
     virtual void RHIReleaseCommandContext(FRHIContext* Context) override;
 
+    virtual Ref<RRHIShaderCompiler> CreateShaderCompiler() override;
     virtual Ref<RRHIViewport> CreateViewport(Ref<RWindow> InWindowHandle, UVector2 InSize,
                                              bool bCreateDepthBuffer) override;
     virtual Ref<RRHITexture> CreateTexture(const FRHITextureSpecification& InDesc) override;
     virtual Ref<RRHIBuffer> CreateBuffer(const FRHIBufferDesc& InDesc) override;
-    virtual Ref<RRHIShader> CreateShader(const std::filesystem::path Path, bool bForceCompile) override;
     virtual Ref<RRHIGraphicsPipeline> CreateGraphicsPipeline(const FRHIGraphicsPipelineSpecification& Config) override;
     virtual Ref<RRHIMaterial> CreateMaterial(const WeakRef<RRHIGraphicsPipeline>& Pipeline) override;
 
@@ -110,8 +109,6 @@ private:
 
     VkInstance m_Instance = VK_NULL_HANDLE;
     FVulkanDevice* Device = nullptr;
-
-    FVulkanShaderCompiler* ShaderCompiler = nullptr;
 
     // Used during runtime //
     TArray<FVulkanCommandContext*> CommandContexts;

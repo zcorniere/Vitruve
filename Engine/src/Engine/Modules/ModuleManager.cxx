@@ -169,6 +169,7 @@ void FModuleManager::TryLoadModule(const std::string_view& ModuleName, FModuleHo
         OutHolder.State = EModuleState::Error;
         OutHolder.ErrorStatus = EModuleErrorStatus::Malformed;
         delete OutHolder.LibraryHolder;
+        OutHolder.LibraryHolder = nullptr;
         return;
     }
 
@@ -180,6 +181,7 @@ void FModuleManager::TryLoadModule(const std::string_view& ModuleName, FModuleHo
         OutHolder.State = EModuleState::Error;
         OutHolder.ErrorStatus = EModuleErrorStatus::EntryPointNotFound;
         delete OutHolder.LibraryHolder;
+        OutHolder.LibraryHolder = nullptr;
         return;
     }
 

@@ -264,7 +264,7 @@ VkImageLayout RVulkanTexture::GetDefaultLayout() const
 const VkDescriptorImageInfo& RVulkanTexture::GetDescriptorImageInfo() const
 {
     DescriptorImageInfo = {
-        .sampler = Sampler,
+        .sampler = GetSampler(),
         .imageView = GetImageView(),
         .imageLayout = GetLayout(),
     };
