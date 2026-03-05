@@ -18,7 +18,6 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
 
     const __m256d one = _mm256_set1_pd(1.0f);
     const __m256d two = _mm256_set1_pd(2.0f);
-    const __m256d zero = _mm256_setzero_pd();
 
     size_t i = 0;
     for (; i + 3 < Count; i += 4)
@@ -44,15 +43,15 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX2(size_t Count, const double* RESTR
         // Compute rotation matrix elements with FMA
         // Using fnmadd_pd for -(a*b)+c and fmadd_pd for a*b+c
         __m256d m00 = _mm256_fnmadd_pd(two, _mm256_add_pd(yy, zz), one);    // 1 - 2*(yy+zz)
-        __m256d m01 = _mm256_fmadd_pd(two, _mm256_add_pd(xy, wz), zero);    // 2*(xy + wz)
-        __m256d m02 = _mm256_fmadd_pd(two, _mm256_sub_pd(xz, wy), zero);    // 2*(xz - wy)
+        __m256d m01 = _mm256_mul_pd(two, _mm256_add_pd(xy, wz));            // 2*(xy + wz)
+        __m256d m02 = _mm256_mul_pd(two, _mm256_sub_pd(xz, wy));            // 2*(xz - wy)
 
-        __m256d m10 = _mm256_fmadd_pd(two, _mm256_sub_pd(xy, wz), zero);    // 2*(xy - wz)
+        __m256d m10 = _mm256_mul_pd(two, _mm256_sub_pd(xy, wz));            // 2*(xy - wz)
         __m256d m11 = _mm256_fnmadd_pd(two, _mm256_add_pd(xx, zz), one);    // 1 - 2*(xx + zz)
-        __m256d m12 = _mm256_fmadd_pd(two, _mm256_add_pd(yz, wx), zero);    // 2*(yz + wx)
+        __m256d m12 = _mm256_mul_pd(two, _mm256_add_pd(yz, wx));            // 2*(yz + wx)
 
-        __m256d m20 = _mm256_fmadd_pd(two, _mm256_add_pd(xz, wy), zero);    // 2*(xz + wy)
-        __m256d m21 = _mm256_fmadd_pd(two, _mm256_sub_pd(yz, wx), zero);    // 2*(yz - wx)
+        __m256d m20 = _mm256_mul_pd(two, _mm256_add_pd(xz, wy));            // 2*(xz + wy)
+        __m256d m21 = _mm256_mul_pd(two, _mm256_sub_pd(yz, wx));            // 2*(yz - wx)
         __m256d m22 = _mm256_fnmadd_pd(two, _mm256_add_pd(xx, yy), one);    // 1 - 2*(xx + yy)
 
         // Apply scale
@@ -111,7 +110,6 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
 
     const __m512d one = _mm512_set1_pd(1.0f);
     const __m512d two = _mm512_set1_pd(2.0f);
-    const __m512d zero = _mm512_setzero_pd();
 
     for (; i + 7 < Count; i += 8)
     {
@@ -138,15 +136,15 @@ ENGINE_API size_t ComputeModelMatrixBatch_AVX512(size_t Count, const double* RES
         // Compute rotation matrix elements with FMA
         // Using fnmadd_pd for -(a*b)+c and fmadd_pd for a*b+c
         __m512d m00 = _mm512_fnmadd_pd(two, _mm512_add_pd(yy, zz), one);    // 1 - 2*(yy+zz)
-        __m512d m01 = _mm512_fmadd_pd(two, _mm512_add_pd(xy, wz), zero);    // 2*(xy + wz)
-        __m512d m02 = _mm512_fmadd_pd(two, _mm512_sub_pd(xz, wy), zero);    // 2*(xz - wy)
+        __m512d m01 = _mm512_mul_pd(two, _mm512_add_pd(xy, wz));            // 2*(xy + wz)
+        __m512d m02 = _mm512_mul_pd(two, _mm512_sub_pd(xz, wy));            // 2*(xz - wy)
 
-        __m512d m10 = _mm512_fmadd_pd(two, _mm512_sub_pd(xy, wz), zero);    // 2*(xy - wz)
+        __m512d m10 = _mm512_mul_pd(two, _mm512_sub_pd(xy, wz));            // 2*(xy - wz)
         __m512d m11 = _mm512_fnmadd_pd(two, _mm512_add_pd(xx, zz), one);    // 1 - 2*(xx + zz)
-        __m512d m12 = _mm512_fmadd_pd(two, _mm512_add_pd(yz, wx), zero);    // 2*(yz + wx)
+        __m512d m12 = _mm512_mul_pd(two, _mm512_add_pd(yz, wx));            // 2*(yz + wx)
 
-        __m512d m20 = _mm512_fmadd_pd(two, _mm512_add_pd(xz, wy), zero);    // 2*(xz + wy)
-        __m512d m21 = _mm512_fmadd_pd(two, _mm512_sub_pd(yz, wx), zero);    // 2*(yz - wx)
+        __m512d m20 = _mm512_mul_pd(two, _mm512_add_pd(xz, wy));            // 2*(xz + wy)
+        __m512d m21 = _mm512_mul_pd(two, _mm512_sub_pd(yz, wx));            // 2*(yz - wx)
         __m512d m22 = _mm512_fnmadd_pd(two, _mm512_add_pd(xx, yy), one);    // 1 - 2*(xx + yy)
 
         // Apply scale
