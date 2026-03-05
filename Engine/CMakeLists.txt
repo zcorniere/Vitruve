@@ -45,6 +45,7 @@ set(VIT_RHI_SOURCES
     src/RHI/RHICommand.cxx
     src/RHI/RHIScene.cxx
     src/RHI/RHIShaderCompiler.cxx
+    src/RHI/RHIShaderCompiler_Reflection.cxx
 )
 
 add_library(

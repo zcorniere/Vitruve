@@ -44,6 +44,8 @@ struct FDescriptorSetInfo
 
 struct FReflectionData
 {
+    ERHIShaderType Type;
+
     TArray<ShaderResource::FStageIO> StageInput;
     TArray<ShaderResource::FStageIO> StageOutput;
 
@@ -96,6 +98,7 @@ public:
 
 private:
     bool CreateSession();
+    ShaderResource::FReflectionData GetReflection(slang::ProgramLayout* programLayout);
 
 private:
     Slang::ComPtr<slang::ISession> session;

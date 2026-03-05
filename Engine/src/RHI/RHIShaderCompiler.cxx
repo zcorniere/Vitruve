@@ -167,14 +167,17 @@ Ref<RRHIShader> RRHIShaderCompiler::Get(std::filesystem::path Path, const std::s
         return nullptr;
     }
 
-    slang::ProgramLayout* layout = LinkedProgram->getLayout(0);
-
     Slang::ComPtr<slang::IBlob> spirvCode;
     SLANG_DIAGNOSE(Result = LinkedProgram->getEntryPointCode(0, 0, spirvCode.writeRef(), diagnostics.writeRef()));
     if (Result == SLANG_FAIL)
     {
         return nullptr;
     }
+    slang::ProgramLayout* layout = LinkedProgram->getLayout(0);
+    ShaderResource::FReflectionData Reflection = GetReflection(layout);
+
+    TArray<uint32> SPIRVCode(static_cast<const uint32*>(spirvCode->getBufferPointer()), spirvCode->getBufferSize());
+    return CreateShaderObject(Reflection.Type, SPIRVCode, Reflection);
 }
 
 DEFINE_PRINTABLE_TYPE(ShaderResource::FPushConstantRange,
