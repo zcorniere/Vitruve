@@ -7,7 +7,9 @@
 #include "Engine/Platforms/Platform.hxx"
 #include "Engine/Platforms/PlatformMisc.hxx"
 
-#define GLFW_INCLUDE_NONE
+#ifndef GLFW_INCLUDE_NONE
+    #define GLFW_INCLUDE_NONE
+#endif
 #include <GLFW/glfw3.h>
 
 namespace VulkanRHI

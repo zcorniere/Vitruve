@@ -9,7 +9,9 @@
 #include "RHI/GenericRHI.hxx"
 #include "RHI/RHI.hxx"
 
-#define GLFW_INCLUDE_NONE
+#ifndef GLFW_INCLUDE_NONE
+    #define GLFW_INCLUDE_NONE
+#endif
 #include <GLFW/glfw3.h>
 
 DECLARE_LOGGER_CATEGORY(Core, LogWindow, Info);

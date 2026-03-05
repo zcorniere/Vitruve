@@ -3,7 +3,9 @@
 #include "VulkanRHI/VulkanExtension.hxx"
 #include "VulkanRHI/VulkanPlatform.hxx"
 
-#define GLFW_INCLUDE_NONE
+#ifndef GLFW_INCLUDE_NONE
+    #define GLFW_INCLUDE_NONE
+#endif
 #include <GLFW/glfw3.h>
 
 template <typename ExistingChainType, typename NewStructType>
