@@ -110,7 +110,7 @@ bool RRHIShaderCompiler::CreateSession()
     slang::SessionDesc sessionDesc;
     slang::TargetDesc targetDesc{
         .format = SLANG_SPIRV,
-        .profile = globalSession->findProfile("glsl_450"),
+        .profile = globalSession->findProfile("spirv_1_3"),
     };
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
@@ -132,6 +132,10 @@ bool RRHIShaderCompiler::CreateSession()
     }
 
     TArray<slang::CompilerOptionEntry> CompilerOption;
+    CompilerOption.Add({.name = slang::CompilerOptionName::VulkanUseEntryPointName,
+                        .value{
+                            .intValue0 = 1,
+                        }});
     CompilerOption.Append(GetOptimisationLevel(Level));
     sessionDesc.compilerOptionEntryCount = CompilerOption.Size();
     sessionDesc.compilerOptionEntries = CompilerOption.Raw();
