@@ -29,8 +29,7 @@ public:
 
 public:
     RVulkanShader() = delete;
-    RVulkanShader(ERHIShaderType Type, const TArray<uint32>& InSPRIVCode,
-                  const ShaderResource::FReflectionData& InReflectionData);
+    RVulkanShader(const TArray<uint32>& InSPRIVCode, const ShaderResource::FReflectionData& InReflectionData);
     virtual ~RVulkanShader();
 
     const ShaderResource::FReflectionData& GetReflectionData() const
@@ -43,14 +42,13 @@ public:
 
     constexpr ERHIShaderType GetShaderType() const
     {
-        return Type;
+        return m_ReflectionData.Type;
     }
 
 private:
     const TArray<uint32> SPIRVCode;
     const ShaderResource::FReflectionData m_ReflectionData;
 
-    ERHIShaderType Type;
     VkShaderModuleCreateInfo ShaderModuleCreateInfo;
 
     friend class VulkanShaderCompiler;

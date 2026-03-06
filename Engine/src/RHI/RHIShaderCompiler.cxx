@@ -1,6 +1,7 @@
 #include "RHI/RHIShaderCompiler.hxx"
 
 #include "Engine/Misc/DataLocation.hxx"
+#include "Engine/Misc/Utils.hxx"
 
 #include <slang-com-helper.h>
 #include <slang-com-ptr.h>
@@ -15,7 +16,6 @@ RRHIShaderCompiler::RRHIShaderCompiler()
     if (!globalSession)
     {
         SlangGlobalSessionDesc Desc;
-
         slang::createGlobalSession(&Desc, globalSession.writeRef());
     }
 
@@ -178,8 +178,10 @@ Ref<RRHIShader> RRHIShaderCompiler::Get(std::filesystem::path Path, const std::s
         return nullptr;
     }
     slang::ProgramLayout* layout = LinkedProgram->getLayout(0);
-    ShaderResource::FReflectionData Reflection = GetReflection(layout, 0);
+    ShaderResource::FReflectionData Reflection = GetReflection(module->getFilePath(), layout, 0);
+    Reflection.EntryPoint = entryPoint;
 
-    TArray<uint32> SPIRVCode(static_cast<const uint32*>(spirvCode->getBufferPointer()), spirvCode->getBufferSize());
-    return CreateShaderObject(Reflection.Type, SPIRVCode, Reflection);
+    TArray<uint32> SPIRVCode(reinterpret_cast<const uint32*>(spirvCode->getBufferPointer()),
+                             spirvCode->getBufferSize() / sizeof(uint32));
+    return CreateShaderObject(SPIRVCode, Reflection);
 }

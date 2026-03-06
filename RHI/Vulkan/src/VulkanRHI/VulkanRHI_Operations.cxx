@@ -67,10 +67,10 @@ class RVulkanShaderCompiler : public RRHIShaderCompiler
     RTTI_DECLARE_TYPEINFO(RVulkanShaderCompiler, RRHIShaderCompiler);
 
 public:
-    Ref<RRHIShader> CreateShaderObject(ERHIShaderType Type, const TArray<uint32>& InSPRIVCode,
+    Ref<RRHIShader> CreateShaderObject(const TArray<uint32>& InSPRIVCode,
                                        const ShaderResource::FReflectionData& InReflectionData) override
     {
-        return Ref<RVulkanShader>::Create(Type, InSPRIVCode, InReflectionData);
+        return Ref<RVulkanShader>::Create(InSPRIVCode, InReflectionData);
     }
 };
 

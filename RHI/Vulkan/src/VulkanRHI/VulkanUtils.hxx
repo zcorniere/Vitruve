@@ -63,7 +63,7 @@ FORCEINLINE VkFormat VertexElementToFormat(const EVertexElementType Type)
 {
     switch (Type)
     {
-        case EVertexElementType::Float1:
+        case EVertexElementType::Float:
             return VK_FORMAT_R32_SFLOAT;
         case EVertexElementType::Float2:
         case EVertexElementType::Float2x2:
@@ -74,7 +74,7 @@ FORCEINLINE VkFormat VertexElementToFormat(const EVertexElementType Type)
         case EVertexElementType::Float4:
         case EVertexElementType::Float4x4:
             return VK_FORMAT_R32G32B32A32_SFLOAT;
-        case EVertexElementType::Uint1:
+        case EVertexElementType::Uint:
             return VK_FORMAT_R32_UINT;
         case EVertexElementType::Uint2:
         case EVertexElementType::Uint2x2:
@@ -85,7 +85,7 @@ FORCEINLINE VkFormat VertexElementToFormat(const EVertexElementType Type)
         case EVertexElementType::Uint4:
         case EVertexElementType::Uint4x4:
             return VK_FORMAT_R32G32B32A32_UINT;
-        case EVertexElementType::Int1:
+        case EVertexElementType::Int:
             return VK_FORMAT_R32_SINT;
         case EVertexElementType::Int2:
         case EVertexElementType::Int2x2:

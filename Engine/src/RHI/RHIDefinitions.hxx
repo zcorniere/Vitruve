@@ -21,15 +21,15 @@ enum class EImageFormat : uint8
 /// The Type of the Vertex
 enum class EVertexElementType : uint8
 {
-    Float1,
+    Float,
     Float2,
     Float3,
     Float4,
-    Uint1,
+    Uint,
     Uint2,
     Uint3,
     Uint4,
-    Int1,
+    Int,
     Int2,
     Int3,
     Int4,

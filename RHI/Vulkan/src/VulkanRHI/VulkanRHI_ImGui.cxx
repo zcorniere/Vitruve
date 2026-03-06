@@ -43,7 +43,7 @@ void VulkanRHI_ImGui::Initialize(FVulkanDevice* InDevice)
                             {.Name = "Position", .Type = EVertexElementType::Float2},
                             {.Name = "Texcoord", .Type = EVertexElementType::Float2},
                             // {.Name = "Color", .Type = EVertexElementType::Float4},
-                            {.Name = "Color", .Type = EVertexElementType::Uint1},
+                            {.Name = "Color", .Type = EVertexElementType::Uint},
                         },
                 },
             },

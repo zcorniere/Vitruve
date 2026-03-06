@@ -11,8 +11,6 @@ namespace ShaderResource
 struct FPushConstantRange
 {
     uint32 Offset = 0;
-    uint32 Size = 0;
-
     ::RTTI::FParameter Parameter;
 
     bool operator==(const FPushConstantRange&) const = default;
@@ -45,6 +43,7 @@ struct FDescriptorSetInfo
 struct FReflectionData
 {
     ERHIShaderType Type;
+    std::string EntryPoint;
 
     TArray<ShaderResource::FStageIO> StageInput;
     TArray<ShaderResource::FStageIO> StageOutput;
@@ -83,7 +82,7 @@ public:
     RRHIShaderCompiler();
     ~RRHIShaderCompiler();
 
-    virtual Ref<RRHIShader> CreateShaderObject(ERHIShaderType Type, const TArray<uint32>& InSPRIVCode,
+    virtual Ref<RRHIShader> CreateShaderObject(const TArray<uint32>& InSPRIVCode,
                                                const ShaderResource::FReflectionData& InReflectionData) = 0;
 
     /// @brief Set the optimization level expected when compiling
@@ -98,7 +97,8 @@ public:
 
 private:
     bool CreateSession();
-    ShaderResource::FReflectionData GetReflection(slang::ProgramLayout* programLayout, unsigned EntryPointIndex);
+    ShaderResource::FReflectionData GetReflection(const std::string_view& Path, slang::ProgramLayout* programLayout,
+                                                  unsigned EntryPointIndex);
 
 private:
     Slang::ComPtr<slang::ISession> session;
@@ -108,9 +108,8 @@ private:
     EOptimizationLevel Level = EOptimizationLevel::None;
 };
 
-DEFINE_PRINTABLE_TYPE(ShaderResource::FPushConstantRange,
-                      "PushConstantRange {{ Offset: {0}, Size: {1}, Parameter: {2:#} }}", Value.Offset, Value.Size,
-                      Value.Parameter)
+DEFINE_PRINTABLE_TYPE(ShaderResource::FPushConstantRange, "PushConstantRange {{ Offset: {0}, Parameter: {1:#} }}",
+                      Value.Offset, Value.Parameter)
 
 DEFINE_PRINTABLE_TYPE(ShaderResource::FStageIO,
                       "StageIO {{ Name: \"{0}\", Type: {1}, Binding: {2}, Location: {3}, Offset: {4} }}", Value.Name,

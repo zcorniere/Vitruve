@@ -26,13 +26,12 @@ void RVulkanShader::RVulkanShaderHandle::SetName(std::string_view Name)
     VULKAN_SET_DEBUG_NAME(Device, VK_OBJECT_TYPE_SHADER_MODULE, Handle, "{:s}", Name);
 }
 
-RVulkanShader::RVulkanShader(ERHIShaderType Type, const TArray<uint32>& InSPIRVCode,
-                             const ShaderResource::FReflectionData& InReflectionData)
-    : Super(Type)
+RVulkanShader::RVulkanShader(const TArray<uint32>& InSPIRVCode, const ShaderResource::FReflectionData& InReflectionData)
+    : Super(InReflectionData.Type)
     , SPIRVCode(InSPIRVCode)
     , m_ReflectionData(InReflectionData)
-    , Type(Type)
 {
+    check(!SPIRVCode.IsEmpty());
     ShaderModuleCreateInfo = {
         .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         .pNext = nullptr,
@@ -53,7 +52,6 @@ const VkShaderModuleCreateInfo& RVulkanShader::GetShaderModuleCreateInfo() const
 
 const char* RVulkanShader::GetEntryPoint() const
 {
-    return "main";
+    return m_ReflectionData.EntryPoint.c_str();
 }
-
 }    // namespace VulkanRHI

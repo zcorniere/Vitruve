@@ -4,7 +4,7 @@ uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
 {
     switch (Type)
     {
-        case EVertexElementType::Float1:
+        case EVertexElementType::Float:
             return sizeof(float);
         case EVertexElementType::Float2:
             return sizeof(float) * 2;
@@ -13,7 +13,7 @@ uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
         case EVertexElementType::Float4:
             return sizeof(float) * 4;
 
-        case EVertexElementType::Uint1:
+        case EVertexElementType::Uint:
             return sizeof(uint32);
         case EVertexElementType::Uint2:
             return sizeof(uint32) * 2;
@@ -22,7 +22,7 @@ uint32 RHI::GetSizeOfElementType(EVertexElementType Type)
         case EVertexElementType::Uint4:
             return sizeof(uint32) * 4;
 
-        case EVertexElementType::Int1:
+        case EVertexElementType::Int:
             return sizeof(int32);
         case EVertexElementType::Int2:
             return sizeof(int32) * 2;

@@ -316,11 +316,11 @@ static bool GetConstantRangeFromShader(TArray<VkPushConstantRange>& OutPushRange
     VkPushConstantRange NewRange{
         .stageFlags = ShaderStage,
         .offset = InShader->GetReflectionData().PushConstants->Offset,
-        .size = InShader->GetReflectionData().PushConstants->Size,
+        .size = InShader->GetReflectionData().PushConstants->Parameter.Size,
     };
     for (VkPushConstantRange& Range: OutPushRanges)
     {
-        // The same range is used in multiple ranges, so just add the ShaderStage and return
+        // The same range is used in another range, so just add the ShaderStage and return
         if (Range.size == NewRange.size && Range.offset == NewRange.offset)
         {
             Range.stageFlags |= ShaderStage;

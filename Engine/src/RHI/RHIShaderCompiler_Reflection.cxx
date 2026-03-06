@@ -63,7 +63,7 @@ static EVertexElementType VertexTypeFromSlang(slang::TypeReflection::ScalarType 
             switch (Columns)                              \
             {                                             \
                 case 1:                                   \
-                    return EVertexElementType::Type##1;   \
+                    return EVertexElementType::Type;      \
                 case 2:                                   \
                     return EVertexElementType::Type##2;   \
                 case 3:                                   \
@@ -101,10 +101,14 @@ static EVertexElementType VertexTypeFromSlang(slang::TypeReflection::ScalarType 
 #undef SLANG_CONVERT_VEC
 }
 
-static void FillParameterType(::RTTI::FParameter& Param, slang::TypeReflection* Type)
+static void FillParameterType(::RTTI::FParameter& Param, slang::TypeLayoutReflection* TypeLayout)
 {
+    slang::TypeReflection* Type = TypeLayout->getType();
     switch (Type->getKind())
     {
+        case slang::TypeReflection::Kind::ConstantBuffer:
+        case slang::TypeReflection::Kind::Resource:
+        case slang::TypeReflection::Kind::DynamicResource:
         case slang::TypeReflection::Kind::Struct:
         {
             Param.Type = RTTI::EParameterType::Struct;
@@ -129,52 +133,63 @@ static void FillParameterType(::RTTI::FParameter& Param, slang::TypeReflection* 
 
     Param.Rows = Type->getColumnCount();
     Param.Columns = Type->getRowCount();
-    Param.Size = 0;    // #TODO:
+
+    slang::ParameterCategory Category = TypeLayout->getParameterCategory();
+    Param.Size = TypeLayout->getSize(Category);
 }
 
 static int offset = 0;
 
-static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableReflection* Type);
-static ::RTTI::FParameter RecuriveTypeDescription(slang::TypeReflection* Type)
+static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableLayoutReflection* TypeLayout);
+static ::RTTI::FParameter RecuriveTypeDescription(slang::TypeLayoutReflection* TypeLayout)
 {
+    slang::TypeReflection* Type = TypeLayout->getType();
+
     ::RTTI::FParameter Parameter;
     Parameter.Name = Type->getName();
-    FillParameterType(Parameter, Type);
 
     std::string offsetString;
     for (int i = 0; i < offset; i++)
     {
         offsetString += "  ";
     }
-    LOG(LogShaderCompiler, Info, "{}Type: {}", offsetString, magic_enum::enum_name(Type->getKind()));
-    if (Type->getElementType())
-        LOG(LogShaderCompiler, Info, "{}ElemType: {}", offsetString,
-            magic_enum::enum_name(Type->getElementType()->getScalarType()));
-    LOG(LogShaderCompiler, Info, "{}Col: {}", offsetString, Type->getColumnCount());
-    LOG(LogShaderCompiler, Info, "{}Row: {}", offsetString, Type->getRowCount());
-
-    for (unsigned i = 0; i < Type->getFieldCount(); i++)
+    slang::TypeLayoutReflection* ElemTypeLayout = TypeLayout->getElementTypeLayout();
+    if (ElemTypeLayout)
     {
-        slang::VariableReflection* field = Type->getFieldByIndex(i);
-        offset += 1;
-        Parameter.Members.Emplace(RecuriveTypeDescription(field));
-        offset -= 1;
+        slang::TypeReflection* ElemType = ElemTypeLayout->getType();
+        LOG(LogShaderCompiler, Trace, "{}Type: {}", offsetString, magic_enum::enum_name(ElemType->getKind()));
+        LOG(LogShaderCompiler, Trace, "{}ElemType: {}", offsetString, magic_enum::enum_name(ElemType->getScalarType()));
+        LOG(LogShaderCompiler, Trace, "{}Col: {}", offsetString, ElemType->getColumnCount());
+        LOG(LogShaderCompiler, Trace, "{}Row: {}", offsetString, ElemType->getRowCount());
+
+        for (unsigned i = 0; i < ElemTypeLayout->getFieldCount(); i++)
+        {
+            slang::VariableLayoutReflection* field = ElemTypeLayout->getFieldByIndex(i);
+            offset += 1;
+            Parameter.Members.Emplace(RecuriveTypeDescription(field));
+            offset -= 1;
+        }
+        FillParameterType(Parameter, ElemTypeLayout);
+    }
+    else
+    {
+        FillParameterType(Parameter, TypeLayout);
     }
     return Parameter;
 }
 
-static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableReflection* Type)
+static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableLayoutReflection* Type)
 {
     std::string offsetString;
     for (int i = 0; i < offset; i++)
     {
         offsetString += "  ";
     }
-    LOG(LogShaderCompiler, Info, "{}Name: {}", offsetString, Type->getName());
-    return RecuriveTypeDescription(Type->getType());
+    LOG(LogShaderCompiler, Trace, "{}Name: {}", offsetString, Type->getName());
+    return RecuriveTypeDescription(Type->getTypeLayout());
 }
 
-ShaderResource::FStageIO GetStageIO(slang::VariableLayoutReflection* Layout)
+static ShaderResource::FStageIO GetStageIO(slang::VariableLayoutReflection* Layout)
 {
     ShaderResource::FStageIO StageIO;
     StageIO.Name = Layout->getName();
@@ -208,7 +223,7 @@ ShaderResource::FStageIO GetStageIO(slang::VariableLayoutReflection* Layout)
     return StageIO;
 }
 
-TArray<ShaderResource::FStageIO> GetStageReflection(slang::VariableLayoutReflection* Reflect)
+static TArray<ShaderResource::FStageIO> GetStageReflection(slang::VariableLayoutReflection* Reflect)
 {
     TArray<ShaderResource::FStageIO> Stage;
     slang::TypeLayoutReflection* TypeReflection = Reflect->getTypeLayout();
@@ -228,16 +243,67 @@ TArray<ShaderResource::FStageIO> GetStageReflection(slang::VariableLayoutReflect
     return Stage;
 }
 
-ShaderResource::FReflectionData RRHIShaderCompiler::GetReflection(slang::ProgramLayout* programLayout,
+static void GetDescriptorSetReflectionForType(ShaderResource::FReflectionData& Data,
+                                              slang::VariableLayoutReflection* Param)
+{
+    using EDescriptorType = ShaderResource::FDescriptorSetInfo::EDescriptorType;
+    slang::ParameterCategory Category = Param->getCategory();
+
+    switch (Category)
+    {
+        case slang::ParameterCategory::PushConstantBuffer:
+        {
+            ShaderResource::FPushConstantRange Push;
+            Push.Parameter = RecuriveTypeDescription(Param);
+            Push.Offset = Param->getOffset();
+            Data.PushConstants = Push;
+        }
+        break;
+        case slang::ParameterCategory::DescriptorTableSlot:
+        {
+            const int Binding = Param->getOffset(Category);
+            const int Set = Param->getBindingSpace(Category);
+            ShaderResource::FDescriptorSetInfo Info;
+            switch (Param->getType()->getKind())
+            {
+                case slang::TypeReflection::Kind::ConstantBuffer:
+                {
+                    Info.Type = EDescriptorType::StorageBuffer;
+                }
+                case slang::TypeReflection::Kind::Resource:
+                {
+                    Info.Type = EDescriptorType::Sampler;
+                }
+                break;
+                default:
+                {
+                    checkMsg(false, "Unsupported type {}", magic_enum::enum_name(Param->getType()->getKind()));
+                }
+            }
+            Info.Parameter = RecuriveTypeDescription(Param);
+
+            Data.DescriptorSetDeclaration.FindOrAdd(Set).FindOrAdd(Binding) = Info;
+        }
+        break;
+        default:
+            checkNoEntry();
+    }
+}
+
+ShaderResource::FReflectionData RRHIShaderCompiler::GetReflection(const std::string_view& Path,
+                                                                  slang::ProgramLayout* programLayout,
                                                                   unsigned EntryPointIndex)
 {
     ShaderResource::FReflectionData Data;
-    Data.Type = FromSlang(programLayout->getEntryPointByIndex(EntryPointIndex)->getStage());
     slang::EntryPointReflection* Ref = programLayout->getEntryPointByIndex(EntryPointIndex);
+    LOG(LogShaderCompiler, Info, "===========================");
+    LOG(LogShaderCompiler, Info, "Shader Reflection - {}", magic_enum::enum_name(Data.Type));
+    LOG(LogShaderCompiler, Info, "Entry point: {}", Ref->getName());
+    LOG(LogShaderCompiler, Info, "{}", Path);
+    LOG(LogShaderCompiler, Info, "===========================");
 
-    LOG(LogShaderCompiler, Trace, "Entry point: {}", Ref->getName());
-
-    LOG(LogShaderCompiler, Info, "Stage input:");
+    Data.Type = FromSlang(Ref->getStage());
+    LOG(LogShaderCompiler, Info, "Stage input:{}", Ref->getParameterCount() ? "" : " None");
     for (unsigned x = 0; x < Ref->getParameterCount(); x++)
     {
         slang::VariableLayoutReflection* Reflect = Ref->getParameterByIndex(x);
@@ -253,8 +319,28 @@ ShaderResource::FReflectionData RRHIShaderCompiler::GetReflection(slang::Program
     }
 
     slang::VariableLayoutReflection* ReturnLayout = Ref->getResultVarLayout();
-    LOG(LogShaderCompiler, Info, "Stage output:");
+    LOG(LogShaderCompiler, Info, "Stage output:{}", ReturnLayout ? "" : " None");
     Data.StageOutput = GetStageReflection(ReturnLayout);
+
+    for (unsigned i = 0; i < programLayout->getParameterCount(); i++)
+    {
+        slang::VariableLayoutReflection* Param = programLayout->getParameterByIndex(i);
+        GetDescriptorSetReflectionForType(Data, Param);
+    }
+
+    LOG(LogShaderCompiler, Info, "Push Constant Buffers:{}", Data.PushConstants.has_value() ? "" : " None");
+    if (Data.PushConstants.has_value())
+    {
+        LOG(LogShaderCompiler, Info, "{}", Data.PushConstants.value());
+    }
+    LOG(LogShaderCompiler, Info, "Descriptor Sets:{}", Data.DescriptorSetDeclaration.IsEmpty() ? " None" : "");
+    for (const auto& [Set, Bindings]: Data.DescriptorSetDeclaration)
+    {
+        for (const auto& [Binding, Info]: Bindings)
+        {
+            LOG(LogShaderCompiler, Info, "({},{}) {}", Set, Binding, Info);
+        }
+    }
 
     return Data;
 }
