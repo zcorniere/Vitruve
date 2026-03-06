@@ -146,10 +146,10 @@ struct FParameter
 {
     std::string Name = "";
     EParameterType Type = EParameterType::Invalid;
-    uint64 Size = 0;
-    uint64 Offset = 0;
-    uint64 Columns = 0;
-    uint64 Rows = 0;
+    uint32 Size = 0;
+    uint32 Offset = 0;
+    uint32 Columns = 0;
+    uint32 Rows = 0;
 
     /// If the parameter is a struct, this array contains the members of the struct
     TArray<FParameter> Members;
