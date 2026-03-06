@@ -98,7 +98,7 @@ public:
 
 private:
     bool CreateSession();
-    ShaderResource::FReflectionData GetReflection(slang::ProgramLayout* programLayout);
+    ShaderResource::FReflectionData GetReflection(slang::ProgramLayout* programLayout, unsigned EntryPointIndex);
 
 private:
     Slang::ComPtr<slang::ISession> session;
@@ -107,3 +107,21 @@ private:
     TArray<std::string> WorkingDirectories;
     EOptimizationLevel Level = EOptimizationLevel::None;
 };
+
+DEFINE_PRINTABLE_TYPE(ShaderResource::FPushConstantRange,
+                      "PushConstantRange {{ Offset: {0}, Size: {1}, Parameter: {2:#} }}", Value.Offset, Value.Size,
+                      Value.Parameter)
+
+DEFINE_PRINTABLE_TYPE(ShaderResource::FStageIO,
+                      "StageIO {{ Name: \"{0}\", Type: {1}, Binding: {2}, Location: {3}, Offset: {4} }}", Value.Name,
+                      magic_enum::enum_name(Value.Type), Value.Binding, Value.Location, Value.Offset)
+
+DEFINE_PRINTABLE_TYPE(ShaderResource::FDescriptorSetInfo, " DescriptorSetInfo {{ Type: {0}, Parameter: {1:#} }}",
+                      magic_enum::enum_name(Value.Type), Value.Parameter)
+
+DEFINE_PRINTABLE_TYPE(
+    ShaderResource::FReflectionData,
+    "ReflectionData {{ StageInput: {0},\nStageOutput: {1},\nPushConstants: {2},\nDescriptor Sets: {3} }}",
+    Value.StageInput, Value.StageOutput,
+    Value.PushConstants.has_value() ? Value.PushConstants.value() : ShaderResource::FPushConstantRange{},
+    Value.DescriptorSetDeclaration)

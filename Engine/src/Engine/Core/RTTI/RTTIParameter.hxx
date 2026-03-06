@@ -124,9 +124,20 @@ enum class EParameterType : uint8
     Struct,
 
     Bool,
+
+    Int8,
+    Int16,
     Int32,
+    Int64,
+
+    Uint8,
+    Uint16,
     Uint32,
+    Uint64,
+
+    HFloat,
     Float,
+    Double,
 
 };
 
@@ -309,10 +320,9 @@ inline std::string PrintShaderParameter(const FParameter& Param, unsigned Indent
     std::string Padding = "";
     for (unsigned i = 0; i < Indent; ++i)
     {
-        Padding += ("\t");
+        Padding += ("  ");
     }
 
-    Result += "\n";
     Result += std::format("{0}Name: \"{1}\"\n", Padding, Param.Name);
     Padding += "\t";
     Result += std::format("{0}Type: {1}\n", Padding, magic_enum::enum_name(Param.Type));
@@ -325,8 +335,6 @@ inline std::string PrintShaderParameter(const FParameter& Param, unsigned Indent
     {
         Result += PrintShaderParameter(Member, Indent + 2, bSimple);
     }
-
-    Result += "\n";
     return Result;
 }
 }    // namespace RTTI

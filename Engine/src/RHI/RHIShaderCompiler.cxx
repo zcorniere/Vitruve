@@ -6,7 +6,7 @@
 #include <slang-com-ptr.h>
 #include <slang.h>
 
-DECLARE_LOGGER_CATEGORY(Core, LogShaderCompiler, Warning)
+DECLARE_LOGGER_CATEGORY(Core, LogShaderCompiler, Info)
 
 static Slang::ComPtr<slang::IGlobalSession> globalSession;
 
@@ -174,26 +174,8 @@ Ref<RRHIShader> RRHIShaderCompiler::Get(std::filesystem::path Path, const std::s
         return nullptr;
     }
     slang::ProgramLayout* layout = LinkedProgram->getLayout(0);
-    ShaderResource::FReflectionData Reflection = GetReflection(layout);
+    ShaderResource::FReflectionData Reflection = GetReflection(layout, 0);
 
     TArray<uint32> SPIRVCode(static_cast<const uint32*>(spirvCode->getBufferPointer()), spirvCode->getBufferSize());
     return CreateShaderObject(Reflection.Type, SPIRVCode, Reflection);
 }
-
-DEFINE_PRINTABLE_TYPE(ShaderResource::FPushConstantRange,
-                      "PushConstantRange {{ Offset: {0}, Size: {1}, Parameter: {2:#} }}", Value.Offset, Value.Size,
-                      Value.Parameter)
-
-DEFINE_PRINTABLE_TYPE(ShaderResource::FStageIO,
-                      "StageIO {{ Name: \"{0}\", Type: {1}, Binding: {2}, Location: {3}, Offset: {4} }}", Value.Name,
-                      magic_enum::enum_name(Value.Type), Value.Binding, Value.Location, Value.Offset)
-
-DEFINE_PRINTABLE_TYPE(ShaderResource::FDescriptorSetInfo, " DescriptorSetInfo {{ Type: {0}, Parameter: {1:#} }}",
-                      magic_enum::enum_name(Value.Type), Value.Parameter)
-
-DEFINE_PRINTABLE_TYPE(
-    ShaderResource::FReflectionData,
-    "ReflectionData {{ StageInput: {0},\nStageOutput: {1},\nPushConstants: {2},\nDescriptor Sets: {3} }}",
-    Value.StageInput, Value.StageOutput,
-    Value.PushConstants.has_value() ? Value.PushConstants.value() : ShaderResource::FPushConstantRange{},
-    Value.DescriptorSetDeclaration)
