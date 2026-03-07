@@ -11,7 +11,7 @@ struct PointLight
     float Radius;
     float Falloff;
     float LightSize;
-    uint CastsShadows;
+    bool CastsShadows;
 };
 [[vk::binding(0,0)]]
 cbuffer PointLights 
@@ -43,7 +43,7 @@ cbuffer DirectionalLights
 cbuffer Camera 
 {
     row_major float4x4 Viewproj;
-    row_major  float4x4 View;
+    row_major float4x4 View;
     row_major float4x4 Proj;
 };
 
@@ -78,8 +78,8 @@ VSOutput vertexMain(VSInput input)
     output.outPosition = input.inPosition;
     output.outNormal   = input.inNormal;
 
-    float4 worldPosition = mul(input.inTransformMatrix, float4(input.inPosition, 1.0));
-    output.position = mul(Viewproj, worldPosition);
+    float4 worldPosition = mul(float4(input.inPosition, 1.0), input.inTransformMatrix);
+    output.position = mul(float4(worldPosition), Viewproj);
 
     return output;
 }
