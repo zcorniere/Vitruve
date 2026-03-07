@@ -14,7 +14,7 @@ struct PointLight
     uint CastsShadows;
 };
 [[vk::binding(0,0)]]
-cbuffer PointLights : register(b0, space0)
+cbuffer PointLights 
 {
     uint PointLightCount;
     PointLight PointLights[1024];
@@ -29,7 +29,7 @@ struct DirectionalLight
 };
 
 [[vk::binding(0, 1)]]
-cbuffer DirectionalLights : register(b1, space0)
+cbuffer DirectionalLights
 {
     uint DirectionalLightCount;
     DirectionalLight DirectionalLights[4];
@@ -40,7 +40,7 @@ cbuffer DirectionalLights : register(b1, space0)
 // =====================================================
 
 [[vk::binding(1, 0)]]
-cbuffer Camera : register(b0, space1)
+cbuffer Camera 
 {
     row_major float4x4 Viewproj;
     row_major  float4x4 View;

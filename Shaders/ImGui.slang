@@ -14,7 +14,7 @@ cbuffer PushConstants
 // =====================================================
 
 [[vk::binding(0, 0)]]
-Sampler2D    sTexture    : register(t0, space0);
+Sampler2D    sTexture;
 
 // =====================================================
 // Vertex structures
