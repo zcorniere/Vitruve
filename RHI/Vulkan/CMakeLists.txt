@@ -20,15 +20,7 @@ add_library(${PROJECT_NAME} ${VIT_LIBRARY_TYPE} ${VULKAN_RENDERER_FILES})
 vit_set_standard_options(${PROJECT_NAME} "VulkanRHI.pch.hxx")
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(${PROJECT_NAME} PRIVATE VULKAN_RHI_EXPORTS)
-target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE imgui_header
-            spirv-cross-core
-            shaderc
-            VulkanMemoryAllocator
-            Vulkan::UtilityHeaders
-            Vulkan::Headers
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE imgui_header VulkanMemoryAllocator Vulkan::UtilityHeaders Vulkan::Headers)
 target_link_libraries(${PROJECT_NAME} PUBLIC VitruveEngine)
 if(UNIX)
     set_target_properties(
