@@ -19,7 +19,7 @@ RRHIShaderCompiler::RRHIShaderCompiler()
         slang::createGlobalSession(&Desc, globalSession.writeRef());
     }
 
-    WorkingDirectories.Add(DataLocationFinder::GetShaderPath());
+    WorkingDirectories.Add(DataLocationFinder::GetShaderPath().string());
 }
 
 RRHIShaderCompiler::~RRHIShaderCompiler()
