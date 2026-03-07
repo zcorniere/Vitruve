@@ -74,7 +74,8 @@ void FVulkanPendingState::PrepareForDraw(FVulkanCmdBuffer* CommandBuffer)
     {
         // #TODO: don't force vertex stage
         VulkanAPI::vkCmdPushConstants(CommandBuffer->GetHandle(), CurrentPipeline->GetPipelineLayout(),
-                                      VK_SHADER_STAGE_VERTEX_BIT, 0, PushConstantData.Size(), PushConstantData.Raw());
+                                      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+                                      PushConstantData.Size(), PushConstantData.Raw());
     }
 
     TArray<VkBuffer> VertexBuffers;

@@ -140,19 +140,17 @@ static void FillParameterType(::RTTI::FParameter& Param, slang::TypeLayoutReflec
 
 static int offset = 0;
 
-static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableLayoutReflection* TypeLayout);
-static ::RTTI::FParameter RecuriveTypeDescription(slang::TypeLayoutReflection* TypeLayout)
+static ::RTTI::FParameter RecursiveTypeDescription(slang::VariableLayoutReflection* TypeLayout);
+static ::RTTI::FParameter RecursiveTypeDescription(slang::TypeLayoutReflection* TypeLayout)
 {
-    slang::TypeReflection* Type = TypeLayout->getType();
-
-    ::RTTI::FParameter Parameter;
-    Parameter.Name = Type->getName();
-
     std::string offsetString;
     for (int i = 0; i < offset; i++)
     {
         offsetString += "  ";
     }
+
+    ::RTTI::FParameter Parameter;
+    Parameter.Name = TypeLayout->getType()->getName();
     slang::TypeLayoutReflection* ElemTypeLayout = TypeLayout->getElementTypeLayout();
     if (ElemTypeLayout)
     {
@@ -166,7 +164,7 @@ static ::RTTI::FParameter RecuriveTypeDescription(slang::TypeLayoutReflection* T
         {
             slang::VariableLayoutReflection* field = ElemTypeLayout->getFieldByIndex(i);
             offset += 1;
-            Parameter.Members.Emplace(RecuriveTypeDescription(field));
+            Parameter.Members.Emplace(RecursiveTypeDescription(field));
             offset -= 1;
         }
         FillParameterType(Parameter, ElemTypeLayout);
@@ -178,7 +176,7 @@ static ::RTTI::FParameter RecuriveTypeDescription(slang::TypeLayoutReflection* T
     return Parameter;
 }
 
-static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableLayoutReflection* Type)
+static ::RTTI::FParameter RecursiveTypeDescription(slang::VariableLayoutReflection* Type)
 {
     std::string offsetString;
     for (int i = 0; i < offset; i++)
@@ -186,7 +184,9 @@ static ::RTTI::FParameter RecuriveTypeDescription(slang::VariableLayoutReflectio
         offsetString += "  ";
     }
     LOG(LogShaderCompiler, Trace, "{}Name: {}", offsetString, Type->getName());
-    return RecuriveTypeDescription(Type->getTypeLayout());
+    ::RTTI::FParameter Param = RecursiveTypeDescription(Type->getTypeLayout());
+    Param.Name = Type->getName();
+    return Param;
 }
 
 static ShaderResource::FStageIO GetStageIO(slang::VariableLayoutReflection* Layout)
@@ -254,7 +254,7 @@ static void GetDescriptorSetReflectionForType(ShaderResource::FReflectionData& D
         case slang::ParameterCategory::PushConstantBuffer:
         {
             ShaderResource::FPushConstantRange Push;
-            Push.Parameter = RecuriveTypeDescription(Param);
+            Push.Parameter = RecursiveTypeDescription(Param);
             Push.Offset = Param->getOffset();
             Data.PushConstants = Push;
         }
@@ -264,23 +264,42 @@ static void GetDescriptorSetReflectionForType(ShaderResource::FReflectionData& D
             const int Binding = Param->getOffset(Category);
             const int Set = Param->getBindingSpace(Category);
             ShaderResource::FDescriptorSetInfo Info;
-            switch (Param->getType()->getKind())
+            slang::TypeReflection* type = Param->getType();
+            slang::TypeReflection::Kind kind = type->getKind();
+
+            if (kind == slang::TypeReflection::Kind::ConstantBuffer)
             {
-                case slang::TypeReflection::Kind::ConstantBuffer:
+                Info.Type = EDescriptorType::UniformBuffer;
+            }
+            else if (kind == slang::TypeReflection::Kind::SamplerState)
+            {
+                Info.Type = EDescriptorType::Sampler;
+            }
+            else if (kind == slang::TypeReflection::Kind::Resource)
+            {
+                SlangResourceShape shape = type->getResourceShape();
+                shape = (SlangResourceShape)(shape & SLANG_RESOURCE_BASE_SHAPE_MASK);
+                SlangResourceAccess access = type->getResourceAccess();
+
+                switch (shape)
                 {
-                    Info.Type = EDescriptorType::StorageBuffer;
-                }
-                case slang::TypeReflection::Kind::Resource:
-                {
-                    Info.Type = EDescriptorType::Sampler;
-                }
-                break;
-                default:
-                {
-                    checkMsg(false, "Unsupported type {}", magic_enum::enum_name(Param->getType()->getKind()));
+                    case SLANG_TEXTURE_2D:
+                    case SLANG_TEXTURE_3D:
+                    case SLANG_TEXTURE_CUBE:
+                        Info.Type = EDescriptorType::Sampler;
+                        break;
+
+                    case SLANG_STRUCTURED_BUFFER:
+                    case SLANG_BYTE_ADDRESS_BUFFER:
+                        Info.Type = (access == SLANG_RESOURCE_ACCESS_READ_WRITE) ? EDescriptorType::StorageBuffer
+                                                                                 : EDescriptorType::UniformBuffer;
+                        break;
+                    default:
+                        checkMsg(false, "{},{}", magic_enum::enum_name(shape), magic_enum::enum_name(access));
+                        break;
                 }
             }
-            Info.Parameter = RecuriveTypeDescription(Param);
+            Info.Parameter = RecursiveTypeDescription(Param);
 
             Data.DescriptorSetDeclaration.FindOrAdd(Set).FindOrAdd(Binding) = Info;
         }
