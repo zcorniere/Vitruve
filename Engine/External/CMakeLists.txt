@@ -85,14 +85,14 @@ target_include_directories(ModernDialogs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Mode
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glm EXCLUDE_FROM_ALL)
 
 # slang
-set(SLANG_VERSION "2026.3.1")
+set(SLANG_VERSION "2026.4")
 
 if(WIN32)
     set(SLANG_ARCHIVE "slang-${SLANG_VERSION}-windows-x86_64.zip")
-    set(SLANG_HASH "47faf59a4966dcf636b758f103941be7113e9d43c10ee6e8697de7663bcfc51f")
+    set(SLANG_HASH "65f3a3cd2fb5e7755c0a3dace870fabf635f802a6ce4abe8fcf285b2abdcdf40")
 elseif(UNIX)
     set(SLANG_ARCHIVE "slang-${SLANG_VERSION}-linux-x86_64.tar.gz")
-    set(SLANG_HASH "5a3618768f3472cc32f8ef59f5c1e3dedabada6d0d92d5b84508bd5eb10a5e01")
+    set(SLANG_HASH "d8ba3154af68df1e4811f840d436cd7cbdeb246713cd716710e4ffcc10305a28")
 else()
     message(FATAL_ERROR "Platform not supported !")
 endif()
