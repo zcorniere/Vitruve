@@ -108,10 +108,19 @@ fetchcontent_makeavailable(slang)
 fetchcontent_getproperties(slang)
 
 add_library(slang::slang SHARED IMPORTED GLOBAL)
-set_target_properties(
-    slang::slang PROPERTIES IMPORTED_LOCATION "${slang_SOURCE_DIR}/lib/libslang.so" INTERFACE_INCLUDE_DIRECTORIES
-                                                                                    "${slang_SOURCE_DIR}/include"
-)
+if(WIN32)
+    set_target_properties(
+        slang::slang
+        PROPERTIES IMPORTED_LOCATION "${slang_SOURCE_DIR}/bin/slang.dll"
+                   IMPORTED_IMPLIB "${slang_SOURCE_DIR}/lib/slang.lib"
+                   INTERFACE_INCLUDE_DIRECTORIES "${slang_SOURCE_DIR}/include"
+    )
+else()
+    set_target_properties(
+        slang::slang PROPERTIES IMPORTED_LOCATION "${slang_SOURCE_DIR}/lib/libslang.so" INTERFACE_INCLUDE_DIRECTORIES
+                                                                                        "${slang_SOURCE_DIR}/include"
+    )
+endif()
 
 # SPIRV-Cross
 set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS
